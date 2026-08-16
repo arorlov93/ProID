@@ -1,0 +1,68 @@
+---
+/** Линейные иконки в чертёжной манере: 1,4 px, квадратные концы, без заливок. */
+export interface Props {
+  name: keyof typeof paths;
+  size?: number;
+  class?: string;
+}
+
+const paths = {
+  // Стопка листов
+  docs: 'M4 6h9l4 4v12H4zM13 6v4h4M3 9v13h11',
+  // Галочка в рамке — приёмка
+  accept: 'M3 3h18v18H3zM8 12l3 3 6-7',
+  // Лупа над листом
+  audit: 'M4 3h11l4 4v6M4 3v18h6M10.5 16.5a4 4 0 1 0 8 0 4 4 0 0 0-8 0M17.5 19.5 21 23',
+  // Календарь
+  cal: 'M3 6h18v15H3zM3 11h18M8 3v5M16 3v5',
+  // Часы
+  clock: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18M12 7v5.5l3.5 2.5',
+  // Кран
+  crane: 'M6 21V4M4 21h4M6 4h14M6 4H2M17 4v6M14.5 10h5M17 10v3',
+  // Чертёж
+  plan: 'M3 4h18v16H3zM9 4v16M3 12h6M15 8h6M15 16h6',
+  // Рубль
+  ruble: 'M9 21V4h4.5a4 4 0 0 1 0 8H9M6 15h8M6 12h3',
+  // Щит
+  shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM8.5 12l2.5 2.5 4.5-5',
+  // Люди
+  team: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2M16 4.5a3.5 3.5 0 0 1 0 6.8M22 21v-2a5 5 0 0 0-3.5-4.8',
+  // Предупреждение
+  warn: 'M12 3 22 20H2zM12 10v5M12 17.5v.5',
+  // Стрелка по кругу — восстановление
+  restore: 'M21 12a9 9 0 1 1-3-6.7M21 3v5h-5',
+  // Линейка
+  ruler: 'M3 9h18v6H3zM7 9v3M11 9v4M15 9v3M19 9v4',
+  // Молоток/стройка
+  build: 'M3 21h18M6 21V10l6-4 6 4v11M10 21v-6h4v6',
+  // Конверт
+  mail: 'M2 5h20v14H2zM2 6l10 7 10-7',
+  // Диалог
+  chat: 'M3 4h18v13H8l-5 4z M8 9h8M8 12.5h5',
+} as const;
+
+const { name, size = 24, class: cls = '' } = Astro.props;
+---
+
+<svg
+  class={`ic ${cls}`}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.4"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[name]} />
+</svg>
+
+<style>
+  .ic {
+    display: block;
+    flex: none;
+  }
+</style>

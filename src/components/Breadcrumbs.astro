@@ -1,0 +1,66 @@
+---
+import { site } from '../data/site';
+
+export interface Props {
+  items: { href: string; t: string }[];
+}
+
+const { items } = Astro.props;
+const all = [{ href: '/', t: 'Главная' }, ...items];
+---
+
+<nav class="bc" aria-label="Хлебные крошки">
+  <ol>
+    {
+      all.map((i, n) => (
+        <li>
+          {n === all.length - 1 ? (
+            <span aria-current="page">{i.t}</span>
+          ) : (
+            <>
+              <a href={i.href}>{i.t}</a>
+              <span class="bc-sep" aria-hidden="true">
+                /
+              </span>
+            </>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .bc {
+    margin-bottom: var(--s6);
+  }
+
+  .bc ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2);
+    list-style: none;
+    font-size: var(--fs-xs);
+    color: var(--tx-dim);
+  }
+
+  .bc li {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+  }
+
+  .bc a {
+    color: var(--tx-dim);
+    text-decoration: none;
+  }
+
+  .bc a:hover {
+    color: var(--accent-tx);
+  }
+
+  .bc-sep {
+    opacity: 0.45;
+  }
+</style>

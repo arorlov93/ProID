@@ -1,0 +1,143 @@
+---
+import { prices, priceGroups, priceLabel } from '../data/prices';
+
+export interface Props {
+  /** Показать только эти группы. По умолчанию — все. */
+  groups?: string[];
+  compact?: boolean;
+}
+
+const { groups, compact = false } = Astro.props;
+const shown = priceGroups.filter((g) => !groups || groups.includes(g.id));
+---
+
+<div class="pt">
+  {
+    shown.map((g) => (
+      <section class="pt-g" data-reveal>
+        {!compact && (
+          <header class="pt-gh">
+            <h3>{g.t}</h3>
+            <p class="dim xs">{g.d}</p>
+          </header>
+        )}
+
+        <div class="tw">
+          <table>
+            <caption class="vh">{g.t}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Работа</th>
+                <th scope="col">Единица</th>
+                <th scope="col" class="price">
+                  Цена
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {prices
+                .filter((p) => p.group === g.id)
+                .map((p) => (
+                  <tr>
+                    <th scope="row" class="pt-n">
+                      {p.name}
+                      {p.note && <span class="pt-note">{p.note}</span>}
+                    </th>
+                    <td class="pt-u">{p.unit}</td>
+                    <td class="price">{priceLabel(p)}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .pt {
+    display: grid;
+    gap: var(--s8);
+  }
+
+  .pt-gh {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s2) var(--s5);
+    margin-bottom: var(--s5);
+  }
+
+  .pt-gh h3 {
+    margin: 0;
+  }
+
+  .pt-n {
+    font-weight: 500;
+    color: var(--tx);
+    max-width: 46ch;
+  }
+
+  .pt-note {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    color: var(--tx-dim);
+    line-height: 1.4;
+  }
+
+  .pt-u {
+    color: var(--tx-mut);
+    white-space: nowrap;
+  }
+
+  /* Ниже 640 px таблица перестраивается в карточки — раздел 5.5 ТЗ. */
+  @media (max-width: 640px) {
+    .tw {
+      border: 0;
+      overflow: visible;
+    }
+
+    table {
+      min-width: 0;
+    }
+
+    thead {
+      display: none;
+    }
+
+    tbody tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--s1) var(--s4);
+      padding: var(--s5) var(--s5);
+      margin-bottom: var(--s3);
+      border: 1px solid var(--bd);
+      border-radius: var(--r-card);
+      background: var(--bg-card);
+    }
+
+    tbody th,
+    tbody td {
+      padding: 0;
+      border: 0;
+    }
+
+    .pt-n {
+      grid-column: 1 / -1;
+      font-size: var(--fs-sm);
+    }
+
+    .pt-u {
+      font-size: var(--fs-xs);
+      align-self: center;
+    }
+
+    .price {
+      text-align: right;
+      align-self: center;
+    }
+  }
+</style>

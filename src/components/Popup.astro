@@ -1,0 +1,119 @@
+---
+import LeadForm from './LeadForm.astro';
+---
+
+{/* Открывается не раньше 30-й секунды и один раз за сессию — см. scripts/ui.ts. */}
+<dialog class="pop" id="popup" data-theme="dark" aria-labelledby="pop-t">
+  <button class="pop-x" type="button" data-close aria-label="Закрыть">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"
+      ><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" /></svg
+    >
+  </button>
+
+  <p class="eyebrow eyebrow--accent">Бесплатно</p>
+  <h2 id="pop-t" class="pop-t">Чек-лист состава ИД — 84 позиции</h2>
+  <p class="pop-d mut">
+    Тот самый перечень, по которому технический заказчик проверяет комплект. Разложен по разделам, с
+    ссылками на пункты СП 68.13330 и РД-11-02-2006. Пройдитесь по нему до сдачи — вернут меньше.
+  </p>
+
+  <LeadForm kind="checklist" id="popup-checklist" compact submit="Прислать чек-лист" note="Письмо придёт сразу, без звонков и рассылки." />
+
+  <button class="pop-later" type="button" data-close>Не сейчас</button>
+</dialog>
+
+<style>
+  .pop {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(520px, calc(100vw - var(--s8)));
+    max-height: min(92dvh, 760px);
+    overflow-y: auto;
+    padding: var(--s9);
+    background: var(--d2);
+    border: 1px solid var(--bd-d);
+    border-radius: var(--r-block);
+    box-shadow: var(--sh-pop);
+    color: var(--tx-d);
+  }
+
+  .pop::backdrop {
+    background: rgb(9 12 15 / 0.72);
+    backdrop-filter: blur(3px);
+  }
+
+  .pop[open] {
+    animation: pop-in var(--t-slow) var(--ease);
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pop[open] {
+      animation: none;
+    }
+  }
+
+  .pop-x {
+    position: absolute;
+    top: var(--s4);
+    right: var(--s4);
+    width: var(--tap);
+    height: var(--tap);
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 1px solid var(--bd-d);
+    border-radius: var(--r-btn);
+    color: var(--tx-d-mut);
+    cursor: pointer;
+    transition: color var(--t) var(--ease), border-color var(--t) var(--ease);
+  }
+
+  .pop-x:hover {
+    color: var(--g);
+    border-color: var(--g);
+  }
+
+  .pop-t {
+    font-size: var(--fs-h3);
+    margin-bottom: var(--s3);
+    max-width: none;
+  }
+
+  .pop-d {
+    font-size: var(--fs-sm);
+    margin-bottom: var(--s6);
+  }
+
+  .pop-later {
+    display: block;
+    margin: var(--s5) auto 0;
+    padding: var(--s2) var(--s4);
+    min-height: var(--tap);
+    background: none;
+    border: 0;
+    color: var(--tx-d-dim);
+    font: inherit;
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+
+  .pop-later:hover {
+    color: var(--tx-d);
+  }
+
+  @media (max-width: 560px) {
+    .pop {
+      padding: var(--s7) var(--s6) var(--s6);
+    }
+  }
+</style>

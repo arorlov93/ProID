@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /404
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&yclid&gclid&from&_openstat
+
+User-agent: Yandex
+Allow: /
+Disallow: /404
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&yclid&gclid&from&_openstat
+
+Host: https://profid.ru
+Sitemap: https://profid.ru/sitemap-index.xml

@@ -1,0 +1,280 @@
+---
+import { site } from '../data/site';
+import { servicesNav } from '../data/nav';
+
+export interface Props {
+  /** zayavka — полная заявка, call — заказ звонка, checklist — лид-магнит. */
+  kind?: 'zayavka' | 'call' | 'checklist';
+  id?: string;
+  title?: string;
+  note?: string;
+  submit?: string;
+  compact?: boolean;
+  /** Предвыбранная услуга на посадочной странице. */
+  service?: string;
+}
+
+const {
+  kind = 'zayavka',
+  id = kind,
+  title,
+  note,
+  submit = kind === 'checklist' ? 'Прислать чек-лист' : kind === 'call' ? 'Перезвоните мне' : 'Отправить заявку',
+  compact = false,
+  service,
+} = Astro.props;
+
+const thanksId = `${id}-thanks`;
+---
+
+<div class="lf" data-form-wrap>
+  <form
+    class:list={['lf-form', compact && 'lf-form--compact']}
+    data-form={kind}
+    data-endpoint={site.formEndpoint}
+    id={id}
+    novalidate
+  >
+    {title && <h3 class="lf-t">{title}</h3>}
+
+    <div class="lf-grid">
+      <label class="field">
+        <span>Имя <i class="req" aria-hidden="true">*</i></span>
+        <input type="text" name="name" required autocomplete="name" placeholder="Как к вам обращаться" />
+        <span class="err" aria-live="polite"></span>
+      </label>
+
+      <label class="field">
+        <span>Телефон <i class="req" aria-hidden="true">*</i></span>
+        <input type="tel" name="phone" required autocomplete="tel" inputmode="tel" placeholder="+7 900 000-00-00" />
+        <span class="err" aria-live="polite"></span>
+      </label>
+
+      {
+        kind !== 'call' && (
+          <label class="field">
+            <span>
+              Почта {kind === 'checklist' && <i class="req" aria-hidden="true">*</i>}
+            </span>
+            <input
+              type="email"
+              name="email"
+              required={kind === 'checklist'}
+              autocomplete="email"
+              inputmode="email"
+              placeholder="inbox@company.ru"
+            />
+            <span class="err" aria-live="polite"></span>
+          </label>
+        )
+      }
+
+      {
+        kind === 'call' && (
+          <label class="field">
+            <span>Когда удобно</span>
+            <select name="time">
+              <option value="asap">Как можно скорее</option>
+              <option value="am">Утром, 9:00–12:00</option>
+              <option value="day">Днём, 12:00–16:00</option>
+              <option value="pm">Вечером, 16:00–19:00</option>
+            </select>
+            <span class="err" aria-live="polite"></span>
+          </label>
+        )
+      }
+
+      {
+        kind === 'zayavka' && (
+          <label class="field">
+            <span>Услуга</span>
+            <select name="service">
+              <option value="">Нужна консультация</option>
+              {servicesNav.map((s) => (
+                <option value={s.href} selected={service === s.href}>
+                  {s.t}
+                </option>
+              ))}
+            </select>
+            <span class="err" aria-live="polite"></span>
+          </label>
+        )
+      }
+    </div>
+
+    {
+      kind === 'zayavka' && (
+        <label class="field">
+          <span>Что за объект и что нужно</span>
+          <textarea
+            name="message"
+            rows="3"
+            placeholder="Например: монолит, 4 секции, 9 этажей. ИД не велась с апреля, сдача в декабре."
+          />
+          <span class="err" aria-live="polite"></span>
+        </label>
+      )
+    }
+
+    {/* Honeypot: настоящий человек этого поля не видит. */}
+    <div class="hp" aria-hidden="true">
+      <label>
+        Не заполняйте это поле
+        <input class="hp-input" type="text" name="company_site" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+
+    <label class="consent">
+      <input type="checkbox" name="consent" required checked />
+      <span>
+        Согласен на обработку персональных данных по <a href="/privacy">политике конфиденциальности</a>. Данные
+        нужны только чтобы ответить на заявку.
+      </span>
+    </label>
+
+    <div class="lf-foot">
+      <button class="btn btn--lg" type="submit">{submit}</button>
+      <p class="lf-note">{note ?? site.responsePromise}</p>
+    </div>
+
+    <p class="lf-status err" data-status aria-live="assertive"></p>
+  </form>
+
+  <div class="lf-thanks" data-thanks tabindex="-1" role="status">
+    <div class="lf-ok" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"
+        ><path d="M7 14.5l4.5 4.5L21 9" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" /></svg
+      >
+    </div>
+    <h3>
+      {kind === 'checklist' ? 'Чек-лист отправлен' : 'Заявка принята'}
+    </h3>
+    <p>
+      {
+        kind === 'checklist'
+          ? 'Письмо придёт в течение минуты. Если его нет — проверьте папку «Спам» или напишите в Telegram.'
+          : 'Инженер посмотрит вводные и вернётся с вопросами и вилкой цены. В рабочее время — в течение часа.'
+      }
+    </p>
+    <p class="lf-fast">
+      Нужно быстрее — <a href={site.telegramUrl} rel="noopener" data-goal="tg">напишите в Telegram</a> или
+      <a class="num" href={`tel:${site.phone}`} data-goal="tel">позвоните</a>.
+    </p>
+  </div>
+</div>
+
+<style>
+  .lf {
+    position: relative;
+  }
+
+  .lf-form {
+    display: grid;
+    gap: var(--s5);
+  }
+
+  .lf-t {
+    margin-bottom: calc(-1 * var(--s2));
+  }
+
+  .lf-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4) var(--s5);
+  }
+
+  .lf-form--compact .lf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 620px) {
+    .lf-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .lf-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s6);
+  }
+
+  .lf-form--compact .lf-foot {
+    display: grid;
+  }
+
+  .lf-note {
+    font-size: var(--fs-xs);
+    color: var(--tx-dim);
+    max-width: 34ch;
+    line-height: 1.45;
+  }
+
+  .lf-status:empty {
+    display: none;
+  }
+
+  /* --- Экран благодарности -------------------------------------------------
+     Живёт рядом с формой и подменяет её без перезагрузки. */
+  .lf-thanks {
+    display: none;
+    text-align: left;
+  }
+
+  .lf-thanks:focus {
+    outline: none;
+  }
+
+  [data-form-wrap]:has([data-sent]) .lf-form {
+    display: none;
+  }
+
+  [data-form-wrap]:has([data-sent]) .lf-thanks {
+    display: block;
+    animation: lf-in var(--t-slow) var(--ease);
+  }
+
+  @keyframes lf-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-form-wrap]:has([data-sent]) .lf-thanks {
+      animation: none;
+    }
+  }
+
+  .lf-ok {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: var(--s5);
+    border: 1.5px solid var(--ok-tx);
+    border-radius: var(--r-pill);
+    color: var(--ok-tx);
+  }
+
+  .lf-thanks h3 {
+    margin-bottom: var(--s3);
+  }
+
+  .lf-thanks p {
+    color: var(--tx-mut);
+    font-size: var(--fs-sm);
+  }
+
+  .lf-fast {
+    margin-top: var(--s4);
+    font-size: var(--fs-xs) !important;
+  }
+
+  .lf-fast a {
+    color: var(--accent-tx);
+    font-weight: 600;
+  }
+</style>

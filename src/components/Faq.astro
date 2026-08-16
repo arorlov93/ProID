@@ -1,0 +1,152 @@
+---
+export interface Props {
+  items: { q: string; a: string }[];
+  title?: string;
+  eyebrow?: string;
+  id?: string;
+}
+
+const { items, title = 'Частые вопросы', eyebrow = 'FAQ', id = 'faq' } = Astro.props;
+---
+
+{/* Ответы лежат в разметке текстом: details раскрыт для поисковика и без JS. */}
+<div class="faq" id={id}>
+  <div class="faq-head">
+    <p class="eyebrow">{eyebrow}</p>
+    <h2>{title}</h2>
+  </div>
+
+  <div class="faq-list">
+    {
+      items.map((it, i) => (
+        <details class="faq-i" open={i === 0} data-reveal>
+          <summary>
+            <span class="faq-q">{it.q}</span>
+            <span class="faq-ic" aria-hidden="true" />
+          </summary>
+          <div class="faq-a">
+            <p set:html={it.a} />
+          </div>
+        </details>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+    gap: var(--s8) var(--s10);
+    align-items: start;
+  }
+
+  .faq-head h2 {
+    max-width: 14ch;
+  }
+
+  .faq-list {
+    border-top: 1px solid var(--bd);
+  }
+
+  .faq-i {
+    border-bottom: 1px solid var(--bd);
+  }
+
+  summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--s6);
+    padding-block: var(--s5);
+    min-height: var(--tap);
+    cursor: pointer;
+    list-style: none;
+    transition: color var(--t) var(--ease);
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:hover {
+    color: var(--accent-tx);
+  }
+
+  .faq-q {
+    font-size: var(--fs-h4);
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    line-height: 1.35;
+    max-width: 46ch;
+    text-wrap: pretty;
+  }
+
+  .faq-ic {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+  }
+
+  .faq-ic::before,
+  .faq-ic::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 1.6px;
+    background: var(--accent-line);
+    transition: transform var(--t) var(--ease), opacity var(--t) var(--ease);
+  }
+
+  .faq-ic::after {
+    transform: rotate(90deg);
+  }
+
+  [open] .faq-ic::after {
+    transform: rotate(0);
+    opacity: 0;
+  }
+
+  .faq-a {
+    padding-bottom: var(--s6);
+  }
+
+  .faq-a p {
+    color: var(--tx-mut);
+    font-size: var(--fs-sm);
+    max-width: var(--measure);
+  }
+
+  .faq-a :global(a) {
+    color: var(--accent-tx);
+    font-weight: 600;
+  }
+
+  @media (min-width: 901px) {
+    [open] .faq-a {
+      animation: faq-in var(--t-slow) var(--ease);
+    }
+  }
+
+  @keyframes faq-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [open] .faq-a {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .faq {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s6);
+    }
+  }
+</style>

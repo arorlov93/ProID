@@ -1,0 +1,456 @@
+---
+import { calc, defaults, limits, money, daysWord } from '../lib/calc';
+import LeadForm from './LeadForm.astro';
+
+const start = calc(defaults);
+
+const fields = [
+  { k: 'acts', t: 'Акты освидетельствования', d: 'Скрытые работы, ответственные конструкции, участки сетей', u: 'шт.' },
+  { k: 'schemes', t: 'Исполнительные схемы', d: 'Листов по геодезии и по факту', u: 'л.' },
+  { k: 'months', t: 'Ведение журналов', d: 'Общий и специальные журналы работ', u: 'мес.' },
+  { k: 'volumes', t: 'Комплектация томов', d: 'Опись, реестр, титул, прошивка', u: 'шт.' },
+] as const;
+---
+
+<div class="calc" id="kalkulyator">
+  <div class="calc-in">
+    <p class="eyebrow">Ввод</p>
+
+    <div class="calc-mode" role="radiogroup" aria-label="Что делаем">
+      <label class="chip">
+        <input type="radio" name="mode" value="new" checked />
+        <span>Оформляем с нуля</span>
+      </label>
+      <label class="chip">
+        <input type="radio" name="mode" value="restore" />
+        <span>Восстанавливаем задним числом</span>
+      </label>
+    </div>
+
+    {
+      fields.map((f) => (
+        <div class="calc-f">
+          <div class="calc-fh">
+            <label for={`c-${f.k}`}>
+              {f.t}
+              <span class="dim xs">{f.d}</span>
+            </label>
+            <div class="calc-val">
+              <input
+                id={`c-${f.k}`}
+                class="num"
+                type="number"
+                inputmode="numeric"
+                data-calc={f.k}
+                value={defaults[f.k]}
+                min={limits[f.k].min}
+                max={limits[f.k].max}
+                step={limits[f.k].step}
+              />
+              <span class="dim xs">{f.u}</span>
+            </div>
+          </div>
+          <input
+            class="calc-range"
+            type="range"
+            aria-label={`${f.t}, ползунок`}
+            data-calc-range={f.k}
+            value={defaults[f.k]}
+            min={limits[f.k].min}
+            max={limits[f.k].max}
+            step={limits[f.k].step}
+            tabindex="-1"
+          />
+        </div>
+      ))
+    }
+
+    <label class="chip chip--wide">
+      <input type="checkbox" name="urgent" data-calc-urgent />
+      <span>Нужно срочно — работаем в две смены, +25%</span>
+    </label>
+  </div>
+
+  <div class="calc-out">
+    <p class="eyebrow">Расчёт</p>
+
+    <ul class="calc-rows" data-calc-rows>
+      {
+        start.rows.map((r) => (
+          <li>
+            <span class="calc-r-t">
+              {r.t}
+              <span class="dim xs">{r.qty}</span>
+            </span>
+            <span class="calc-r-p num">
+              {money(r.from)}–{money(r.to)} ₽
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="calc-total">
+      <div>
+        <p class="eyebrow">Вилка по объёму</p>
+        <p class="calc-sum num" data-calc-sum>{money(start.from)}–{money(start.to)} ₽</p>
+      </div>
+      <div class="calc-days">
+        <p class="eyebrow">Срок</p>
+        <p class="calc-d num" data-calc-days>
+          {start.days} {daysWord(start.days)}
+        </p>
+      </div>
+    </div>
+
+    <p class="calc-note xs dim">
+      Вилка считается по средним ставкам прайса. Точную цифру инженер называет после того, как посмотрит
+      проект и переписку с технадзором — обычно в тот же день. <a href="/ceny">Весь прайс</a>.
+    </p>
+
+    <details class="calc-form">
+      <summary>Прислать расчёт на почту и обсудить</summary>
+      <LeadForm kind="zayavka" id="calc-form" compact submit="Отправить расчёт" />
+    </details>
+  </div>
+</div>
+
+<script>
+  import { calc, defaults, limits, money, daysWord, type CalcInput } from '../lib/calc';
+
+  const root = document.getElementById('kalkulyator');
+  if (root) {
+    const state: CalcInput = { ...defaults };
+    const rowsBox = root.querySelector<HTMLElement>('[data-calc-rows]')!;
+    const sumBox = root.querySelector<HTMLElement>('[data-calc-sum]')!;
+    const daysBox = root.querySelector<HTMLElement>('[data-calc-days]')!;
+    let used = false;
+
+    const render = () => {
+      const res = calc(state);
+      rowsBox.innerHTML = res.rows.length
+        ? res.rows
+            .map(
+              (r) =>
+                `<li><span class="calc-r-t">${r.t}<span class="dim xs">${r.qty}</span></span>` +
+                `<span class="calc-r-p num">${money(r.from)}–${money(r.to)} ₽</span></li>`,
+            )
+            .join('')
+        : '<li class="calc-empty">Укажите хотя бы один объём — посчитаем.</li>';
+      sumBox.textContent = res.from ? `${money(res.from)}–${money(res.to)} ₽` : '—';
+      daysBox.textContent = res.from ? `${res.days} ${daysWord(res.days)}` : '—';
+
+      if (!used) {
+        used = true;
+        (window as any).profidGoal?.('calc_use');
+      }
+    };
+
+    const clamp = (k: keyof typeof limits, v: number) =>
+      Math.min(limits[k].max, Math.max(limits[k].min, Math.round(v || 0)));
+
+    root.querySelectorAll<HTMLInputElement>('[data-calc]').forEach((inp) => {
+      const k = inp.dataset.calc as keyof typeof limits;
+      const range = root.querySelector<HTMLInputElement>(`[data-calc-range="${k}"]`);
+      inp.addEventListener('input', () => {
+        state[k] = clamp(k, Number(inp.value));
+        if (range) range.value = String(state[k]);
+        render();
+      });
+      inp.addEventListener('blur', () => (inp.value = String(state[k])));
+      range?.addEventListener('input', () => {
+        state[k] = clamp(k, Number(range.value));
+        inp.value = String(state[k]);
+        render();
+      });
+    });
+
+    root.querySelectorAll<HTMLInputElement>('input[name=mode]').forEach((r) =>
+      r.addEventListener('change', () => {
+        state.mode = r.value as 'new' | 'restore';
+        render();
+      }),
+    );
+
+    root.querySelector<HTMLInputElement>('[data-calc-urgent]')?.addEventListener('change', (e) => {
+      state.urgent = (e.target as HTMLInputElement).checked;
+      render();
+    });
+  }
+</script>
+
+<style>
+  .calc {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 1px;
+    background: var(--bd);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-block);
+    overflow: hidden;
+  }
+
+  .calc-in,
+  .calc-out {
+    background: var(--bg-card);
+    padding: clamp(var(--s6), 2.6vw, var(--s9));
+  }
+
+  .calc-out {
+    background: var(--bg-card-2);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- Переключатели --- */
+  .calc-mode {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin-bottom: var(--s7);
+  }
+
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding: var(--s2) var(--s5);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-pill);
+    font-size: var(--fs-sm);
+    color: var(--tx-mut);
+    cursor: pointer;
+    transition: border-color var(--t) var(--ease), color var(--t) var(--ease), background-color var(--t) var(--ease);
+  }
+
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    min-height: 0;
+  }
+
+  .chip:hover {
+    border-color: var(--accent-line);
+    color: var(--tx);
+  }
+
+  .chip:has(input:checked) {
+    border-color: var(--accent-line);
+    color: var(--accent-tx);
+    background: var(--veil-g-soft);
+    font-weight: 600;
+  }
+
+  .chip:has(input:focus-visible) {
+    outline: 2px solid var(--g);
+    outline-offset: 3px;
+  }
+
+  .chip--wide {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: var(--r-btn);
+    margin-top: var(--s5);
+  }
+
+  /* --- Поля --- */
+  .calc-f + .calc-f {
+    margin-top: var(--s6);
+  }
+
+  .calc-fh {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--s5);
+  }
+
+  .calc-fh label {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .calc-fh label .xs {
+    display: block;
+    font-weight: 400;
+    line-height: 1.4;
+    max-width: 34ch;
+  }
+
+  .calc-val {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s2);
+    flex: none;
+  }
+
+  .calc-val input {
+    width: 84px;
+    min-height: 38px;
+    padding: var(--s2) var(--s3);
+    text-align: right;
+    font-weight: 700;
+    font-size: var(--fs-body);
+  }
+
+  /* Дорожка тонкая, но палец попадает по 44 px: высоту держит сам input,
+     а полоску рисует псевдоэлемент дорожки. */
+  .calc-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: var(--tap);
+    min-height: var(--tap);
+    margin-top: var(--s2);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .calc-range::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: var(--r-pill);
+    background: var(--bd);
+  }
+
+  .calc-range::-moz-range-track {
+    height: 3px;
+    border-radius: var(--r-pill);
+    background: var(--bd);
+  }
+
+  .calc-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -7.5px;
+    border-radius: var(--r-pill);
+    background: var(--g);
+    border: 0;
+    cursor: grab;
+    transition: box-shadow var(--t) var(--ease);
+  }
+
+  .calc-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--r-pill);
+    background: var(--g);
+    border: 0;
+    cursor: grab;
+  }
+
+  .calc-range:hover::-webkit-slider-thumb,
+  .calc-range:focus-visible::-webkit-slider-thumb {
+    box-shadow: var(--ring);
+  }
+
+  /* --- Результат --- */
+  .calc-rows {
+    list-style: none;
+    display: grid;
+    gap: var(--s3);
+    padding-bottom: var(--s5);
+    border-bottom: 1px solid var(--bd);
+  }
+
+  .calc-rows li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: var(--fs-sm);
+  }
+
+  .calc-r-t {
+    color: var(--tx-mut);
+  }
+
+  .calc-r-t .xs {
+    display: block;
+  }
+
+  .calc-r-p {
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--tx);
+  }
+
+  .calc-empty {
+    color: var(--tx-dim);
+  }
+
+  .calc-total {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s5) var(--s8);
+    justify-content: space-between;
+    padding-block: var(--s6);
+  }
+
+  .calc-sum {
+    font-size: clamp(26px, 2.8vw, 38px);
+    font-weight: 700;
+    letter-spacing: var(--ls-h);
+    color: var(--accent-tx);
+    line-height: 1.1;
+  }
+
+  .calc-d {
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 600;
+    letter-spacing: var(--ls-h);
+  }
+
+  /* При переносе на новую строку правое выравнивание выглядит как случайный
+     отступ, поэтому подпись срока всегда прижата влево. */
+  .calc-days {
+    text-align: left;
+  }
+
+  .calc-note {
+    max-width: 46ch;
+    margin-bottom: var(--s5);
+  }
+
+  .calc-note a {
+    color: var(--accent-tx);
+  }
+
+  .calc-form {
+    margin-top: auto;
+    border-top: 1px solid var(--bd);
+    padding-top: var(--s5);
+  }
+
+  .calc-form summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    color: var(--accent-tx);
+    min-height: var(--tap);
+    display: flex;
+    align-items: center;
+  }
+
+  .calc-form[open] summary {
+    margin-bottom: var(--s5);
+  }
+
+  @media (max-width: 900px) {
+    .calc {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .calc-fh {
+      flex-wrap: wrap;
+    }
+  }
+</style>

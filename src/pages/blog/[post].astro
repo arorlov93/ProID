@@ -1,0 +1,136 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Faq from '../../components/Faq.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { articleSchema, breadcrumbs, faqSchema } from '../../lib/schema';
+
+export const getStaticPaths = (async () => {
+  const items = await getCollection('blog');
+  return items.map((p) => ({ params: { post: p.id }, props: { entry: p } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const d = entry.data;
+const path = `/blog/${entry.id}`;
+const { Content } = await render(entry);
+
+const crumbs = [
+  { href: '/blog', t: 'Блог' },
+  { href: path, t: d.h1 },
+];
+
+const words = entry.body?.split(/\s+/).length ?? 0;
+const schema = [
+  breadcrumbs(crumbs),
+  articleSchema({
+    headline: d.h1,
+    description: d.description,
+    path,
+    published: d.date,
+    updated: d.updated,
+    words,
+  }),
+  ...(d.faq ? [faqSchema(d.faq)] : []),
+];
+
+const fmtDate = (x: Date) => x.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base
+  title={d.title}
+  description={d.description}
+  path={path}
+  ogType="article"
+  publishedAt={d.date}
+  updatedAt={d.updated}
+  schema={schema}
+>
+  <article>
+    <section class="sec sec--tight" data-theme="dark">
+      <div class="wrap wrap--narrow">
+        <Breadcrumbs items={crumbs} />
+        <p class="eyebrow eyebrow--accent">
+          Кластер {d.cluster} · {d.readingMin} мин чтения
+        </p>
+        <h1>{d.h1}</h1>
+        <p class="lead po-lead">{d.excerpt}</p>
+        <p class="xs dim po-date">
+          <time datetime={d.date.toISOString().slice(0, 10)}>Опубликовано {fmtDate(d.date)}</time>
+          {d.updated && <> · обновлено {fmtDate(d.updated)}</>}
+        </p>
+      </div>
+    </section>
+
+    <section class="sec" data-theme="light">
+      <div class="wrap wrap--narrow">
+        <aside class="tldr" aria-label="Коротко">
+          <p class="eyebrow">Коротко</p>
+          <ul class="ul ul--check">
+            {d.tldr.map((t) => <li>{t}</li>)}
+          </ul>
+        </aside>
+
+        <div class="prose po-body"><Content /></div>
+      </div>
+    </section>
+
+    {
+      d.faq && (
+        <section class="sec" data-theme="dark">
+          <div class="wrap">
+            <Faq items={d.faq} title="Вопросы по теме" />
+          </div>
+        </section>
+      )
+    }
+
+    <section class="sec" data-theme="light">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="eyebrow">Дальше</p>
+          <h2>Что почитать и что заказать</h2>
+        </div>
+        <div class:list={['grid', d.related.length >= 4 ? 'grid--4' : 'grid--3']}>
+          {
+            d.related.map((r) => (
+              <a class="card card--link" href={r.href} data-reveal>
+                <h3>{r.t}</h3>
+                <p>{r.d}</p>
+                <span class="tlink">Открыть</span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </article>
+
+  <CtaBand
+    eyebrow="Заявка"
+    title="Разберём вашу ситуацию"
+    text="Пришлите то, что есть. Экспресс-проверка до 30 позиций делается за один рабочий день и ничего не стоит."
+    points={['Первая консультация инженера — бесплатно', 'Ответ в рабочее время в течение часа']}
+    theme="dark"
+  />
+</Base>
+
+<style>
+  .po-lead { margin-top: var(--s6); }
+  .po-date { margin-top: var(--s5); }
+
+  .tldr {
+    padding: var(--s6) var(--s7);
+    margin-bottom: var(--s9);
+    border: 1px solid var(--bd);
+    border-left: 3px solid var(--accent-line);
+    border-radius: 0 var(--r-card) var(--r-card) 0;
+    background: var(--bg-card);
+  }
+
+  .po-body :global(h2) { max-width: 28ch; }
+  .po-body :global(h3) { font-size: var(--fs-h4); }
+  .card h3 { font-size: var(--fs-h4); }
+</style>

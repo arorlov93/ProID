@@ -1,0 +1,1132 @@
+---
+import Base from '../layouts/Base.astro';
+import Drawing from '../components/Drawing.astro';
+import Icon from '../components/Icon.astro';
+import Faq from '../components/Faq.astro';
+import Calculator from '../components/Calculator.astro';
+import PriceTable from '../components/PriceTable.astro';
+import LeadForm from '../components/LeadForm.astro';
+import { site, stats } from '../data/site';
+import { servicesNav } from '../data/nav';
+import { byId, priceLabel } from '../data/prices';
+import { faqSchema, itemListSchema } from '../lib/schema';
+import { getCollection } from 'astro:content';
+
+const objects = (await getCollection('objects')).sort((a, b) => a.data.order - b.data.order);
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+
+const tasks = [
+  { ic: 'warn', t: 'Заказчик вернул комплект', d: 'Замечания на пять листов, сроки горят, а править некому. Разбираем список, закрываем позиции, выходим на приёмку вместе с вами.' },
+  { ic: 'restore', t: 'ИД не велась с начала работ', d: 'Полгода стройки без единого акта. Восстанавливаем комплект по журналам, чатам, накладным и фотофиксации.' },
+  { ic: 'team', t: 'Инженер ПТО уволился', d: 'Ушёл вместе с паролями и логикой комплекта. Подхватываем за неделю, дальше ведём сами.' },
+  { ic: 'ruble', t: 'Не подписывают КС-2', d: 'Объёмы не бьются с актами, а без подписи нет оплаты. Сводим документы так, чтобы возразить было нечем.' },
+  { ic: 'clock', t: 'До сдачи две недели', d: 'Комплекта нет, а комиссия назначена. Собираем в темпе, работаем в две смены, отдаём по разделам.' },
+  { ic: 'plan', t: 'Технадзор бракует схемы', d: 'Оформление не по РД-11-02-2006, отметки не сходятся. Переделываем и защищаем в переписке.' },
+  { ic: 'crane', t: 'Нужен ППР, разрабатывать некому', d: 'Без проекта производства работ не пускают на площадку. Делаем ППР, ППРк и технологические карты.' },
+  { ic: 'audit', t: 'Смету завернули на проверке', d: 'Расценки не те, объёмы задвоены. Проверяем, пересобираем, пишем заключение по расхождениям.' },
+] as const;
+
+const process = [
+  { n: '01', t: 'Смотрим, что есть', d: 'Присылаете проект, переписку с технадзором и то, что уже собрано. Инженер разбирает материал и называет вилку цены. Обычно в тот же день.' },
+  { n: '02', t: 'Считаем и фиксируем', d: 'Договор, объём, сроки по разделам. Понедельная разбивка — вы видите, что будет готово к каждой пятнице.' },
+  { n: '03', t: 'Ведём и показываем', d: 'Документы уходят вам по мере готовности, а не одним томом в конце. Расхождения с проектом видны сразу.' },
+  { n: '04', t: 'Защищаем на приёмке', d: 'Отрабатываем замечания технадзора и заказчика до подписи. Замечания после сдачи закрываем без доплаты.' },
+] as const;
+
+const scenes = [
+  {
+    dw: 'plan',
+    t: 'Разбор проекта',
+    d: 'Начинаем не с бланков, а с проекта. Ищем, где рабочая документация разошлась со стройкой: перенесённые оси, изменённые узлы, снятые с производства материалы. Это те места, откуда потом приходят возвраты.',
+    label: 'План этажа с осями и размерными цепочками — разбор проектной документации',
+  },
+  {
+    dw: 'section',
+    t: 'Ведение по ходу работ',
+    d: 'Акт закрывается, пока работа видна, а не через полгода по памяти прораба. Отметки берём из исполнительной геодезии, ссылки на нормативы подставляем сразу, а не при сдаче.',
+    label: 'Разрез здания с отметками уровней и башенным краном — ведение документации по ходу работ',
+  },
+  {
+    dw: 'title',
+    t: 'Приёмка комплекта',
+    d: 'Том уходит с описью, реестром и титулом, прошитый и пронумерованный. Если у комиссии возникают вопросы, на них отвечает инженер, который этот комплект вёл, а не менеджер.',
+    label: 'Титульный лист тома исполнительной документации со штампом приёмки',
+  },
+] as const;
+
+const faq = [
+  {
+    q: 'Сколько стоит исполнительная документация и от чего зависит цена',
+    a: 'Считаем по объёму, а не по площади объекта. Акт освидетельствования — от 750 ₽, исполнительная схема — от 1 500 ₽, ведение журналов — от 3 500 ₽ в месяц. Комплект под ключ по объекту — от 45 000 ₽. Вилку по вашим вводным даёт <a href="#kalkulyator">калькулятор</a>, полный <a href="/ceny">прайс открыт</a>.',
+  },
+  {
+    q: 'Работаете дистанционно или нужен выезд на объект',
+    a: 'Основная работа дистанционная: проект, журналы, переписка и оформление не требуют присутствия. По Москве и области выезжаем на замеры, фотофиксацию и приёмку. В других регионах выезд обсуждаем отдельно — чаще хватает материалов от прораба.',
+  },
+  {
+    q: 'Что делать, если документация вообще не велась',
+    a: 'Восстанавливаем задним числом. Собираем исходные данные из общего журнала, накладных, актов на материалы, переписки и фотоотчётов, дальше строим комплект в правильной хронологии. Подробно — на странице <a href="/vosstanovlenie-id">восстановления ИД</a>.',
+  },
+  {
+    q: 'Кто отвечает, если заказчик вернёт комплект',
+    a: 'Мы. Замечания по нашим документам отрабатываем без доплаты и без ограничения по количеству кругов, пока комплект не примут. Это записано в договоре, а не обещано на словах.',
+  },
+  {
+    q: 'Чем внешний отдел ПТО выгоднее штатного инженера',
+    a: 'Штатный инженер ПТО в Москве обходится примерно в 180 000 ₽ в месяц со всеми взносами, отпуском и простоями. Абонентское обслуживание на один объект — от 60 000 ₽. Считать выгодно до тех пор, пока объектов один-два. Расчёт — <a href="#sravnenie">в таблице ниже</a>.',
+  },
+  {
+    q: 'С какими нормативами работаете',
+    a: 'СП 68.13330.2017, РД-11-02-2006 и РД-11-05-2007, ГОСТ Р 21.101-2020 в части оформления, отраслевые своды правил по видам работ. Если у заказчика свой регламент оформления — работаем по нему.',
+  },
+  {
+    q: 'Как быстро начнёте',
+    a: 'После согласования объёма — в тот же день. Первая консультация по вашему комплекту бесплатна: смотрим, что есть, и говорим, что с этим делать, даже если работать вместе не начнём.',
+  },
+];
+
+const schema = [
+  faqSchema(faq),
+  itemListSchema('Услуги ПрофИД', servicesNav.map((s) => ({ href: s.href, t: s.t }))),
+];
+---
+
+<Base
+  title="Исполнительная документация: заказать в Москве — ПрофИД"
+  description="Внешний отдел ПТО: оформление, ведение и восстановление исполнительной документации, ППР и сметы. Москва и область, дистанционно по России. Прайс открыт."
+  path="/"
+  schema={schema}
+>
+  <!-- ═══ 1. Первый экран ═══════════════════════════════════════════════ -->
+  <section class="sec hero" data-theme="dark">
+    <div class="wrap hero-in">
+      <div class="hero-l">
+        <p class="eyebrow eyebrow--accent">Внешний отдел ПТО · Москва и область</p>
+        <h1>Исполнительная документация, которую принимают <i>с первого раза</i></h1>
+        <p class="lead hero-lead">
+          Оформляем, ведём и восстанавливаем ИД, разрабатываем ППР, считаем и проверяем сметы. Заказать
+          можно и отдельный акт, и весь комплект по объекту — работаем как отдел ПТО на вашей стороне и
+          не закрываем задачу, пока документы не примут.
+        </p>
+
+        <div class="btn-row hero-btns">
+          <a class="btn btn--lg" href="#kalkulyator">Рассчитать стоимость</a>
+          <a class="btn btn--2 btn--lg" href="/audit-komplekta">Проверить комплект</a>
+        </div>
+
+        <p class="hero-badge">
+          <span class="pulse" aria-hidden="true"></span>
+          {site.responsePromise}
+        </p>
+
+        <dl class="hero-stats">
+          {
+            stats.map((s) => (
+              <div class="hero-stat" data-reveal>
+                <dt class="hero-num num">
+                  <span data-count={s.value}>{s.value}</span>{s.suffix}
+                </dt>
+                <dd>
+                  <b>{s.label}</b>
+                  <span class="xs dim">{s.note}</span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <div class="hero-r">
+        <Drawing
+          kind="plan"
+          label="План этажа с осями, размерными цепочками и штампом приёмки — исполнительная документация"
+          caption="План с размерными цепочками, осями и штампом приёмки — то, как комплект выглядит после нас"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 2. Задачи ════════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="light" id="zadachi">
+    <div class="wrap">
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Задачи</p>
+          <h2>С чем к нам приходят</h2>
+        </div>
+        <p class="mut">
+          Восемь ситуаций, которые повторяются из объекта в объект. Если узнали свою — дальше уже был
+          кто-то с такой же, и она решаема.
+        </p>
+      </div>
+
+      <div class="grid grid--4">
+        {
+          tasks.map((t) => (
+            <article class="card card--hover task" data-reveal>
+              <span class="task-ic" aria-hidden="true">
+                <Icon name={t.ic} size={22} />
+              </span>
+              <h3>{t.t}</h3>
+              <p>{t.d}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 3. Объекты ═══════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="dark" id="obekty">
+    <div class="wrap">
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Объекты</p>
+          <h2>Где мы вели документацию</h2>
+        </div>
+        <p class="mut">
+          Общественные здания, промышленность, инженерная инфраструктура, гидротехника. Разные заказчики
+          и разные регламенты приёмки — от этого зависит, как собирается комплект.
+        </p>
+      </div>
+
+      <div class="obj-grid">
+        {
+          objects.map((o) => (
+            <a class="card card--link obj" href={`/obekty/${o.id}`} data-reveal>
+              <div class="obj-dw" aria-hidden="true">
+                <Drawing kind={o.data.drawing} label="" />
+              </div>
+              <div class="obj-tx">
+                <p class="eyebrow">
+                  {o.data.city} · {o.data.year}
+                </p>
+                <h3>{o.data.h1}</h3>
+                <p>{o.data.kind}</p>
+                <span class="tlink">Что делали</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      <p class="sec-more">
+        <a class="tlink" href="/obekty">Все объекты и состав работ</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ 4. УТП и сравнение с конкурентами ════════════════════════════ -->
+  <section class="sec" data-theme="light" id="pochemu">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Разница</p>
+        <h2>Почему комплект принимают</h2>
+        <p>
+          Оформить бланк умеют все. Разница начинается там, где комплект встречается с приёмкой: кто-то
+          сдал и ушёл, а кто-то отвечает за то, что сдал.
+        </p>
+      </div>
+
+      <div class="utp">
+        {
+          [
+            {
+              t: 'Мы были по ту сторону стола',
+              d: 'Ведущий инженер работал в техническом заказчике и принимал комплекты сам. Мы знаем, за что цепляется взгляд проверяющего в первые пять минут: несходящиеся даты, ссылки на отменённые редакции, паспорта без привязки к акту.',
+            },
+            {
+              t: 'Замечания закрываем без доплаты',
+              d: 'В договоре записано: возврат по нашим документам отрабатываем бесплатно и без ограничения по количеству кругов. Подрядчики на разовых заказах так не работают — им выгоднее сдать и уйти.',
+            },
+            {
+              t: 'Документы идут в темпе стройки',
+              d: 'Акты закрываются, пока работа видна. Не «соберём к сдаче», а еженедельная выдача по разделам. Расхождения с проектом всплывают в мае, а не в декабре на комиссии.',
+            },
+            {
+              t: 'Цены открыты',
+              d: 'Прайс лежит на сайте целиком, с единицами и вилками. Ни одной строки «по запросу» — считать вы можете до звонка, а не после трёх переговоров.',
+            },
+          ].map((u) => (
+            <article class="utp-i" data-reveal>
+              <span class="utp-ic" aria-hidden="true">
+                <Icon name="accept" size={20} />
+              </span>
+              <div>
+                <h3>{u.t}</h3>
+                <p class="mut">{u.d}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="vs" data-reveal>
+        <div class="tw">
+          <table>
+            <caption class="vh">Сравнение подходов к ведению исполнительной документации</caption>
+            <thead>
+              <tr>
+                <th scope="col">Что важно</th>
+                <th scope="col">Разовый подрядчик</th>
+                <th scope="col">Штатный инженер</th>
+                <th scope="col" class="vs-us">ПрофИД</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                [
+                  ['Опыт приёмки со стороны заказчика', 'редко', 'зависит от человека', 'основной опыт'],
+                  ['Возвраты после сдачи', 'за отдельные деньги', 'бесплатно', 'бесплатно, без ограничений'],
+                  ['Отпуск, больничный, увольнение', 'не касается', 'стройка встаёт', 'подменяет второй инженер'],
+                  ['Стоимость на один объект в месяц', 'от 45 000 ₽ разово', 'около 180 000 ₽', 'от 60 000 ₽'],
+                  ['Готовность подключиться', '1–2 недели', 'месяц на поиск', 'в тот же день'],
+                ].map((row) => (
+                  <tr>
+                    <th scope="row">{row[0]}</th>
+                    <td class="mut">{row[1]}</td>
+                    <td class="mut">{row[2]}</td>
+                    <td class="vs-us price">{row[3]}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 5. Услуги ════════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="dark" id="uslugi">
+    <div class="wrap">
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Услуги</p>
+          <h2>Что делаем</h2>
+        </div>
+        <p class="mut">
+          Каждую услугу можно заказать отдельно или собрать из них абонентское обслуживание. Цены — из
+          общего прайса, скрытых строк нет.
+        </p>
+      </div>
+
+      <div class="grid grid--3">
+        {
+          services.map((s) => (
+            <a class="card card--link srv" href={`/${s.id}`} data-reveal>
+              <p class="eyebrow">{s.data.card.tag}</p>
+              <h3>{s.data.h1}</h3>
+              <p>{s.data.card.short}</p>
+              <p class="srv-p">
+                <b class="num acc">
+                  {s.data.price.from === 0 ? 'бесплатно' : `от ${s.data.price.from.toLocaleString('ru-RU')} ₽`}
+                </b>
+                <span class="xs dim">
+                  {s.data.price.from === 0 ? 'до 30 позиций' : `за ${s.data.price.unit}`}
+                </span>
+              </p>
+              <span class="tlink">Подробно</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6. Калькулятор ═══════════════════════════════════════════════ -->
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Калькулятор</p>
+          <h2>Посчитайте до звонка</h2>
+        </div>
+        <p class="mut">
+          Двигайте объёмы — вилка и срок пересчитываются сразу. Это оценка по средним ставкам: точную
+          цифру инженер называет, посмотрев проект.
+        </p>
+      </div>
+
+      <div data-reveal>
+        <Calculator />
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 7. Прайс ═════════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="dark" id="ceny">
+    <div class="wrap">
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Цены</p>
+          <h2>Прайс без «по запросу»</h2>
+        </div>
+        <p class="mut">
+          Основные позиции — ниже. Полный прайс со сметами, ППР и восстановлением лежит на
+          <a href="/ceny">отдельной странице</a>.
+        </p>
+      </div>
+
+      <PriceTable groups={['id', 'abon']} />
+
+      <p class="sec-more">
+        <a class="tlink" href="/ceny">Весь прайс, 28 позиций</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ 8. Свой инженер или внешний отдел ════════════════════════════ -->
+  <section class="sec" data-theme="light" id="sravnenie">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Расчёт</p>
+        <h2>Свой инженер или внешний отдел</h2>
+        <p>
+          Считаем честно: у штатного инженера есть плюсы — он на площадке и знает объект изнутри. Вопрос
+          только в цене этого удобства и в том, что происходит, когда он уходит в отпуск.
+        </p>
+      </div>
+
+      <div class="calc2" data-reveal>
+        <article class="calc2-c">
+          <p class="eyebrow">Штатный инженер ПТО</p>
+          <ul class="calc2-rows">
+            {
+              [
+                ['Оклад на руки', '120 000 ₽'],
+                ['НДФЛ и страховые взносы', '≈ 52 000 ₽'],
+                ['Рабочее место, техника, ПО', '≈ 8 000 ₽'],
+                ['Отпуск и больничные в месяц', '≈ 11 000 ₽'],
+              ].map((r) => (
+                <li>
+                  <span>{r[0]}</span>
+                  <span class="num">{r[1]}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="calc2-sum num">≈ 191 000 ₽ <span class="xs dim">в месяц</span></p>
+          <p class="xs dim">
+            Плюс месяц на поиск замены и простой стройки, если инженер уходит перед сдачей.
+          </p>
+        </article>
+
+        <div class="calc2-vs" aria-hidden="true"><span>против</span></div>
+
+        <article class="calc2-c calc2-c--us">
+          <p class="eyebrow eyebrow--accent">Внешний отдел ПТО</p>
+          <ul class="calc2-rows">
+            {
+              [
+                ['Абонентское обслуживание, один объект', '60 000 ₽'],
+                ['Взносы, отпуск, простой', '0 ₽'],
+                ['Рабочее место и ПО', '0 ₽'],
+                ['Второй инженер на подмену', 'входит в тариф'],
+              ].map((r) => (
+                <li>
+                  <span>{r[0]}</span>
+                  <span class="num">{r[1]}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="calc2-sum num acc">от 60 000 ₽ <span class="xs dim">в месяц</span></p>
+          <p class="xs dim">
+            Экономия около 130 000 ₽ в месяц на объект. На двух объектах разрыв сокращается — там уже
+            стоит считать вместе.
+          </p>
+        </article>
+      </div>
+
+      <p class="sec-more">
+        <a class="tlink" href="/autsorsing-pto">Как устроено абонентское обслуживание</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ 9. Процесс ═══════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="dark" id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Процесс</p>
+        <h2>Четыре шага от заявки до подписи</h2>
+      </div>
+
+      <ol class="steps">
+        {
+          process.map((p) => (
+            <li class="step" data-reveal>
+              <span class="step-n num">{p.n}</span>
+              <h3>{p.t}</h3>
+              <p class="mut">{p.d}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ═══ 10. Как это выглядит изнутри ═════════════════════════════════ -->
+  <section class="sec" data-theme="light" id="iznutri">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Изнутри</p>
+        <h2>Как это выглядит в работе</h2>
+      </div>
+
+      <div class="scenes">
+        {
+          scenes.map((s, i) => (
+            <article class={`scene ${i % 2 ? 'scene--rev' : ''}`} data-reveal>
+              <div class="scene-dw">
+                <Drawing kind={s.dw as 'plan'} label={s.label} />
+              </div>
+              <div class="scene-tx">
+                <p class="eyebrow">Сцена {String(i + 1).padStart(2, '0')}</p>
+                <h3>{s.t}</h3>
+                <p class="mut">{s.d}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 11. Лид-магнит ═══════════════════════════════════════════════ -->
+  <section class="sec" data-theme="dark" id="checklist">
+    <div class="wrap">
+      <div class="lm" data-reveal>
+        <div class="lm-l">
+          <p class="eyebrow eyebrow--accent">Бесплатно</p>
+          <h2>Чек-лист состава ИД, 84 позиции</h2>
+          <p class="lead">
+            Перечень, по которому технический заказчик проверяет комплект. Разложен по разделам, с
+            ссылками на пункты СП 68.13330 и РД-11-02-2006 и пометками, что чаще всего забывают.
+          </p>
+          <ul class="ul ul--check lm-pts">
+            <li>Что входит в том по каждому виду работ</li>
+            <li>Какие приложения требуют вместе с актом</li>
+            <li>12 позиций, из-за которых комплект возвращают чаще всего</li>
+          </ul>
+          <p class="xs dim lm-note">
+            Письмо придёт сразу. Рассылки нет, звонить без вашей просьбы не будем.
+          </p>
+        </div>
+
+        <div class="lm-r block">
+          <LeadForm kind="checklist" id="lm-checklist" compact />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 12. FAQ ══════════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <Faq items={faq} title="Что спрашивают чаще всего" />
+    </div>
+  </section>
+
+  <!-- ═══ 13. Контакты ═════════════════════════════════════════════════ -->
+  <section class="sec" data-theme="dark" id="kontakty">
+    <div class="wrap">
+      <div class="ct">
+        <div class="ct-l">
+          <p class="eyebrow eyebrow--accent">Контакты</p>
+          <h2>Напишите — посмотрим ваш комплект</h2>
+          <p class="lead">
+            Первая консультация бесплатна: смотрим, что есть, и говорим, что с этим делать. Даже если
+            работать вместе не начнём.
+          </p>
+
+          <ul class="ct-list">
+            <li>
+              <Icon name="clock" size={18} />
+              <div><b>{site.phoneHuman}</b><span class="xs dim">{site.hours}</span></div>
+              <a class="ct-cover" href={`tel:${site.phone}`} data-goal="tel" aria-label="Позвонить"></a>
+            </li>
+            <li>
+              <Icon name="chat" size={18} />
+              <div><b>@{site.telegram}</b><span class="xs dim">Быстрее всего — файлы и голосовые тоже</span></div>
+              <a class="ct-cover" href={site.telegramUrl} rel="noopener" data-goal="tg" aria-label="Написать в Telegram"></a>
+            </li>
+            <li>
+              <Icon name="mail" size={18} />
+              <div><b>{site.email}</b><span class="xs dim">Для проектов, смет и объёмных вложений</span></div>
+              <a class="ct-cover" href={`mailto:${site.email}`} data-goal="mail" aria-label="Написать письмо"></a>
+            </li>
+          </ul>
+
+          <p class="xs dim ct-geo">
+            {site.addressRegion} — с выездом на объект. Остальная Россия — дистанционно, часовые пояса
+            закрываем вдвоём.
+          </p>
+        </div>
+
+        <div class="ct-r">
+          <div class="block ct-form" id="zayavka">
+            <div class="ct-tabs" role="tablist" aria-label="Что отправить">
+              <button class="ct-tab is-on" type="button" role="tab" aria-selected="true" aria-controls="ct-p1" id="ct-t1">
+                Заявка
+              </button>
+              <button class="ct-tab" type="button" role="tab" aria-selected="false" aria-controls="ct-p2" id="ct-t2">
+                Заказать звонок
+              </button>
+            </div>
+
+            <div id="ct-p1" role="tabpanel" aria-labelledby="ct-t1">
+              <LeadForm kind="zayavka" id="ct-zayavka" />
+            </div>
+
+            <div id="ct-p2" role="tabpanel" aria-labelledby="ct-t2" hidden>
+              <LeadForm kind="call" id="ct-call" compact />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Два режима формы в контактах. Обе панели лежат в HTML, скрипт только
+  // переключает видимость — контент индексируется целиком.
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.ct-tab'));
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle('is-on', on);
+        t.setAttribute('aria-selected', String(on));
+        const panel = document.getElementById(t.getAttribute('aria-controls')!);
+        if (panel) panel.hidden = !on;
+      });
+    });
+  });
+</script>
+
+<style>
+  /* ── Первый экран ─────────────────────────────────────────────────────── */
+  .hero {
+    padding-block: clamp(var(--s9), 6vw, var(--s12)) var(--sec-y);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 90% at 78% 12%, var(--veil-bp), transparent 62%);
+    pointer-events: none;
+  }
+
+  .hero-in {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    gap: var(--s10);
+    align-items: center;
+  }
+
+  .hero-lead {
+    margin-top: var(--s6);
+  }
+
+  .hero-btns {
+    margin-top: var(--s8);
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-top: var(--s6);
+    padding: var(--s2) var(--s5) var(--s2) var(--s4);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-pill);
+    font-size: var(--fs-xs);
+    color: var(--tx-mut);
+  }
+
+  .pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--r-pill);
+    background: var(--ok);
+    box-shadow: 0 0 0 0 rgb(62 196 109 / 0.5);
+    animation: pulse 2.4s var(--ease) infinite;
+  }
+
+  @keyframes pulse {
+    70% { box-shadow: 0 0 0 8px rgb(62 196 109 / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(62 196 109 / 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse { animation: none; }
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s5) var(--s6);
+    margin-top: var(--s10);
+    padding-top: var(--s7);
+    border-top: 1px solid var(--bd-soft);
+  }
+
+  .hero-num {
+    font-size: var(--fs-num);
+    font-weight: 700;
+    letter-spacing: var(--ls-h);
+    color: var(--g);
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+
+  .hero-stat dd {
+    margin-top: var(--s2);
+  }
+
+  .hero-stat dd b {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  /* Только подпись под цифрой. Селектор без dd захватывал и span счётчика
+     внутри dt — цифра и её суффикс разъезжались на две строки. */
+  .hero-stat dd span {
+    display: block;
+    line-height: 1.4;
+  }
+
+  .hero-r {
+    position: relative;
+  }
+
+  @media (max-width: 1080px) {
+    .hero-in { grid-template-columns: minmax(0, 1fr); gap: var(--s9); }
+    .hero-r { max-width: 620px; }
+  }
+
+  @media (max-width: 620px) {
+    .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero-btns .btn { width: 100%; }
+  }
+
+  /* ── Задачи ───────────────────────────────────────────────────────────── */
+  .task-ic {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: var(--s5);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-in);
+    color: var(--accent-line);
+    transition: border-color var(--t) var(--ease), background-color var(--t) var(--ease);
+  }
+
+  .task:hover .task-ic {
+    border-color: var(--accent-line);
+    background: var(--veil-g-soft);
+  }
+
+  .task h3 {
+    font-size: var(--fs-h4);
+  }
+
+  /* ── Объекты ──────────────────────────────────────────────────────────── */
+  .obj-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-card);
+  }
+
+  .obj {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 300px;
+    padding: var(--s7);
+    overflow: hidden;
+  }
+
+  .obj-dw {
+    position: absolute;
+    inset: -4% -10% auto auto;
+    width: 62%;
+    opacity: 0.34;
+    pointer-events: none;
+    /* Чертёж-подложка растворяется к краю карточки: жёсткий обрез
+       рассекает штамп посреди слова и читается как дефект вёрстки. */
+    mask-image: linear-gradient(200deg, #000 30%, transparent 78%);
+    transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
+  }
+
+  .obj:hover .obj-dw {
+    opacity: 0.55;
+    transform: translateY(-4px);
+  }
+
+  .obj-tx {
+    position: relative;
+  }
+
+  .obj h3 {
+    font-size: var(--fs-h3);
+    margin-bottom: var(--s2);
+    max-width: 16ch;
+  }
+
+  .obj p {
+    margin-bottom: var(--s5);
+    font-size: var(--fs-sm);
+    max-width: 34ch;
+  }
+
+  @media (max-width: 700px) {
+    .obj-grid { grid-template-columns: minmax(0, 1fr); }
+    .obj { min-height: 260px; }
+  }
+
+  .sec-more {
+    margin-top: var(--s7);
+  }
+
+  /* ── УТП ──────────────────────────────────────────────────────────────── */
+  .utp {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s8) var(--s10);
+    margin-bottom: var(--s10);
+  }
+
+  .utp-i {
+    display: flex;
+    gap: var(--s5);
+  }
+
+  .utp-ic {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: var(--r-in);
+    background: var(--veil-g);
+    color: var(--accent-tx);
+  }
+
+  .utp-i h3 {
+    font-size: var(--fs-h4);
+    margin-bottom: var(--s3);
+  }
+
+  .utp-i p {
+    font-size: var(--fs-sm);
+  }
+
+  @media (max-width: 820px) {
+    .utp { grid-template-columns: minmax(0, 1fr); gap: var(--s7); }
+  }
+
+  .vs-us {
+    color: var(--accent-tx);
+    font-weight: 600;
+  }
+
+  /* ── Услуги ───────────────────────────────────────────────────────────── */
+  .srv {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .srv h3 {
+    font-size: var(--fs-h4);
+  }
+
+  .srv > p:not(.srv-p) {
+    flex: 1;
+  }
+
+  .srv-p {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s3);
+    margin-block: var(--s5) var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--bd-soft);
+  }
+
+  .srv-p b {
+    font-size: var(--fs-h4);
+  }
+
+  /* ── Свой или внешний ─────────────────────────────────────────────────── */
+  .calc2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: var(--s6);
+    align-items: stretch;
+  }
+
+  .calc2-c {
+    background: var(--bg-card);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-card);
+    padding: var(--s7);
+  }
+
+  .calc2-c--us {
+    border-color: var(--accent-line);
+    box-shadow: var(--sh);
+  }
+
+  .calc2-rows {
+    list-style: none;
+    display: grid;
+    gap: var(--s3);
+    padding-bottom: var(--s5);
+    margin-bottom: var(--s5);
+    border-bottom: 1px solid var(--bd-soft);
+  }
+
+  .calc2-rows li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: var(--fs-sm);
+    color: var(--tx-mut);
+  }
+
+  .calc2-rows li span:last-child {
+    color: var(--tx);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .calc2-sum {
+    font-size: clamp(24px, 2.4vw, 32px);
+    font-weight: 700;
+    letter-spacing: var(--ls-h);
+    margin-bottom: var(--s3);
+  }
+
+  .calc2-sum span {
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .calc2-vs {
+    display: grid;
+    place-items: center;
+    color: var(--tx-dim);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-caps);
+  }
+
+  @media (max-width: 860px) {
+    .calc2 { grid-template-columns: minmax(0, 1fr); }
+    .calc2-vs { padding-block: var(--s2); }
+  }
+
+  /* ── Процесс ──────────────────────────────────────────────────────────── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s8);
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .step {
+    position: relative;
+    padding-top: var(--s7);
+    border-top: 1px solid var(--bd);
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 38px;
+    height: 2px;
+    background: var(--g);
+  }
+
+  .step-n {
+    display: block;
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-eyebrow);
+    color: var(--accent-tx);
+    font-weight: 700;
+    margin-bottom: var(--s4);
+  }
+
+  .step h3 {
+    font-size: var(--fs-h4);
+    margin-bottom: var(--s3);
+  }
+
+  .step p {
+    font-size: var(--fs-sm);
+  }
+
+  @media (max-width: 980px) {
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s7); }
+  }
+
+  @media (max-width: 560px) {
+    .steps { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* ── Сцены ────────────────────────────────────────────────────────────── */
+  .scenes {
+    display: grid;
+    gap: var(--s11);
+  }
+
+  .scene {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--s10);
+    align-items: center;
+  }
+
+  .scene--rev .scene-dw {
+    order: 2;
+  }
+
+  .scene-dw {
+    background: var(--d);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-block);
+    padding: var(--s6);
+  }
+
+  .scene-tx h3 {
+    margin-bottom: var(--s4);
+  }
+
+  @media (max-width: 900px) {
+    .scenes { gap: var(--s9); }
+    .scene { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+    .scene--rev .scene-dw { order: 0; }
+  }
+
+  /* ── Лид-магнит ───────────────────────────────────────────────────────── */
+  .lm {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+    gap: var(--s10);
+    align-items: center;
+  }
+
+  .lm-pts {
+    margin-top: var(--s6);
+  }
+
+  .lm-note {
+    margin-top: var(--s5);
+  }
+
+  @media (max-width: 980px) {
+    .lm { grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
+  }
+
+  /* ── Контакты ─────────────────────────────────────────────────────────── */
+  .ct {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--s10);
+    align-items: start;
+  }
+
+  .ct-list {
+    list-style: none;
+    display: grid;
+    gap: var(--s3);
+    margin-top: var(--s8);
+  }
+
+  .ct-list li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    min-height: var(--tap);
+    padding: var(--s4) var(--s5);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-card);
+    color: var(--accent-line);
+    transition: border-color var(--t) var(--ease);
+  }
+
+  .ct-list li:hover {
+    border-color: var(--accent-line);
+  }
+
+  .ct-list b {
+    display: block;
+    font-size: var(--fs-body);
+  }
+
+  .ct-list span {
+    display: block;
+    line-height: 1.4;
+  }
+
+  .ct-cover {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--r-card);
+  }
+
+  .ct-geo {
+    margin-top: var(--s6);
+    max-width: 42ch;
+  }
+
+  .ct-tabs {
+    display: flex;
+    gap: var(--s2);
+    margin-bottom: var(--s7);
+    padding-bottom: var(--s5);
+    border-bottom: 1px solid var(--bd);
+  }
+
+  .ct-tab {
+    min-height: var(--tap);
+    padding: var(--s2) var(--s5);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--r-pill);
+    color: var(--tx-mut);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--t) var(--ease), border-color var(--t) var(--ease), background-color var(--t) var(--ease);
+  }
+
+  .ct-tab:hover {
+    color: var(--tx);
+  }
+
+  .ct-tab.is-on {
+    color: var(--accent-tx);
+    border-color: var(--accent-line);
+    background: var(--veil-g-soft);
+  }
+
+  @media (max-width: 980px) {
+    .ct { grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
+  }
+</style>

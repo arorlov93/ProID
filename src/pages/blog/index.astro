@@ -1,0 +1,121 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { breadcrumbs, itemListSchema } from '../../lib/schema';
+
+const posts = (await getCollection('blog')).sort((a, b) => +b.data.date - +a.data.date);
+const crumbs = [{ href: '/blog', t: 'Блог' }];
+const schema = [
+  breadcrumbs(crumbs),
+  itemListSchema('Статьи', posts.map((p) => ({ href: `/blog/${p.id}`, t: p.data.h1 }))),
+];
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base
+  title="Блог об исполнительной документации — ПрофИД"
+  description="Статьи об исполнительной документации: состав комплекта, причины возврата, восстановление задним числом, требования нормативов. Практика, а не пересказ СП."
+  path="/blog"
+  schema={schema}
+>
+  <section class="sec sec--tight" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow eyebrow--accent">Блог</p>
+      <h1>Как это устроено на практике</h1>
+      <p class="lead bl-lead">
+        Разбираем то, с чем сталкиваемся на объектах: почему возвращают комплекты, что входит в состав по
+        нормативам, как восстанавливать документацию задним числом. Без пересказа сводов правил — только
+        то, что меняет решения.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="bl">
+        {
+          posts.map((p) => (
+            <article class="card card--hover bl-i" data-reveal>
+              <div class="bl-meta">
+                <span class="eyebrow">Кластер {p.data.cluster}</span>
+                <span class="xs dim num">
+                  <time datetime={p.data.date.toISOString().slice(0, 10)}>{fmtDate(p.data.date)}</time>
+                  {' · '}{p.data.readingMin} мин
+                </span>
+              </div>
+              <h2><a href={`/blog/${p.id}`}>{p.data.h1}</a></h2>
+              <p class="mut">{p.data.excerpt}</p>
+              <span class="tlink">Читать</span>
+            </article>
+          ))
+        }
+      </div>
+
+      <p class="note bl-note">
+        Планируем ещё семь материалов под кластеры Б и В: акт освидетельствования скрытых работ с
+        разбором формы, заполнение общего журнала, требования к исполнительным схемам, состав по
+        РД-11-02-2006, отличие ИД от проектной документации, что делать, если не подписывают КС-2, и
+        когда нужен ППР. Порядок — по частотности запросов.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Вопрос"
+    title="Не нашли свой случай"
+    text="Опишите ситуацию — ответим разбором, а не отпиской. Частые вопросы становятся следующими статьями."
+    points={['Первая консультация бесплатна', 'Экспресс-проверка комплекта — за один рабочий день']}
+    theme="dark"
+  />
+</Base>
+
+<style>
+  .bl-lead { margin-top: var(--s6); }
+
+  .bl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-card);
+  }
+
+  .bl-i { display: flex; flex-direction: column; }
+
+  .bl-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s3);
+    margin-bottom: var(--s5);
+    padding-bottom: var(--s4);
+    border-bottom: 1px solid var(--bd-soft);
+  }
+
+  .bl-meta .eyebrow { margin: 0; }
+
+  .bl-i h2 {
+    font-size: var(--fs-h3);
+    margin-bottom: var(--s4);
+    max-width: none;
+  }
+
+  .bl-i h2 a { text-decoration: none; }
+
+  .bl-i h2 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .bl-i { position: relative; }
+  .bl-i p { flex: 1; margin-bottom: var(--s5); }
+  .bl-note { margin-top: var(--s8); }
+
+  @media (max-width: 1000px) { .bl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) { .bl { grid-template-columns: minmax(0, 1fr); } }
+</style>

@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Drawing from '../../components/Drawing.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { breadcrumbs, itemListSchema } from '../../lib/schema';
+
+const objects = (await getCollection('objects')).sort((a, b) => a.data.order - b.data.order);
+const crumbs = [{ href: '/obekty', t: 'Объекты' }];
+const schema = [
+  breadcrumbs(crumbs),
+  itemListSchema('Объекты', objects.map((o) => ({ href: `/obekty/${o.id}`, t: o.data.h1 }))),
+];
+---
+
+<Base
+  title="Объекты: где вели исполнительную документацию"
+  description="Объекты ПрофИД: общественные здания, объекты культурного наследия, портовая инфраструктура, производство. Что делали на каждом и чем эти объекты отличались."
+  path="/obekty"
+  schema={schema}
+>
+  <section class="sec sec--tight" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow eyebrow--accent">Объекты</p>
+      <h1>Где мы вели документацию</h1>
+      <p class="lead ob-lead">
+        Общественные здания, объекты культурного наследия, портовая инфраструктура, производство. Разные
+        заказчики и разные регламенты приёмки — именно от них зависит, как собирается комплект. В каждой
+        карточке разбираем, чем объект был сложен и что из этого следует для похожих задач.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="obl">
+        {
+          objects.map((o) => (
+            <a class="card card--link obc" href={`/obekty/${o.id}`} data-reveal>
+              <div class="obc-dw" aria-hidden="true">
+                <Drawing kind={o.data.drawing} label="" />
+              </div>
+              <div class="obc-tx">
+                <p class="eyebrow">{o.data.city}</p>
+                <h2>{o.data.h1}</h2>
+                <p class="mut">{o.data.kind}</p>
+                <ul class="obc-scope">
+                  {o.data.scope.slice(0, 3).map((s) => <li>{s}</li>)}
+                </ul>
+                <span class="tlink">Что делали</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      <p class="note obl-note">
+        Часть объектов под соглашением о неразглашении, поэтому в карточках нет заказчиков и коммерческих
+        деталей. Если нужны рекомендации по конкретному типу объекта — спросите, дадим контакт напрямую.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Ваш объект"
+    title="Расскажите про свой"
+    text="Тип объекта и регламент приёмки определяют состав комплекта больше, чем площадь. Опишите вводные — скажем, на что смотреть в первую очередь."
+    points={['Первая консультация бесплатна', 'Экспресс-проверка комплекта — за один день', 'Работаем по России дистанционно']}
+    theme="dark"
+  />
+</Base>
+
+<style>
+  .ob-lead { margin-top: var(--s6); }
+
+  .obl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-card);
+  }
+
+  .obc {
+    position: relative;
+    overflow: hidden;
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .obc-dw {
+    position: absolute;
+    inset: -6% -12% auto auto;
+    width: 60%;
+    opacity: 0.3;
+    pointer-events: none;
+    /* Чертёж-подложка растворяется к краю карточки: жёсткий обрез
+       рассекает штамп посреди слова и читается как дефект вёрстки. */
+    mask-image: linear-gradient(200deg, #000 30%, transparent 78%);
+    transition: opacity var(--t-slow) var(--ease);
+  }
+
+  .obc:hover .obc-dw { opacity: 0.5; }
+
+  .obc-tx { position: relative; }
+
+  .obc h2 {
+    font-size: var(--fs-h3);
+    margin-bottom: var(--s3);
+    max-width: 16ch;
+  }
+
+  .obc-scope {
+    list-style: none;
+    display: grid;
+    gap: var(--s2);
+    margin-block: var(--s5);
+    font-size: var(--fs-xs);
+    color: var(--tx-dim);
+  }
+
+  .obc-scope li {
+    padding-left: var(--s5);
+    position: relative;
+  }
+
+  .obc-scope li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 8px;
+    height: 1px;
+    background: var(--accent-line);
+  }
+
+  .obl-note { margin-top: var(--s8); }
+
+  @media (max-width: 700px) {
+    .obl { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

@@ -1,0 +1,672 @@
+---
+/**
+ * Техническая графика вместо фотографий.
+ *
+ * Почему так: стоковых фото стройки в единой гамме взять негде — сеть окружения
+ * закрыта, а разнородный сток по свету хуже, чем его отсутствие (раздел 5.6 ТЗ).
+ * Инженерная аудитория читает чертёж как «свой»: план с размерными цепочками,
+ * разрез с отметками, титул тома со штампом приёмки. Люди — масштабные фигуры,
+ * как их и рисуют на настоящих листах.
+ *
+ * Линии отрисовываются по stroke-dashoffset при появлении в поле зрения.
+ */
+export interface Props {
+  kind: 'plan' | 'section' | 'title' | 'stack';
+  class?: string;
+  /** Подпись под чертежом — заодно работает как описание для читающих с экрана. */
+  caption?: string;
+  label: string;
+}
+
+const { kind, class: cls = '', caption, label } = Astro.props;
+
+/** Размерная цепочка: линия, засечки под 45°, подписи. */
+type Chain = { x: number; y: number; segs: number[]; dir?: 'h' | 'v'; scale?: number };
+
+const planChain: Chain = { x: 92, y: 396, segs: [96, 128, 96, 132] };
+// Сетка подложки перекрывает холст с запасом, чтобы не было пустых полей по краям.
+const gridLines = Array.from({ length: 20 }, (_, i) => -40 + i * 40);
+const gridRows = Array.from({ length: 16 }, (_, i) => -40 + i * 40);
+---
+
+<figure class={`dw ${cls}`}>
+  {
+    kind === 'plan' && (
+      <svg
+        viewBox="0 0 660 500"
+        class="dw-svg"
+        data-draw
+        role="img"
+        aria-label={label}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <g class="dw-grid">
+          {gridLines.map((x) => (
+            <line x1={x} y1="-40" x2={x} y2="520" />
+          ))}
+          {gridRows.map((y) => (
+            <line x1="-40" y1={y} x2="680" y2={y} />
+          ))}
+        </g>
+
+        {/* Наружные стены — двойная линия, как на плане */}
+        <g class="dw-wall">
+          <rect x="92" y="76" width="452" height="284" />
+          <rect x="100" y="84" width="436" height="268" />
+        </g>
+
+        {/* Внутренние перегородки */}
+        <g class="dw-part">
+          <path d="M280 84v268M280 196h256M408 196v156" />
+          <path d="M100 268h180" />
+        </g>
+
+        {/* Проёмы: разрывы в стене с дугой открывания */}
+        <g class="dw-door">
+          <path d="M280 128h0" />
+          <path d="M280 120v34" class="dw-gap" />
+          <path d="M280 154a34 34 0 0 0 34-34" />
+          <path d="M338 196v0" />
+          <path d="M330 196h36" class="dw-gap" />
+          <path d="M366 196a36 36 0 0 0-36 36" />
+          <path d="M100 300v34" class="dw-gap" />
+          <path d="M100 334a34 34 0 0 0 34-34" />
+        </g>
+
+        {/* Штриховка помещения */}
+        <g class="dw-hatch">
+          {Array.from({ length: 14 }, (_, i) => (
+            <line x1={296 + i * 16} y1="352" x2={368 + i * 16} y2="212" />
+          ))}
+        </g>
+
+        {/* Оси */}
+        <g class="dw-axis">
+          <path d="M92 48v340M280 48v340M408 48v340M544 48v340" />
+          <path d="M60 76h500M60 196h500M60 360h500" />
+          {[
+            [92, 40, '1'],
+            [280, 40, '2'],
+            [408, 40, '3'],
+            [544, 40, '4'],
+          ].map(([cx, cy, t]) => (
+            <>
+              <circle cx={cx as number} cy={cy as number} r="13" />
+              <text x={cx as number} y={(cy as number) + 4.5} text-anchor="middle">
+                {t}
+              </text>
+            </>
+          ))}
+          {[
+            [46, 76, 'А'],
+            [46, 196, 'Б'],
+            [46, 360, 'В'],
+          ].map(([cx, cy, t]) => (
+            <>
+              <circle cx={cx as number} cy={cy as number} r="13" />
+              <text x={cx as number} y={(cy as number) + 4.5} text-anchor="middle">
+                {t}
+              </text>
+            </>
+          ))}
+        </g>
+
+        {/* Размерная цепочка снизу */}
+        <g class="dw-dim">
+          <line x1="92" y1="412" x2="544" y2="412" />
+          {[92, 280, 408, 544].map((x) => (
+            <>
+              <line x1={x} y1="404" x2={x} y2="420" />
+              <line x1={x - 5} y1="418" x2={x + 5} y2="406" class="dw-tick" />
+            </>
+          ))}
+          {[
+            [186, '6000'],
+            [344, '4200'],
+            [476, '4500'],
+          ].map(([x, t]) => (
+            <text x={x as number} y="404" text-anchor="middle">
+              {t}
+            </text>
+          ))}
+          <line x1="576" y1="76" x2="576" y2="360" />
+          {[76, 196, 360].map((y) => (
+            <>
+              <line x1="568" y1={y} x2="584" y2={y} />
+              <line x1="582" y1={y - 5} x2="570" y2={y + 5} class="dw-tick" />
+            </>
+          ))}
+          <text x="596" y="140" text-anchor="middle" transform="rotate(90 596 140)">
+            3900
+          </text>
+          <text x="596" y="284" text-anchor="middle" transform="rotate(90 596 284)">
+            5400
+          </text>
+        </g>
+
+        {/* Масштабная фигура — человек в чертёжной традиции */}
+        <g class="dw-fig">
+          <circle cx="180" cy="152" r="7" />
+          <path d="M180 159v26M180 166l-11 9M180 166l11 9M180 185l-9 17M180 185l9 17" />
+        </g>
+
+        {/* Подписи помещений */}
+        <g class="dw-txt">
+          <text x="186" y="120">ПОМ. 1</text>
+          <text x="186" y="134" class="dw-txt-s">
+            48,6 м²
+          </text>
+          <text x="330" y="130">ПОМ. 2</text>
+          <text x="330" y="144" class="dw-txt-s">
+            31,2 м²
+          </text>
+          <text x="130" y="300">ПОМ. 3</text>
+          <text x="130" y="314" class="dw-txt-s">
+            18,4 м²
+          </text>
+          <text x="440" y="270">ПОМ. 4</text>
+          <text x="440" y="284" class="dw-txt-s">
+            26,8 м²
+          </text>
+        </g>
+
+        {/* Штамп «принято» — ниже размерной цепочки, как на настоящем листе */}
+        <g class="dw-stamp">
+          <rect x="428" y="442" width="188" height="50" rx="3" />
+          <path d="M442 466l9 9 17-19" />
+          <text x="480" y="462">ПРИНЯТО</text>
+          <text x="480" y="480" class="dw-txt-s">
+            без замечаний
+          </text>
+        </g>
+      </svg>
+    )
+  }
+
+  {
+    kind === 'section' && (
+      <svg viewBox="-10 -20 660 500" class="dw-svg" data-draw role="img" aria-label={label} preserveAspectRatio="xMidYMid meet">
+        <g class="dw-grid">
+          {gridLines.map((x) => (
+            <line x1={x} y1="-40" x2={x} y2="520" />
+          ))}
+          {gridRows.map((y) => (
+            <line x1="-40" y1={y} x2="680" y2={y} />
+          ))}
+        </g>
+
+        {/* Земля */}
+        <g class="dw-ground">
+          <path d="M40 392h520" />
+          {Array.from({ length: 33 }, (_, i) => (
+            <line x1={40 + i * 16} y1="392" x2={30 + i * 16} y2="404" />
+          ))}
+        </g>
+
+        {/* Каркас: фундамент, перекрытия, колонны */}
+        <g class="dw-wall">
+          <path d="M116 392v-14h300v14" />
+          <rect x="116" y="352" width="300" height="26" />
+          <rect x="116" y="266" width="300" height="18" />
+          <rect x="116" y="184" width="300" height="18" />
+          <rect x="116" y="102" width="300" height="18" />
+        </g>
+
+        <g class="dw-part">
+          <path d="M136 352v-68M196 352v-68M276 352v-68M356 352v-68M396 352v-68" />
+          <path d="M136 266v-64M196 266v-64M276 266v-64M356 266v-64M396 266v-64" />
+          <path d="M136 184v-64M196 184v-64M276 184v-64M356 184v-64M396 184v-64" />
+        </g>
+
+        {/* Штриховка перекрытий */}
+        <g class="dw-hatch">
+          {Array.from({ length: 26 }, (_, i) => (
+            <line x1={120 + i * 12} y1="284" x2={132 + i * 12} y2="266" />
+          ))}
+          {Array.from({ length: 26 }, (_, i) => (
+            <line x1={120 + i * 12} y1="202" x2={132 + i * 12} y2="184" />
+          ))}
+        </g>
+
+        {/* Башенный кран */}
+        <g class="dw-crane">
+          <path d="M470 392V96M456 392h28" />
+          <path d="M470 96h116M470 96H396" />
+          <path d="M470 78v18M470 78l112 18M470 78l-70 18" />
+          <path d="M544 96v42M536 138h16M544 138v14" />
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <path d={`M462 ${368 - i * 34}l16 -34M478 ${368 - i * 34}l-16 -34`} />
+          ))}
+        </g>
+
+        {/* Отметки уровней */}
+        <g class="dw-level">
+          {[
+            [352, '0,000'],
+            [266, '+3,300'],
+            [184, '+6,600'],
+            [102, '+9,900'],
+          ].map(([y, t]) => (
+            <>
+              <line x1="416" y1={y as number} x2="452" y2={y as number} />
+              <path d={`M424 ${(y as number) - 9}l7 9 7-9z`} class="dw-lvl-mark" />
+              <text x="456" y={(y as number) - 5}>
+                {t}
+              </text>
+            </>
+          ))}
+          <line x1="80" y1="378" x2="80" y2="102" />
+          <line x1="72" y1="378" x2="88" y2="378" />
+          <line x1="72" y1="102" x2="88" y2="102" />
+          <text x="64" y="244" text-anchor="middle" transform="rotate(-90 64 244)">
+            13 200
+          </text>
+        </g>
+
+        <g class="dw-fig">
+          <circle cx="230" cy="322" r="6" />
+          <path d="M230 328v22M230 334l-9 8M230 334l9 8M230 350l-8 14M230 350l8 14" />
+          <circle cx="322" cy="322" r="6" />
+          <path d="M322 328v22M322 334l-9 8M322 334l9 8M322 350l-8 14M322 350l8 14" />
+        </g>
+
+        <g class="dw-txt">
+          <text x="126" y="94">РАЗРЕЗ 1—1</text>
+          <text x="126" y="440" class="dw-txt-s">
+            монолитный каркас, отм. 0,000 — +9,900
+          </text>
+        </g>
+      </svg>
+    )
+  }
+
+  {
+    kind === 'title' && (
+      <svg viewBox="-10 -20 660 500" class="dw-svg" data-draw role="img" aria-label={label} preserveAspectRatio="xMidYMid meet">
+        <g class="dw-grid">
+          {gridLines.map((x) => (
+            <line x1={x} y1="-40" x2={x} y2="520" />
+          ))}
+        </g>
+
+        {/* Лист с рамкой и полями */}
+        <g class="dw-wall">
+          <rect x="112" y="26" width="416" height="408" />
+        </g>
+        <g class="dw-part">
+          <rect x="132" y="38" width="384" height="384" />
+        </g>
+
+        <g class="dw-txt">
+          <text x="324" y="106" text-anchor="middle" class="dw-txt-l">
+            ИСПОЛНИТЕЛЬНАЯ
+          </text>
+          <text x="324" y="136" text-anchor="middle" class="dw-txt-l">
+            ДОКУМЕНТАЦИЯ
+          </text>
+          <text x="324" y="168" text-anchor="middle" class="dw-txt-s">
+            ТОМ 3. МОНОЛИТНЫЕ КОНСТРУКЦИИ
+          </text>
+        </g>
+
+        <g class="dw-dim">
+          <line x1="212" y1="184" x2="436" y2="184" />
+        </g>
+
+        {/* Строки описи. Шаг подобран так, чтобы последняя строка заканчивалась
+            выше основной надписи: штамп не должен наезжать на опись. */}
+        <g class="dw-rows">
+          {[
+            ['Общий журнал работ', '1 кн.'],
+            ['Акты освидетельствования скрытых работ', '128 шт.'],
+            ['Исполнительные схемы', '46 л.'],
+            ['Паспорта и сертификаты', '74 поз.'],
+            ['Акты испытаний', '12 шт.'],
+            ['Реестр и опись тома', '4 л.'],
+          ].map(([t, n], i) => (
+            <>
+              <line x1="164" y1={218 + i * 23} x2="484" y2={218 + i * 23} />
+              <text x="164" y={213 + i * 23}>
+                {t}
+              </text>
+              <text x="484" y={213 + i * 23} text-anchor="end" class="dw-txt-n">
+                {n}
+              </text>
+            </>
+          ))}
+        </g>
+
+        {/* Основная надпись со штампом приёмки */}
+        <g class="dw-stamp dw-stamp--big">
+          <rect x="290" y="352" width="194" height="72" rx="3" />
+          <path d="M290 376h194M338 352v72" />
+          <path d="M302 390l10 10 18-21" class="dw-tick-big" />
+          <text x="352" y="370">ПРИНЯТО</text>
+          <text x="352" y="396" class="dw-txt-s">
+            технический заказчик
+          </text>
+          <text x="352" y="414" class="dw-txt-s">
+            замечаний нет
+          </text>
+        </g>
+
+        <g class="dw-txt">
+          <text x="164" y="370" class="dw-txt-s">
+            Лист 1
+          </text>
+          <text x="164" y="392" class="dw-txt-s">
+            Листов 264
+          </text>
+          <text x="164" y="414" class="dw-txt-s">
+            Изм. 0
+          </text>
+        </g>
+      </svg>
+    )
+  }
+
+  {
+    kind === 'stack' && (
+      <svg viewBox="-10 -20 660 500" class="dw-svg" data-draw role="img" aria-label={label} preserveAspectRatio="xMidYMid meet">
+        <g class="dw-grid">
+          {gridLines.map((x) => (
+            <line x1={x} y1="-40" x2={x} y2="520" />
+          ))}
+        </g>
+
+        <g class="dw-part">
+          <rect x="96" y="128" width="268" height="300" />
+          <rect x="128" y="100" width="268" height="300" />
+        </g>
+        <g class="dw-wall">
+          <path d="M164 68h204l72 72v264H164z" />
+          <path d="M368 68v72h72" />
+        </g>
+
+        <g class="dw-rows">
+          {Array.from({ length: 9 }, (_, i) => (
+            <line x1="192" y1={196 + i * 24} x2={i % 3 === 2 ? 340 : 412} y2={196 + i * 24} />
+          ))}
+        </g>
+
+        <g class="dw-check">
+          <circle cx="422" cy="352" r="46" />
+          <path d="M398 352l16 16 32-36" />
+        </g>
+
+        <g class="dw-txt">
+          <text x="192" y="172" class="dw-txt-l">
+            КОМПЛЕКТ ИД
+          </text>
+        </g>
+      </svg>
+    )
+  }
+
+  {caption && <figcaption class="dw-cap">{caption}</figcaption>}
+</figure>
+
+<style>
+  .dw {
+    position: relative;
+    margin: 0;
+  }
+
+  .dw-svg {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 660 / 500;
+    /* Сетка подложки нарочно выходит за viewBox — обрезаем по рамке элемента,
+       иначе она расширяет документ и на узких экранах появляется горизонтальный скролл. */
+    overflow: hidden;
+  }
+
+  /* Общее для всех линий: тонкая чертёжная графика */
+  .dw-svg :is(line, path, rect, circle) {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .dw-grid line {
+    stroke: var(--bp);
+    stroke-width: 1;
+    opacity: 0.08;
+  }
+
+  .dw-wall rect,
+  .dw-wall path {
+    stroke: var(--bp);
+    stroke-width: 2;
+    opacity: 0.95;
+  }
+
+  .dw-part path,
+  .dw-part rect {
+    stroke: var(--bp);
+    stroke-width: 1.3;
+    opacity: 0.7;
+  }
+
+  .dw-door path {
+    stroke: var(--bp);
+    stroke-width: 1.1;
+    opacity: 0.5;
+  }
+
+  .dw-door .dw-gap {
+    stroke: var(--bg, var(--d));
+    stroke-width: 3.4;
+    opacity: 1;
+  }
+
+  .dw-hatch line {
+    stroke: var(--bp);
+    stroke-width: 0.8;
+    opacity: 0.22;
+  }
+
+  .dw-axis path {
+    stroke: var(--bp);
+    stroke-width: 1;
+    opacity: 0.34;
+    stroke-dasharray: 14 4 3 4;
+  }
+
+  .dw-axis circle {
+    stroke: var(--bp);
+    stroke-width: 1.2;
+    opacity: 0.75;
+  }
+
+  .dw-dim line {
+    stroke: var(--bp);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+
+  .dw-dim .dw-tick {
+    stroke-width: 1.6;
+    opacity: 0.85;
+  }
+
+  .dw-ground path {
+    stroke: var(--bp);
+    stroke-width: 1.6;
+    opacity: 0.8;
+  }
+
+  .dw-ground line {
+    stroke: var(--bp);
+    stroke-width: 1;
+    opacity: 0.42;
+  }
+
+  .dw-crane path {
+    stroke: var(--bp);
+    stroke-width: 1.1;
+    opacity: 0.45;
+  }
+
+  .dw-level line {
+    stroke: var(--g);
+    stroke-width: 1;
+    opacity: 0.65;
+  }
+
+  .dw-lvl-mark {
+    stroke: var(--g);
+    stroke-width: 1.2;
+    fill: none;
+  }
+
+  .dw-rows line {
+    stroke: var(--bp);
+    stroke-width: 1;
+    opacity: 0.34;
+  }
+
+  .dw-fig circle,
+  .dw-fig path {
+    stroke: var(--bp);
+    stroke-width: 1.4;
+    opacity: 0.62;
+  }
+
+  .dw-check circle {
+    stroke: var(--ok);
+    stroke-width: 1.6;
+    opacity: 0.55;
+  }
+
+  .dw-check path {
+    stroke: var(--ok);
+    stroke-width: 4;
+    stroke-linecap: square;
+  }
+
+  .dw-stamp rect {
+    stroke: var(--ok);
+    stroke-width: 1.4;
+    opacity: 0.8;
+  }
+
+  .dw-stamp path {
+    stroke: var(--ok);
+    stroke-width: 3.2;
+    stroke-linecap: square;
+  }
+
+  .dw-stamp text {
+    fill: var(--ok);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  .dw-stamp--big text {
+    font-size: 13px;
+  }
+
+  .dw-stamp .dw-txt-s {
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+  }
+
+  .dw-txt text,
+  .dw-axis text,
+  .dw-dim text,
+  .dw-level text,
+  .dw-rows text {
+    fill: var(--bp);
+    font-family: var(--font);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    font-weight: 600;
+    opacity: 0.82;
+  }
+
+  .dw-dim text,
+  .dw-rows text {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.66;
+    letter-spacing: 0.05em;
+  }
+
+  .dw-level text {
+    fill: var(--g);
+    font-size: 10.5px;
+    opacity: 0.9;
+  }
+
+  .dw-txt .dw-txt-s,
+  .dw-rows .dw-txt-n {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.6;
+    letter-spacing: 0.04em;
+  }
+
+  .dw-txt .dw-txt-l {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    fill: var(--bp);
+    opacity: 0.95;
+  }
+
+  .dw-cap {
+    margin-top: var(--s4);
+    font-size: var(--fs-xs);
+    color: var(--tx-dim);
+    letter-spacing: 0.02em;
+  }
+
+  /* --- Отрисовка линиями --------------------------------------------------
+     Штрихи «прочерчиваются» при появлении. Текст и штамп проявляются следом. */
+  .dw-svg[data-draw] :is(.dw-wall, .dw-part, .dw-axis, .dw-dim, .dw-level, .dw-ground, .dw-crane, .dw-rows, .dw-door, .dw-check) :is(line, path, rect, circle) {
+    stroke-dasharray: 2200;
+    stroke-dashoffset: 2200;
+    transition: stroke-dashoffset 1.5s var(--ease);
+  }
+
+  .dw-svg[data-draw] .dw-axis path {
+    stroke-dasharray: 14 4 3 4;
+  }
+
+  .dw-svg[data-draw] :is(.dw-hatch, .dw-fig, .dw-txt, .dw-stamp) {
+    opacity: 0;
+    transition: opacity 0.6s var(--ease) 0.7s;
+  }
+
+  .dw-svg[data-draw].drawn :is(.dw-wall, .dw-part, .dw-axis, .dw-dim, .dw-level, .dw-ground, .dw-crane, .dw-rows, .dw-door, .dw-check) :is(line, path, rect, circle) {
+    stroke-dashoffset: 0;
+  }
+
+  .dw-svg[data-draw].drawn :is(.dw-hatch, .dw-fig, .dw-txt, .dw-stamp) {
+    opacity: 1;
+  }
+
+  /* Без JS чертёж виден целиком: класс .drawn ставит скрипт, а .js — шапка. */
+  :global(html:not(.js)) .dw-svg :is(line, path, rect, circle) {
+    stroke-dashoffset: 0 !important;
+  }
+
+  :global(html:not(.js)) .dw-svg :is(.dw-hatch, .dw-fig, .dw-txt, .dw-stamp) {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dw-svg :is(line, path, rect, circle) {
+      stroke-dashoffset: 0 !important;
+      transition: none !important;
+    }
+
+    .dw-svg :is(.dw-hatch, .dw-fig, .dw-txt, .dw-stamp) {
+      opacity: 1 !important;
+      transition: none !important;
+    }
+  }
+</style>

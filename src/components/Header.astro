@@ -1,0 +1,368 @@
+---
+import Logo from './Logo.astro';
+import { mainNav, servicesNav } from '../data/nav';
+import { site } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isServices = servicesNav.some((s) => s.href === path) || path === '/uslugi';
+---
+
+<a class="skip" href="#main">Перейти к содержанию</a>
+
+<header class="site-header" data-theme="dark" id="hdr">
+  <div class="wrap hd">
+    {/* Имя ссылке даёт сам знак: в нём видимый текст «ПрофИД» и «Внешний отдел
+        ПТО», и доступное имя обязано его содержать. */}
+    <a class="hd-logo" href="/">
+      <Logo variant="full" tone="dark" height={34} title="ПрофИД — внешний отдел ПТО, на главную" />
+    </a>
+
+    <nav class="hd-nav" aria-label="Основная навигация">
+      <ul>
+        <li class="has-sub">
+          <a href="/uslugi" aria-current={isServices ? 'page' : undefined} aria-expanded="false" aria-haspopup="true">
+            Услуги
+            <svg width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true"
+              ><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg
+            >
+          </a>
+          <div class="sub">
+            <ul>
+              {
+                servicesNav.map((s) => (
+                  <li>
+                    <a href={s.href} aria-current={s.href === path ? 'page' : undefined}>
+                      <span class="sub-t">{s.t}</span>
+                      <span class="sub-d">{s.d}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </li>
+        {
+          mainNav.slice(1).map((n) => (
+            <li>
+              <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>
+                {n.t}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="hd-act">
+      <a class="hd-tel num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a>
+      <a class="btn" href="/kontakty#zayavka">Оставить заявку</a>
+    </div>
+
+    <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mnav" id="burger">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mnav" id="mnav" hidden>
+    <div class="wrap">
+      <p class="eyebrow">Услуги</p>
+      <ul class="mnav-list">
+        {servicesNav.map((s) => <li><a href={s.href}>{s.t}</a></li>)}
+      </ul>
+      <p class="eyebrow">Разделы</p>
+      <ul class="mnav-list">
+        {mainNav.slice(1).map((n) => <li><a href={n.href}>{n.t}</a></li>)}
+      </ul>
+      <div class="mnav-act">
+        <a class="btn btn--wide" href="/kontakty#zayavka">Оставить заявку</a>
+        <a class="btn btn--2 btn--wide num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: color-mix(in srgb, var(--d) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--bd-d-soft);
+    transition: transform var(--t-slow) var(--ease), border-color var(--t) var(--ease);
+  }
+
+  /* Прячется при скролле вниз, возвращается при скролле вверх. */
+  :global(html.hd-down) .site-header {
+    transform: translateY(-100%);
+  }
+
+  :global(html.hd-scrolled) .site-header {
+    border-bottom-color: var(--bd-d);
+  }
+
+  .hd {
+    display: flex;
+    align-items: center;
+    gap: var(--s7);
+    height: var(--header-h);
+  }
+
+  .hd-logo {
+    display: flex;
+    align-items: center;
+    flex: none;
+    min-height: var(--tap);
+    line-height: 0;
+    text-decoration: none;
+    border-radius: var(--r-in);
+  }
+
+  .hd-nav {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hd-nav > ul {
+    display: flex;
+    align-items: center;
+    gap: var(--s6);
+    list-style: none;
+  }
+
+  .hd-nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding-block: var(--s5);
+    font-size: var(--fs-sm);
+    color: var(--tx-d-mut);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--t) var(--ease);
+  }
+
+  /* Подчёркивание растёт слева — раздел 5.3 ТЗ. */
+  .hd-nav > ul > li > a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 14px;
+    height: 1.5px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t) var(--ease);
+  }
+
+  .hd-nav > ul > li > a:hover {
+    color: var(--tx-d);
+  }
+
+  .hd-nav > ul > li > a:hover::after {
+    transform: scaleX(1);
+  }
+
+  .hd-nav > ul > li > a[aria-current='page'] {
+    color: var(--tx-d);
+  }
+
+  .hd-nav > ul > li > a[aria-current='page']::after {
+    background: var(--g);
+    transform: scaleX(1);
+  }
+
+  /* --- Выпадающий список услуг --- */
+  .has-sub {
+    position: relative;
+  }
+
+  .sub {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: calc(-1 * var(--s4));
+    width: 380px;
+    padding: var(--s3);
+    background: var(--d2);
+    border: 1px solid var(--bd-d);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-pop);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity var(--t) var(--ease), transform var(--t) var(--ease), visibility var(--t);
+  }
+
+  .has-sub:hover .sub,
+  .has-sub:focus-within .sub {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .sub ul {
+    list-style: none;
+  }
+
+  .sub a {
+    display: block;
+    padding: var(--s3) var(--s4);
+    border-radius: var(--r-in);
+    transition: background-color var(--t) var(--ease);
+  }
+
+  .sub a::after {
+    display: none;
+  }
+
+  .sub a:hover {
+    background: var(--veil-w);
+  }
+
+  .sub-t {
+    display: block;
+    color: var(--tx-d);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+  }
+
+  .sub a:hover .sub-t {
+    color: var(--g);
+  }
+
+  .sub-d {
+    display: block;
+    color: var(--tx-d-dim);
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    white-space: normal;
+  }
+
+  /* --- Действия --- */
+  .hd-act {
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    flex: none;
+  }
+
+  .hd-tel {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--tx-d);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .hd-tel:hover {
+    color: var(--g);
+  }
+
+  /* --- Бургер --- */
+  .burger {
+    display: none;
+    width: var(--tap);
+    height: var(--tap);
+    flex: none;
+    background: none;
+    border: 1px solid var(--bd-d);
+    border-radius: var(--r-btn);
+    cursor: pointer;
+    padding: 12px 11px;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color var(--t) var(--ease);
+  }
+
+  .burger:hover {
+    border-color: var(--g);
+  }
+
+  .burger span {
+    display: block;
+    height: 1.6px;
+    background: var(--tx-d);
+    border-radius: 2px;
+    transition: transform var(--t) var(--ease), opacity var(--t) var(--ease);
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(1) {
+    transform: translateY(7.4px) rotate(45deg);
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(3) {
+    transform: translateY(-7.4px) rotate(-45deg);
+  }
+
+  /* --- Мобильное меню --- */
+  .mnav {
+    display: none;
+    background: var(--d);
+    border-top: 1px solid var(--bd-d-soft);
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    padding-block: var(--s6) var(--s8);
+  }
+
+  .mnav[hidden] {
+    display: none;
+  }
+
+  .mnav-list {
+    list-style: none;
+    margin-bottom: var(--s6);
+    border-top: 1px solid var(--bd-d-soft);
+  }
+
+  .mnav-list a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding-block: var(--s3);
+    border-bottom: 1px solid var(--bd-d-soft);
+    color: var(--tx-d);
+    text-decoration: none;
+    font-size: var(--fs-body);
+  }
+
+  .mnav-act {
+    display: grid;
+    gap: var(--s3);
+  }
+
+  @media (max-width: 1100px) {
+    .hd-nav > ul {
+      gap: var(--s5);
+    }
+
+    .hd-tel {
+      display: none;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .hd-nav,
+    .hd-act {
+      display: none;
+    }
+
+    .hd {
+      justify-content: space-between;
+      gap: var(--s4);
+    }
+
+    .burger {
+      display: flex;
+    }
+
+    .mnav:not([hidden]) {
+      display: block;
+    }
+  }
+</style>

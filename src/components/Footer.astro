@@ -1,0 +1,164 @@
+---
+import Logo from './Logo.astro';
+import { footerNav } from '../data/nav';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="ft" data-theme="dark">
+  <div class="wrap">
+    <div class="ft-top">
+      <div class="ft-brand">
+        <Logo variant="full" tone="dark" height={38} title="ПрофИД" />
+        <p class="ft-about">
+          Внешний отдел ПТО. Оформляем, ведём и восстанавливаем исполнительную документацию,
+          разрабатываем ППР, считаем и проверяем сметы. Москва и область — с выездом,
+          остальная Россия — дистанционно.
+        </p>
+        <ul class="ft-contacts">
+          <li><a class="num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a></li>
+          <li><a href={`mailto:${site.email}`} data-goal="mail">{site.email}</a></li>
+          <li><a href={site.telegramUrl} rel="noopener" data-goal="tg">Telegram: @{site.telegram}</a></li>
+          <li class="dim">{site.hours}</li>
+        </ul>
+      </div>
+
+      {
+        footerNav.map((col) => (
+          <nav class="ft-col" aria-label={col.t}>
+            <p class="eyebrow">{col.t}</p>
+            <ul>
+              {col.items.map((i) => (
+                <li>
+                  <a href={i.href}>{i.t}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+
+    <div class="ft-geo">
+      <span class="dim">Работаем в городах:</span>
+      {site.serviceArea.map((c) => <span class="geo-chip">{c}</span>)}
+    </div>
+
+    <div class="ft-bottom">
+      <p class="xs dim">
+        © {year} {site.legalName}
+        {site.inn && <>, ИНН {site.inn}</>}
+        {site.ogrn && <>, ОГРН {site.ogrn}</>}
+        {!site.inn && <span class="todo">реквизиты не заполнены</span>}
+      </p>
+      <p class="xs dim">
+        <a href="/privacy">Политика конфиденциальности</a> · Информация на сайте не является публичной офертой
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ft {
+    background: var(--d-deep);
+    color: var(--tx-d);
+    border-top: 1px solid var(--bd-d-soft);
+    padding-block: var(--s11) var(--s7);
+  }
+
+  .ft-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+    gap: var(--s8);
+    padding-bottom: var(--s9);
+  }
+
+  .ft-about {
+    margin-block: var(--s5) var(--s6);
+    color: var(--tx-d-mut);
+    font-size: var(--fs-sm);
+    max-width: 44ch;
+  }
+
+  .ft-contacts {
+    list-style: none;
+    display: grid;
+    gap: var(--s2);
+    font-size: var(--fs-sm);
+  }
+
+  .ft-contacts a {
+    color: var(--tx-d);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .ft-contacts a:hover {
+    color: var(--g);
+  }
+
+  .ft-col ul {
+    list-style: none;
+    display: grid;
+    gap: var(--s3);
+  }
+
+  .ft-col a {
+    font-size: var(--fs-sm);
+    color: var(--tx-d-mut);
+    text-decoration: none;
+  }
+
+  .ft-col a:hover {
+    color: var(--g);
+  }
+
+  .ft-geo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s3);
+    align-items: center;
+    padding-block: var(--s6);
+    border-top: 1px solid var(--bd-d-soft);
+    font-size: var(--fs-xs);
+  }
+
+  .geo-chip {
+    padding: 3px var(--s3);
+    border: 1px solid var(--bd-d-soft);
+    border-radius: var(--r-pill);
+    color: var(--tx-d-mut);
+  }
+
+  .ft-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s3) var(--s8);
+    padding-top: var(--s6);
+    border-top: 1px solid var(--bd-d-soft);
+  }
+
+  .ft-bottom p {
+    max-width: none;
+  }
+
+  .todo {
+    color: var(--warn);
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .ft-top {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s7);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .ft-top {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

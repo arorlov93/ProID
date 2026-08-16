@@ -1,0 +1,14 @@
+{
+  "name": "ПрофИД — внешний отдел ПТО",
+  "short_name": "ПрофИД",
+  "description": "Исполнительная документация, ППР и сметы. Москва и область, дистанционно по России.",
+  "lang": "ru-RU",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#171c22",
+  "theme_color": "#171c22",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

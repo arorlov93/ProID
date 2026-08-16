@@ -1,0 +1,134 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Drawing from '../../components/Drawing.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { breadcrumbs } from '../../lib/schema';
+
+export const getStaticPaths = (async () => {
+  const items = await getCollection('objects');
+  return items.map((o) => ({ params: { object: o.id }, props: { entry: o } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const d = entry.data;
+const path = `/obekty/${entry.id}`;
+const { Content } = await render(entry);
+
+const crumbs = [
+  { href: '/obekty', t: 'Объекты' },
+  { href: path, t: d.h1 },
+];
+---
+
+<Base title={d.title} description={d.description} path={path} schema={[breadcrumbs(crumbs)]}>
+  <section class="sec sec--tight" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <div class="oh">
+        <div>
+          <p class="eyebrow eyebrow--accent">{d.city}</p>
+          <h1>{d.h1}</h1>
+          <p class="lead oh-lead">{d.kind}</p>
+
+          <dl class="oh-spec">
+            {
+              d.spec.map((s) => (
+                <div>
+                  <dt class="xs dim">{s.k}</dt>
+                  <dd>{s.v}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+        <Drawing kind={d.drawing} class="oh-dw" label={`${d.h1} — техническая графика`} />
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="og">
+        <div>
+          <p class="eyebrow">Состав работ</p>
+          <h2>Что входило</h2>
+          <ul class="ul ul--check og-scope">
+            {d.scope.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+        <div class="block og-res">
+          <p class="eyebrow eyebrow--accent">Результат</p>
+          <p class="lead">{d.result}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="dark">
+    <div class="wrap">
+      <div class="prose"><Content /></div>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Похожая задача"
+    title="Обсудим ваш объект"
+    text="Опишите тип объекта и то, как устроена приёмка. Скажем, чем ваш случай похож на этот и на что смотреть в первую очередь."
+    points={['Первая консультация бесплатна', 'Экспресс-проверка комплекта — за один рабочий день']}
+    theme="light"
+  />
+</Base>
+
+<style>
+  .oh {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: var(--s10);
+    align-items: center;
+    padding-block: var(--s6) var(--s8);
+  }
+
+  .oh-lead { margin-top: var(--s5); }
+
+  .oh-spec {
+    display: grid;
+    gap: var(--s4);
+    margin-top: var(--s8);
+    padding-top: var(--s6);
+    border-top: 1px solid var(--bd-soft);
+  }
+
+  .oh-spec div {
+    display: grid;
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1fr);
+    gap: var(--s5);
+    align-items: baseline;
+  }
+
+  .oh-spec dd { font-size: var(--fs-sm); font-weight: 600; }
+
+  .oh-dw { opacity: 0.9; }
+
+  @media (max-width: 900px) {
+    .oh { grid-template-columns: minmax(0, 1fr); gap: var(--s7); }
+  }
+
+  .og {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: var(--s10);
+    align-items: start;
+  }
+
+  .og h2 { margin-block: var(--s3) var(--s6); }
+  .og-scope { margin-top: var(--s2); }
+  .og-res { position: sticky; top: calc(var(--header-h) + var(--s6)); }
+
+  @media (max-width: 900px) {
+    .og { grid-template-columns: minmax(0, 1fr); gap: var(--s7); }
+    .og-res { position: static; }
+  }
+</style>

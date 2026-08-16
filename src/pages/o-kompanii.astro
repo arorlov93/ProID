@@ -1,0 +1,230 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Drawing from '../components/Drawing.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, stats } from '../data/site';
+import { breadcrumbs } from '../lib/schema';
+
+const crumbs = [{ href: '/o-kompanii', t: 'О компании' }];
+
+const principles = [
+  { ic: 'accept', t: 'Отвечаем за то, что сдали', d: 'Замечания по нашим документам закрываем без доплаты и без ограничения по количеству кругов. Это в договоре, а не в обещаниях на сайте.' },
+  { ic: 'ruble', t: 'Цены открыты целиком', d: 'Прайс на 28 позиций лежит на сайте с единицами и вилками. Считать вы можете до звонка. Пересчёт объёма согласуем письменно до начала работ.' },
+  { ic: 'warn', t: 'Говорим, когда не возьмёмся', d: 'Если объём недоказуем или срок нереален, скажем в первую неделю. Взять деньги и не успеть дороже для обеих сторон, чем отказаться сразу.' },
+  { ic: 'team', t: 'На объекте всегда двое', d: 'Ведущий инженер и подменяющий, оба в курсе состояния комплекта. Отпуск, болезнь и часовые пояса не останавливают работу.' },
+];
+---
+
+<Base
+  title="О компании ПрофИД — внешний отдел ПТО"
+  description="ПрофИД — внешний отдел ПТО: исполнительная документация, ППР и сметы. Опыт приёмки со стороны технического заказчика. Как мы работаем и за что отвечаем."
+  path="/o-kompanii"
+  schema={[breadcrumbs(crumbs)]}
+>
+  <section class="sec sec--tight" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <div class="ah">
+        <div>
+          <p class="eyebrow eyebrow--accent">О компании</p>
+          <h1>Внешний отдел ПТО</h1>
+          <p class="lead ah-lead">
+            ПрофИД ведёт исполнительную документацию, разрабатывает проекты производства работ и считает
+            сметы для строительных подрядчиков. Москва и область — с выездом на объект, остальная Россия —
+            дистанционно. Разница между нами и подрядчиком на разовых заказах в одном: мы отвечаем за
+            комплект на приёмке, а не сдаём его и уходим.
+          </p>
+        </div>
+        <Drawing kind="title" class="ah-dw" label="Титульный лист тома исполнительной документации со штампом приёмки" />
+      </div>
+
+      <dl class="ah-stats">
+        {
+          stats.map((s) => (
+            <div data-reveal>
+              <dt class="num"><span data-count={s.value}>{s.value}</span>{s.suffix}</dt>
+              <dd><b>{s.label}</b><span class="xs dim">{s.note}</span></dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="prose">
+        <h2>Откуда взялся подход</h2>
+        <p>
+          Ведущий инженер ПрофИД несколько лет работал на стороне технического заказчика и принимал
+          комплекты сам. Через его руки прошли документы десятков подрядчиков — и стало видно, что
+          возвраты почти всегда происходят по одним и тем же причинам, а не из-за сложности объекта.
+        </p>
+        <p>
+          Несходящиеся даты. Ссылки на редакции, отменённые два года назад. Паспорта, сваленные в конец
+          тома без привязки к актам. Объёмы, не бьющиеся с КС-2. Всё это ловится за пятнадцать минут
+          просмотра — и всё это можно было не допустить на этапе оформления.
+        </p>
+        <p>
+          Отсюда и подход: оформлять сразу под то, как документы будут проверять, а не под то, как их
+          удобно составлять. Разница в трудозатратах небольшая, разница в количестве возвратов —
+          принципиальная.
+        </p>
+
+        <h2>Как мы работаем</h2>
+        <p>
+          Первая неделя на любом объекте — ревизия. Смотрим проект, общий журнал, то, что уже оформлено,
+          переписку с надзором. По результату вы получаете письменную картину: что в порядке, что требует
+          доработки, что придётся восстанавливать и сколько это стоит.
+        </p>
+        <p>
+          Дальше — недельный ритм. Каждую пятницу выдаётся то, что закрыто за неделю, и короткий список
+          того, что упирается в исходные данные с вашей стороны. Список короткий намеренно: если в нём
+          двадцать пунктов, значит процесс сломан, и это повод разбираться, а не наращивать нагрузку на
+          площадку.
+        </p>
+        <p>
+          На приёмке комплект защищает инженер, который его вёл. Не менеджер и не служба поддержки —
+          человек, который знает, почему в акте от девятнадцатого числа стоит именно эта ссылка.
+        </p>
+
+        <h2>С чем не работаем</h2>
+        <p>
+          Не оформляем акты на работы, которых не было, и не подтверждаем качество, которое никто не
+          проверял. Восстановление документации — это сбор доказательств того, что работы выполнены;
+          комплект, собранный из ничего, разваливается на первой серьёзной проверке и создаёт риски
+          серьёзнее, чем задержка сдачи.
+        </p>
+        <p>
+          Если объём недоказуемого велик, мы скажем об этом до начала работ и предложим путь через
+          обследование. Он дороже и дольше, но за ним стоит проверяемый факт.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="dark">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Принципы</p>
+        <h2>Четыре вещи, на которых держится работа</h2>
+      </div>
+      <div class="grid grid--4">
+        {
+          principles.map((p) => (
+            <article class="card card--hover" data-reveal>
+              <span class="pr-ic" aria-hidden="true"><Icon name={p.ic as 'accept'} size={20} /></span>
+              <h3>{p.t}</h3>
+              <p>{p.d}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Реквизиты</p>
+        <h2>Формально</h2>
+      </div>
+      <dl class="req">
+        <div><dt>Наименование</dt><dd>{site.legalName}</dd></div>
+        <div><dt>ИНН</dt><dd>{site.inn || <span class="todo">TODO: заполнить в src/data/site.ts</span>}</dd></div>
+        <div><dt>ОГРН</dt><dd>{site.ogrn || <span class="todo">TODO: заполнить в src/data/site.ts</span>}</dd></div>
+        <div><dt>Регион работы</dt><dd>{site.addressRegion}, дистанционно по России</dd></div>
+        <div><dt>Часы работы</dt><dd>{site.hours}</dd></div>
+        <div><dt>Почта</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Знакомство"
+    title="Начните с бесплатной проверки"
+    text="Пришлите то, что уже собрано. Посмотрим до 30 позиций и за один рабочий день скажем, есть ли системная проблема. Это ни к чему не обязывает."
+    points={['Первая консультация инженера — бесплатно', 'Ответ в рабочее время в течение часа']}
+    theme="dark"
+  />
+</Base>
+
+<style>
+  .ah {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--s10);
+    align-items: center;
+    padding-block: var(--s6) var(--s8);
+  }
+
+  .ah-lead { margin-top: var(--s6); }
+  .ah-dw { opacity: 0.85; }
+
+  .ah-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s6);
+    padding-top: var(--s7);
+    border-top: 1px solid var(--bd-soft);
+  }
+
+  .ah-stats dt {
+    font-size: var(--fs-num);
+    font-weight: 700;
+    letter-spacing: var(--ls-h);
+    color: var(--g);
+    white-space: nowrap;
+    line-height: 1.05;
+  }
+
+  .ah-stats dd { margin-top: var(--s2); }
+  .ah-stats dd b { display: block; font-size: var(--fs-sm); }
+  .ah-stats dd span { display: block; line-height: 1.4; }
+
+  @media (max-width: 900px) {
+    .ah { grid-template-columns: minmax(0, 1fr); gap: var(--s7); }
+    .ah-dw { display: none; }
+  }
+
+  @media (max-width: 620px) {
+    .ah-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .pr-ic {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    margin-bottom: var(--s5);
+    border-radius: var(--r-in);
+    background: var(--veil-g);
+    color: var(--accent-tx);
+  }
+
+  .req {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4) var(--s10);
+  }
+
+  .req div {
+    display: grid;
+    grid-template-columns: minmax(0, 0.55fr) minmax(0, 1fr);
+    gap: var(--s5);
+    align-items: baseline;
+    padding-block: var(--s3);
+    border-bottom: 1px solid var(--bd-soft);
+  }
+
+  .req dt { font-size: var(--fs-xs); color: var(--tx-dim); }
+  .req dd { font-size: var(--fs-sm); font-weight: 600; }
+  .req a { color: var(--accent-tx); }
+  .todo { color: var(--warn-tx); font-weight: 600; font-size: var(--fs-xs); }
+
+  @media (max-width: 760px) {
+    .req { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

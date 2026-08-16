@@ -1,0 +1,33 @@
+{
+  "name": "profid-site",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "shot": "node scripts/shots.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arorlov93/ProID.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arorlov93/ProID/issues"
+  },
+  "homepage": "https://github.com/arorlov93/ProID#readme",
+  "dependencies": {
+    "astro": "^5.18.2"
+  },
+  "devDependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "html-validate": "^11.7.0",
+    "lighthouse": "^13.4.1",
+    "linkinator": "^8.0.3",
+    "playwright": "^1.62.1",
+    "sharp": "^0.35.3",
+    "typescript": "^5.9.3"
+  },
+  "private": true,
+  "type": "module"
+}

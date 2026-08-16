@@ -1,0 +1,346 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Drawing from '../components/Drawing.astro';
+import Faq from '../components/Faq.astro';
+import Icon from '../components/Icon.astro';
+import LeadForm from '../components/LeadForm.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { breadcrumbs, faqSchema, serviceSchema } from '../lib/schema';
+import { fmt } from '../data/prices';
+
+export const getStaticPaths = (async () => {
+  const items = await getCollection('services');
+  return items.map((s) => ({ params: { service: s.id }, props: { entry: s } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const d = entry.data;
+const path = `/${entry.id}`;
+const { Content } = await render(entry);
+
+const crumbs = [
+  { href: '/uslugi', t: 'Услуги' },
+  { href: path, t: d.h1 },
+];
+
+const schema = [
+  breadcrumbs(crumbs),
+  faqSchema(d.faq),
+  serviceSchema({
+    name: d.h1,
+    description: d.description,
+    path,
+    priceFrom: d.price.from,
+    unit: d.price.unit,
+  }),
+];
+---
+
+<Base title={d.title} description={d.description} path={path} schema={schema}>
+  <!-- Первый экран услуги -->
+  <section class="sec sec--tight srv-hero" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+
+      <div class="srv-top">
+        <div>
+          <p class="eyebrow eyebrow--accent">{d.eyebrow}</p>
+          <h1>{d.h1}</h1>
+          <p class="lead srv-lead">{d.lead}</p>
+
+          <div class="srv-price">
+            <div>
+              <p class="eyebrow">Цена</p>
+              <p class="srv-price-v num">
+                {d.price.from === 0 ? 'бесплатно' : `от ${fmt(d.price.from)} ₽`}
+                <span class="dim">/ {d.price.unit}</span>
+              </p>
+            </div>
+            <p class="xs dim srv-price-n">{d.price.note}</p>
+          </div>
+
+          <div class="btn-row srv-btns">
+            <a class="btn btn--lg" href="#zayavka-verh">Обсудить задачу</a>
+            <a class="btn btn--2 btn--lg" href="/ceny">Смотреть прайс</a>
+          </div>
+        </div>
+
+        <div class="srv-dw">
+          <Drawing kind={d.drawing} label={`${d.h1} — техническая графика`} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Форма после первого экрана -->
+  <section class="sec sec--tight" data-theme="light" id="zayavka-verh">
+    <div class="wrap">
+      <div class="srv-form1">
+        <div>
+          <p class="eyebrow">Первый шаг</p>
+          <h2>Пришлите вводные — посчитаем</h2>
+          <p class="mut">
+            Инженер посмотрит, что есть, и вернётся с вопросами и вилкой цены. Обычно в тот же день.
+            Первая консультация бесплатна.
+          </p>
+        </div>
+        <div class="block">
+          <LeadForm kind="zayavka" id="srv-top-form" service={path} compact />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Что входит -->
+  <section class="sec" data-theme="dark">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Состав</p>
+        <h2>Что входит</h2>
+      </div>
+      <ul class="ul ul--check ul--2">
+        {d.includes.map((i) => <li data-reveal>{i}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Когда это нужно -->
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Ситуации</p>
+        <h2>Когда это нужно</h2>
+      </div>
+      <div class:list={['grid', d.when.length === 3 ? 'grid--3' : 'grid--4']}>
+        {
+          d.when.map((w) => (
+            <article class="card card--hover" data-reveal>
+              <h3>{w.t}</h3>
+              <p>{w.d}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Отличие -->
+  <section class="sec" data-theme="dark">
+    <div class="wrap">
+      <div class="edge">
+        <div class="edge-l">
+          <p class="eyebrow eyebrow--accent">Разница</p>
+          <h2>{d.edge.t}</h2>
+          <p class="lead">{d.edge.d}</p>
+        </div>
+        <ul class="edge-pts">
+          {
+            d.edge.points.map((p) => (
+              <li data-reveal>
+                <span class="edge-ic" aria-hidden="true">
+                  <Icon name="accept" size={18} />
+                </span>
+                <span>{p}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Текст страницы -->
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="sec" data-theme="dark">
+    <div class="wrap">
+      <Faq items={d.faq} />
+    </div>
+  </section>
+
+  <!-- Перелинковка -->
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Дальше</p>
+        <h2>Смежные задачи</h2>
+      </div>
+      <div class:list={['grid', d.related.length >= 4 ? 'grid--4' : 'grid--3']}>
+        {
+          d.related.map((r) => (
+            <a class="card card--link rel" href={r.href} data-reveal>
+              <h3>{r.t}</h3>
+              <p>{r.d}</p>
+              <span class="tlink">Открыть</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Форма в конце -->
+  <CtaBand
+    eyebrow="Заявка"
+    title="Обсудим ваш объект"
+    text="Опишите задачу в двух предложениях — инженер вернётся с вопросами и вилкой цены. В рабочее время в течение часа."
+    points={[
+      'Первая консультация по вашему комплекту — бесплатно',
+      'Замечания по нашим документам закрываем без доплаты',
+      'Работаем по Москве и области с выездом, по России — дистанционно',
+    ]}
+    id="zayavka"
+    service={path}
+    theme="dark"
+  />
+</Base>
+
+<style>
+  .srv-hero {
+    padding-top: var(--s8);
+  }
+
+  .srv-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--s10);
+    align-items: center;
+    padding-bottom: var(--s8);
+  }
+
+  .srv-lead {
+    margin-top: var(--s6);
+  }
+
+  .srv-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s8);
+    margin-top: var(--s8);
+    padding: var(--s5) var(--s6);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-card);
+    background: var(--bg-card);
+  }
+
+  .srv-price-v {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    letter-spacing: var(--ls-h);
+    color: var(--accent-tx);
+  }
+
+  .srv-price-v span {
+    font-size: var(--fs-sm);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .srv-price-n {
+    flex: 1;
+    min-width: 240px;
+    max-width: 46ch;
+  }
+
+  .srv-btns {
+    margin-top: var(--s7);
+  }
+
+  .srv-dw {
+    opacity: 0.9;
+  }
+
+  @media (max-width: 1000px) {
+    .srv-top {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s8);
+    }
+
+    .srv-dw {
+      max-width: 560px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .srv-btns .btn {
+      width: 100%;
+    }
+  }
+
+  /* --- Форма после первого экрана --- */
+  .srv-form1 {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: var(--s9);
+    align-items: center;
+  }
+
+  .srv-form1 h2 {
+    margin-block: var(--s3) var(--s4);
+  }
+
+  .srv-form1 p {
+    font-size: var(--fs-sm);
+  }
+
+  @media (max-width: 900px) {
+    .srv-form1 {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s7);
+    }
+  }
+
+  /* --- Отличие --- */
+  .edge {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s10);
+    align-items: start;
+  }
+
+  .edge-pts {
+    list-style: none;
+    display: grid;
+    gap: var(--s4);
+  }
+
+  .edge-pts li {
+    display: flex;
+    gap: var(--s4);
+    align-items: flex-start;
+    padding: var(--s5);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-card);
+    background: var(--bg-card);
+    font-size: var(--fs-sm);
+    color: var(--tx-mut);
+  }
+
+  .edge-ic {
+    flex: none;
+    color: var(--accent-tx);
+    margin-top: 1px;
+  }
+
+  @media (max-width: 900px) {
+    .edge {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s7);
+    }
+  }
+
+  .rel h3 {
+    font-size: var(--fs-h4);
+  }
+</style>

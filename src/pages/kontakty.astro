@@ -1,0 +1,185 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Icon from '../components/Icon.astro';
+import Faq from '../components/Faq.astro';
+import { site } from '../data/site';
+import { breadcrumbs, faqSchema } from '../lib/schema';
+
+const crumbs = [{ href: '/kontakty', t: 'Контакты' }];
+
+const faq = [
+  { q: 'Как быстро вы отвечаете', a: 'В рабочее время — в течение часа. Вечером и в выходные заявка всё равно прочитывается: в команде двое в разных часовых поясах, поэтому окно ответа шире обычного рабочего дня.' },
+  { q: 'Что прислать, чтобы разговор был предметным', a: 'Рабочую документацию по разделу, общий журнал в текущем состоянии и письменные замечания заказчика, если они приходили. Этого хватает, чтобы назвать вилку цены в тот же день. Если чего-то нет — присылайте, что есть.' },
+  { q: 'Куда отправлять большие файлы', a: 'На почту ссылкой на облако или в Telegram — там проходят и архивы, и голосовые. Отдельный обменник разворачивать не нужно.' },
+  { q: 'Работаете с регионами', a: 'Да, дистанционно по всей России. Настраиваем сбор исходных данных с прорабом и работаем асинхронно. По Москве и области выезжаем на замеры, фотофиксацию и приёмку.' },
+  { q: 'Можно приехать в офис', a: 'Встречаемся на объекте или онлайн — так практичнее для обеих сторон. Если нужна личная встреча в Москве, договоримся отдельно.' },
+];
+---
+
+<Base
+  title="Контакты ПрофИД — внешний отдел ПТО в Москве"
+  description="Контакты ПрофИД: телефон, Telegram, почта. Заявка на исполнительную документацию, ППР и сметы. Отвечаем в течение часа, первая консультация бесплатна."
+  path="/kontakty"
+  schema={[breadcrumbs(crumbs), faqSchema(faq)]}
+>
+  <section class="sec sec--tight" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <div class="kt">
+        <div class="kt-l">
+          <p class="eyebrow eyebrow--accent">Контакты</p>
+          <h1>Напишите — посмотрим ваш комплект</h1>
+          <p class="lead kt-lead">
+            Первая консультация бесплатна: смотрим, что есть, и говорим, что с этим делать. Даже если
+            работать вместе не начнём. Экспресс-проверка до 30 позиций — за один рабочий день.
+          </p>
+
+          <ul class="kt-list">
+            <li>
+              <Icon name="clock" size={18} />
+              <div><b>{site.phoneHuman}</b><span class="xs dim">{site.hours}</span></div>
+              <a class="kt-cover" href={`tel:${site.phone}`} data-goal="tel" aria-label="Позвонить"></a>
+            </li>
+            <li>
+              <Icon name="chat" size={18} />
+              <div><b>@{site.telegram}</b><span class="xs dim">Быстрее всего — файлы и голосовые тоже</span></div>
+              <a class="kt-cover" href={site.telegramUrl} rel="noopener" data-goal="tg" aria-label="Написать в Telegram"></a>
+            </li>
+            <li>
+              <Icon name="mail" size={18} />
+              <div><b>{site.email}</b><span class="xs dim">Для проектов, смет и объёмных вложений</span></div>
+              <a class="kt-cover" href={`mailto:${site.email}`} data-goal="mail" aria-label="Написать письмо"></a>
+            </li>
+          </ul>
+
+          <div class="kt-geo">
+            <p class="eyebrow">География</p>
+            <p class="xs mut">
+              {site.addressRegion} — с выездом на объект: замеры, фотофиксация, участие в приёмке.
+              Остальная Россия — дистанционно. Разницу в часовых поясах закрываем вдвоём, заявка с
+              Дальнего Востока не ждёт до московского утра.
+            </p>
+            <ul class="kt-chips">
+              {site.serviceArea.map((c) => <li>{c}</li>)}
+            </ul>
+          </div>
+        </div>
+
+        <div class="kt-r block" id="zayavka">
+          <div class="kt-tabs" role="tablist" aria-label="Что отправить">
+            <button class="kt-tab is-on" type="button" role="tab" aria-selected="true" aria-controls="kt-p1" id="kt-t1">Заявка</button>
+            <button class="kt-tab" type="button" role="tab" aria-selected="false" aria-controls="kt-p2" id="kt-t2">Заказать звонок</button>
+          </div>
+          <div id="kt-p1" role="tabpanel" aria-labelledby="kt-t1"><LeadForm kind="zayavka" id="kt-zayavka" /></div>
+          <div id="kt-p2" role="tabpanel" aria-labelledby="kt-t2" hidden><LeadForm kind="call" id="kt-call" compact /></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap"><Faq items={faq} title="Как с нами удобнее работать" /></div>
+  </section>
+</Base>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.kt-tab'));
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle('is-on', on);
+        t.setAttribute('aria-selected', String(on));
+        const panel = document.getElementById(t.getAttribute('aria-controls')!);
+        if (panel) panel.hidden = !on;
+      });
+    });
+  });
+</script>
+
+<style>
+  .kt {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--s10);
+    align-items: start;
+    padding-block: var(--s6) var(--s8);
+  }
+
+  .kt-lead { margin-top: var(--s6); }
+
+  .kt-list {
+    list-style: none;
+    display: grid;
+    gap: var(--s3);
+    margin-top: var(--s8);
+  }
+
+  .kt-list li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    min-height: var(--tap);
+    padding: var(--s4) var(--s5);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-card);
+    color: var(--accent-line);
+    transition: border-color var(--t) var(--ease);
+  }
+
+  .kt-list li:hover { border-color: var(--accent-line); }
+  .kt-list b { display: block; font-size: var(--fs-body); color: var(--tx); }
+  .kt-list span { display: block; line-height: 1.4; }
+  .kt-cover { position: absolute; inset: 0; border-radius: var(--r-card); }
+
+  .kt-geo { margin-top: var(--s8); }
+  .kt-geo p.xs { max-width: 46ch; }
+
+  .kt-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    list-style: none;
+    margin-top: var(--s5);
+  }
+
+  .kt-chips li {
+    padding: 3px var(--s3);
+    border: 1px solid var(--bd-soft);
+    border-radius: var(--r-pill);
+    font-size: var(--fs-xs);
+    color: var(--tx-mut);
+  }
+
+  .kt-tabs {
+    display: flex;
+    gap: var(--s2);
+    margin-bottom: var(--s7);
+    padding-bottom: var(--s5);
+    border-bottom: 1px solid var(--bd);
+  }
+
+  .kt-tab {
+    min-height: var(--tap);
+    padding: var(--s2) var(--s5);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--r-pill);
+    color: var(--tx-mut);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--t) var(--ease), border-color var(--t) var(--ease), background-color var(--t) var(--ease);
+  }
+
+  .kt-tab:hover { color: var(--tx); }
+  .kt-tab.is-on { color: var(--accent-tx); border-color: var(--accent-line); background: var(--veil-g-soft); }
+
+  @media (max-width: 980px) {
+    .kt { grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
+  }
+</style>

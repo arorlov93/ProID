@@ -1,0 +1,176 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Popup from '../components/Popup.astro';
+import { site } from '../data/site';
+
+export interface Props {
+  title: string;
+  description: string;
+  path: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  schema?: Record<string, unknown>[];
+  publishedAt?: Date;
+  updatedAt?: Date;
+  /** Всплывающее окно с чек-листом. Выключаем на самом чек-листе и на служебных. */
+  popup?: boolean;
+}
+
+const { popup = true, ...seo } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#171c22" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/favicon.svg" color="#e0a94a" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <Seo {...seo} />
+    {/* Ставим метку до первой отрисовки: без неё блоки появления остаются видимыми,
+        и сайт полностью читается при выключенном JavaScript. */}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+
+  <body>
+    <Header />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {popup && <Popup />}
+
+    {/* Закреплённая полоса связи на мобильных — раздел 5.5 ТЗ. */}
+    <div class="callbar no-print" aria-hidden="false">
+      <a class="callbar-i" href={`tel:${site.phone}`} data-goal="tel">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"
+          ><path
+            d="M4.6 2.5h3l1.5 3.7-1.9 1.2a10.5 10.5 0 0 0 5.4 5.4l1.2-1.9 3.7 1.5v3c0 .8-.7 1.5-1.5 1.4A14.7 14.7 0 0 1 3.2 4c-.1-.8.6-1.5 1.4-1.5Z"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          /></svg
+        >
+        Позвонить
+      </a>
+      <a class="callbar-i" href={site.telegramUrl} rel="noopener" data-goal="tg">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"
+          ><path d="M17.5 3.3 2.8 9c-.8.3-.8 1.4 0 1.7l3.6 1.2 1.4 4.3c.2.7 1.1.9 1.6.3l2-2.2 3.7 2.7c.6.4 1.4.1 1.6-.6l2-11.9c.1-.8-.7-1.4-1.2-1.2Z"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          /></svg
+        >
+        Telegram
+      </a>
+      <a class="callbar-i callbar-i--main" href="/kontakty#zayavka">Оставить заявку</a>
+    </div>
+
+    <script>
+      import '../scripts/ui';
+    </script>
+
+    {
+      site.analytics.yandexMetrika && (
+        <script
+          is:inline
+          define:vars={{ id: site.analytics.yandexMetrika }}
+          set:html={`
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+        ym(${id},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
+      `}
+        />
+      )
+    }
+    {
+      site.analytics.yandexMetrika && (
+        <noscript>
+          <div>
+            <img
+              src={`https://mc.yandex.ru/watch/${site.analytics.yandexMetrika}`}
+              style="position:absolute;left:-9999px"
+              alt=""
+            />
+          </div>
+        </noscript>
+      )
+    }
+  </body>
+</html>
+
+<style>
+  main {
+    display: block;
+  }
+
+  .callbar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    gap: 1px;
+    background: var(--bd-d);
+    border-top: 1px solid var(--bd-d);
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translateY(110%);
+    transition: transform var(--t-slow) var(--ease);
+  }
+
+  :global(html.cb-on) .callbar {
+    transform: none;
+  }
+
+  .callbar-i {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+    min-height: 52px;
+    background: var(--d2);
+    color: var(--tx-d);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .callbar-i--main {
+    flex: 1.3;
+    background: var(--g);
+    color: var(--d);
+  }
+
+  @media (max-width: 760px) {
+    .callbar {
+      display: flex;
+    }
+
+    :global(body) {
+      padding-bottom: calc(52px + env(safe-area-inset-bottom));
+    }
+  }
+
+  @media print {
+    .callbar {
+      display: none;
+    }
+  }
+</style>

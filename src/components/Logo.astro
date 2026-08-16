@@ -1,0 +1,80 @@
+---
+/**
+ * Логотип — вариант A из logo.html: угловой штамп чертежа с галочкой приёмки.
+ * Знак несёт обещание «принято с первого раза», а не украшение.
+ */
+export interface Props {
+  variant?: 'full' | 'mark';
+  tone?: 'dark' | 'light';
+  height?: number;
+  class?: string;
+  title?: string;
+}
+
+const { variant = 'full', tone = 'dark', height = 34, class: cls = '', title } = Astro.props;
+
+// tone — это фон, на котором стоит знак.
+const line = tone === 'dark' ? '#e0a94a' : '#c9913a';
+const word = tone === 'dark' ? '#f2f4f6' : '#151a20';
+const sub = tone === 'dark' ? '#8f99a6' : '#6b7482';
+const w = variant === 'full' ? Math.round((height * 250) / 74) : height;
+---
+
+{
+  variant === 'full' ? (
+    <svg
+      class={`logo ${cls}`}
+      width={w}
+      height={height}
+      viewBox="0 0 250 74"
+      fill="none"
+      role={title ? 'img' : 'presentation'}
+      aria-label={title}
+      aria-hidden={title ? undefined : 'true'}
+      focusable="false"
+    >
+      <rect x="1" y="6" width="60" height="60" stroke={line} stroke-width="2" />
+      <path d="M1 21h60M1 51h60M16 6v15M16 51v15" stroke={line} stroke-width="1" opacity=".45" />
+      <path class="logo-tick" d="M18 37.5l9 9 17-19" stroke={line} stroke-width="4.5" stroke-linecap="square" />
+      <text x="78" y="38" font-size="27" font-weight="600" letter-spacing="-.4" font-family="var(--font)">
+        <tspan fill={word}>Проф</tspan><tspan fill={line}>ИД</tspan>
+      </text>
+      <text x="80" y="56" fill={sub} font-size="10" letter-spacing="1.6" font-family="var(--font)">
+        ВНЕШНИЙ ОТДЕЛ ПТО
+      </text>
+    </svg>
+  ) : (
+    <svg
+      class={`logo ${cls}`}
+      width={w}
+      height={height}
+      viewBox="0 0 62 62"
+      fill="none"
+      role={title ? 'img' : 'presentation'}
+      aria-label={title}
+      aria-hidden={title ? undefined : 'true'}
+      focusable="false"
+    >
+      <rect x="1" y="1" width="60" height="60" stroke={line} stroke-width="2" />
+      <path d="M1 16h60M1 46h60M16 1v15M16 46v15" stroke={line} stroke-width="1" opacity=".45" />
+      <path class="logo-tick" d="M18 32.5l9 9 17-19" stroke={line} stroke-width="4.5" stroke-linecap="square" />
+    </svg>
+  )
+}
+
+<style>
+  .logo {
+    display: block;
+    height: auto;
+  }
+
+  .logo-tick {
+    transition: transform var(--t-slow) var(--ease);
+    transform-origin: 31px 34px;
+  }
+
+  a:hover .logo .logo-tick,
+  a:focus-visible .logo .logo-tick {
+    transform: scale(1.12);
+  }
+</style>

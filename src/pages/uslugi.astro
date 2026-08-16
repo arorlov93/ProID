@@ -1,0 +1,145 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Drawing from '../components/Drawing.astro';
+import { breadcrumbs, itemListSchema } from '../lib/schema';
+import { fmt } from '../data/prices';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const crumbs = [{ href: '/uslugi', t: 'Услуги' }];
+const schema = [
+  breadcrumbs(crumbs),
+  itemListSchema('Услуги ПрофИД', services.map((s) => ({ href: `/${s.id}`, t: s.data.h1 }))),
+];
+---
+
+<Base
+  title="Услуги внешнего отдела ПТО — ИД, ППР, сметы"
+  description="Услуги ПТО в строительстве: оформление, ведение и восстановление исполнительной документации, аудит комплекта, разработка ППР, сметы. Открытый прайс, работа по РФ."
+  path="/uslugi"
+  schema={schema}
+>
+  <section class="sec sec--tight" data-theme="dark">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <div class="uh">
+        <div>
+          <p class="eyebrow eyebrow--accent">Услуги</p>
+          <h1>Услуги ПТО в строительстве</h1>
+          <p class="lead uh-lead">
+            Семь направлений, которые закрывают производственно-технический отдел целиком. Каждое можно
+            заказать отдельно или собрать из них абонентское обслуживание объекта. Цены везде открыты, ни
+            одной строки «по запросу».
+          </p>
+        </div>
+        <Drawing kind="stack" class="uh-dw" label="Комплект исполнительной документации — техническая графика" />
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-theme="light">
+    <div class="wrap">
+      <div class="ulist">
+        {
+          services.map((s) => (
+            <a class="card card--link ui" href={`/${s.id}`} data-reveal>
+              <div class="ui-l">
+                <p class="eyebrow">{s.data.card.tag}</p>
+                <h2>{s.data.h1}</h2>
+                <p class="mut">{s.data.card.short}</p>
+              </div>
+              <div class="ui-r">
+                <p class="ui-p num">
+                  {s.data.price.from === 0 ? 'бесплатно' : `от ${fmt(s.data.price.from)} ₽`}
+                </p>
+                <p class="xs dim">за {s.data.price.unit}</p>
+                <span class="tlink">Подробно</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Не выбрали"
+    title="Опишите задачу — подскажем, что нужно"
+    text="Не обязательно знать, называется это ведением, восстановлением или аудитом. Опишите ситуацию своими словами, инженер разберётся и предложит вариант."
+    points={[
+      'Первая консультация по вашему комплекту — бесплатно',
+      'Экспресс-проверка до 30 позиций — за один рабочий день',
+      'Ответ в рабочее время в течение часа',
+    ]}
+    theme="dark"
+  />
+</Base>
+
+<style>
+  .uh {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: var(--s10);
+    align-items: center;
+    padding-block: var(--s6) var(--s8);
+  }
+
+  .uh-lead {
+    margin-top: var(--s6);
+  }
+
+  .uh-dw {
+    opacity: 0.85;
+  }
+
+  @media (max-width: 900px) {
+    .uh { grid-template-columns: minmax(0, 1fr); gap: var(--s7); }
+    .uh-dw { display: none; }
+  }
+
+  .ulist {
+    display: grid;
+    gap: var(--gap-card);
+  }
+
+  .ui {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+    gap: var(--s8);
+    align-items: center;
+  }
+
+  .ui h2 {
+    font-size: var(--fs-h3);
+    margin-bottom: var(--s3);
+    max-width: none;
+  }
+
+  .ui p.mut {
+    font-size: var(--fs-sm);
+  }
+
+  .ui-r {
+    text-align: right;
+  }
+
+  .ui-p {
+    font-size: var(--fs-h4);
+    font-weight: 700;
+    color: var(--accent-tx);
+    white-space: nowrap;
+  }
+
+  .ui-r .tlink {
+    margin-top: var(--s4);
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 700px) {
+    .ui { grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
+    .ui-r { text-align: left; }
+    .ui-r .tlink { justify-content: flex-start; }
+  }
+</style>

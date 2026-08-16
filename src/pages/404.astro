@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Drawing from '../components/Drawing.astro';
+import { servicesNav, mainNav } from '../data/nav';
+---
+
+<Base
+  title="Страница не найдена — ПрофИД"
+  description="Страница не найдена. Здесь навигация по всем разделам сайта ПрофИД и форма заявки: опишите задачу, и инженер ответит на неё в течение часа в рабочее время."
+  path="/404"
+  noindex
+  popup={false}
+>
+  <section class="sec" data-theme="dark">
+    <div class="wrap">
+      <div class="nf">
+        <div>
+          <p class="eyebrow eyebrow--accent">Ошибка 404</p>
+          <h1>Такой страницы нет</h1>
+          <p class="lead nf-lead">
+            Ссылка устарела или в адресе опечатка. Ниже — все разделы сайта. Если искали что-то
+            конкретное, опишите задачу в форме: инженер ответит в течение часа и пришлёт нужную ссылку.
+          </p>
+
+          <nav class="nf-nav" aria-label="Разделы сайта">
+            <p class="eyebrow">Услуги</p>
+            <ul>
+              {servicesNav.map((s) => <li><a href={s.href}>{s.t}</a></li>)}
+            </ul>
+            <p class="eyebrow nf-nav-t">Разделы</p>
+            <ul>
+              {mainNav.map((n) => <li><a href={n.href}>{n.t}</a></li>)}
+              <li><a href="/checklist">Чек-лист состава ИД</a></li>
+            </ul>
+          </nav>
+
+          <p class="btn-row nf-btns">
+            <a class="btn btn--lg" href="/">На главную</a>
+            <a class="btn btn--2 btn--lg" href="/ceny">Смотреть прайс</a>
+          </p>
+        </div>
+
+        <div class="nf-r">
+          <div class="block"><LeadForm kind="zayavka" id="nf-form" compact title="Опишите задачу" /></div>
+          <Drawing kind="plan" class="nf-dw" label="План этажа — техническая графика" />
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+    gap: var(--s10);
+    align-items: start;
+  }
+
+  .nf-lead { margin-top: var(--s6); }
+
+  .nf-nav { margin-top: var(--s8); }
+  .nf-nav-t { margin-top: var(--s6); }
+
+  .nf-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s3);
+    list-style: none;
+  }
+
+  .nf-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: var(--s2) var(--s4);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-pill);
+    font-size: var(--fs-sm);
+    color: var(--tx-mut);
+    text-decoration: none;
+    transition: border-color var(--t) var(--ease), color var(--t) var(--ease);
+  }
+
+  .nf-nav a:hover { border-color: var(--accent-line); color: var(--accent-tx); }
+
+  .nf-btns { margin-top: var(--s8); }
+  .nf-dw { margin-top: var(--s8); opacity: 0.5; }
+
+  @media (max-width: 980px) {
+    .nf { grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
+    .nf-dw { display: none; }
+  }
+</style>

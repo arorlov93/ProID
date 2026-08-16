@@ -1,0 +1,108 @@
+---
+import { site } from '../data/site';
+
+export interface Props {
+  title: string;
+  description: string;
+  /** Путь без домена и без завершающего слэша: /oformlenie-id */
+  path: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  /** Готовые куски JSON-LD, кроме Organization/LocalBusiness — они ставятся всегда. */
+  schema?: Record<string, unknown>[];
+  publishedAt?: Date;
+  updatedAt?: Date;
+}
+
+const {
+  title,
+  description,
+  path,
+  ogType = 'website',
+  noindex = false,
+  schema = [],
+  publishedAt,
+  updatedAt,
+} = Astro.props;
+
+const canonical = site.url + (path === '/' ? '/' : path);
+const ogImage = `${site.url}/og${path === '/' ? '/index' : path}.png`;
+
+const org = {
+  '@type': 'Organization',
+  '@id': `${site.url}/#org`,
+  name: site.name,
+  legalName: site.legalName,
+  url: site.url,
+  logo: { '@type': 'ImageObject', url: `${site.url}/logo.svg`, width: 512, height: 512 },
+  description: 'Внешний отдел ПТО: исполнительная документация, ППР, сметы. Москва и область, дистанционно по России.',
+  email: site.email,
+  telephone: site.phone,
+  areaServed: site.serviceArea.map((n) => ({ '@type': 'AdministrativeArea', name: n })),
+  sameAs: [site.telegramUrl],
+  ...(site.inn ? { taxID: site.inn } : {}),
+};
+
+const localBusiness = {
+  '@type': 'ProfessionalService',
+  '@id': `${site.url}/#business`,
+  name: `${site.name} — ${site.tagline}`,
+  parentOrganization: { '@id': `${site.url}/#org` },
+  url: site.url,
+  telephone: site.phone,
+  email: site.email,
+  priceRange: '₽₽',
+  image: `${site.url}/logo.svg`,
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: 'RU',
+    addressRegion: site.addressRegion,
+    addressLocality: site.addressLocality,
+    ...(site.streetAddress ? { streetAddress: site.streetAddress } : {}),
+    ...(site.postalCode ? { postalCode: site.postalCode } : {}),
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
+  openingHours: site.hoursSchema,
+  areaServed: site.serviceArea.map((n) => ({ '@type': 'City', name: n })),
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  url: site.url,
+  name: site.name,
+  inLanguage: 'ru-RU',
+  publisher: { '@id': `${site.url}/#org` },
+};
+
+const graph = { '@context': 'https://schema.org', '@graph': [org, localBusiness, website, ...schema] };
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+{!noindex && <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={title} />
+{publishedAt && <meta property="article:published_time" content={publishedAt.toISOString()} />}
+{updatedAt && <meta property="article:modified_time" content={updatedAt.toISOString()} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<meta name="geo.region" content="RU-MOW" />
+<meta name="geo.placename" content="Москва" />
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(graph)} />
