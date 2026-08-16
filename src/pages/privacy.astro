@@ -32,12 +32,13 @@ const operator = site.legalName + (site.inn ? `, ИНН ${site.inn}` : '');
   <section class="sec" data-theme="light">
     <div class="wrap wrap--narrow">
       <div class="prose">
+        {/* Заполнить в src/data/site.ts: legalName, inn, ogrn, streetAddress, postalCode.
+            Как только они заданы, этот блок исчезает сам. */}
         {!site.inn && (
           <p class="pv-todo">
-            <b>TODO перед публикацией.</b> В <code>src/data/site.ts</code> не заполнены реквизиты
-            оператора: <code>legalName</code>, <code>inn</code>, <code>ogrn</code>,
-            <code>streetAddress</code>. Без них политика не соответствует требованиям части 2 статьи 18.1
-            152-ФЗ. Значения подставятся во все места документа автоматически.
+            <b>Документ не готов к публикации.</b> Не заполнены реквизиты оператора: наименование
+            юридического лица, ИНН, ОГРН и адрес. Без них политика не отвечает требованиям части 2
+            статьи 18.1 152-ФЗ. После заполнения значения подставятся по всему документу автоматически.
           </p>
         )}
 

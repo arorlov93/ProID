@@ -133,8 +133,10 @@ const principles = [
       </div>
       <dl class="req">
         <div><dt>Наименование</dt><dd>{site.legalName}</dd></div>
-        <div><dt>ИНН</dt><dd>{site.inn || <span class="todo">TODO: заполнить в src/data/site.ts</span>}</dd></div>
-        <div><dt>ОГРН</dt><dd>{site.ogrn || <span class="todo">TODO: заполнить в src/data/site.ts</span>}</dd></div>
+        {/* Пока реквизиты не заданы в src/data/site.ts, здесь видна пометка —
+            опубликовать сайт, не заметив пропуска, не получится. */}
+        <div><dt>ИНН</dt><dd>{site.inn || <span class="todo">не заполнено</span>}</dd></div>
+        <div><dt>ОГРН</dt><dd>{site.ogrn || <span class="todo">не заполнено</span>}</dd></div>
         <div><dt>Регион работы</dt><dd>{site.addressRegion}, дистанционно по России</dd></div>
         <div><dt>Часы работы</dt><dd>{site.hours}</dd></div>
         <div><dt>Почта</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd></div>

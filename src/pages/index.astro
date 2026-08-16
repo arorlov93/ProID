@@ -199,7 +199,8 @@ const schema = [
               </div>
               <div class="obj-tx">
                 <p class="eyebrow">
-                  {o.data.city} · {o.data.year}
+                  {o.data.city}
+                  {!o.data.year.startsWith('TODO') && <> · {o.data.year}</>}
                 </p>
                 <h3>{o.data.h1}</h3>
                 <p>{o.data.kind}</p>
