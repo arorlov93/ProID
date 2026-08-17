@@ -36,7 +36,7 @@ const services = defineCollection({
     /** Перелинковка: 3–5 ссылок на смежные услуги и статьи. */
     related: z.array(z.object({ href: z.string(), t: z.string(), d: z.string() })).min(3).max(5),
     /** Что рисовать в шапке страницы. */
-    drawing: z.enum(['plan', 'section', 'title', 'stack']).default('plan'),
+    drawing: z.enum(['plan', 'section', 'title', 'node']).default('plan'),
     card: z.object({ short: z.string(), tag: z.string() }),
   }),
 });
@@ -75,7 +75,7 @@ const objects = defineCollection({
     spec: z.array(z.object({ k: z.string(), v: z.string() })),
     scope: z.array(z.string()).min(4),
     result: z.string(),
-    drawing: z.enum(['plan', 'section', 'title', 'stack']).default('plan'),
+    drawing: z.enum(['plan', 'section', 'title', 'node']).default('plan'),
   }),
 });
 

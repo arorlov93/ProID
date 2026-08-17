@@ -1,0 +1,344 @@
+/* ============================================================================
+   Начертание чертежей.
+
+   Главное здесь — иерархия толщин по ГОСТ 2.303. Именно она отличает чертёж от
+   схемы: контур сечения втрое толще размерной линии, штриховка тоньше обеих.
+   Толщины заданы в единицах viewBox и не масштабируются вместе с картинкой
+   (vector-effect), поэтому чертёж читается и в карточке 300 px, и на весь экран.
+   ========================================================================= */
+
+:root {
+  --lw-cut: 2.1px;   /* контур сечения — самая толстая линия листа */
+  --lw-main: 1.15px; /* видимый контур */
+  --lw-thin: 0.65px; /* размерные, выносные, штриховка */
+  --lw-hair: 0.45px; /* осевые и подложка */
+}
+
+.dw-svg :where(line, path, rect, circle, polyline) {
+  vector-effect: non-scaling-stroke;
+  fill: none;
+}
+
+.dw-svg text {
+  font-family: var(--font);
+  fill: var(--bp);
+  letter-spacing: 0.02em;
+}
+
+/* --- Толщины --------------------------------------------------------------- */
+
+.d-cut {
+  stroke: var(--bp);
+  stroke-width: var(--lw-cut);
+  stroke-linejoin: miter;
+}
+
+.d-main {
+  stroke: var(--bp);
+  stroke-width: var(--lw-main);
+  opacity: 0.9;
+}
+
+.d-thin {
+  stroke: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.68;
+}
+
+.d-dim,
+.d-dim-ext {
+  stroke: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.55;
+}
+
+/* Засечка под 45° вместо стрелки — так размеры ставят в строительных чертежах. */
+.d-tick {
+  stroke: var(--bp);
+  stroke-width: 1.1px;
+  opacity: 0.95;
+}
+
+.d-arrow {
+  stroke: var(--bp);
+  fill: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.85;
+}
+
+/* Осевая — штрихпунктир по ГОСТ 2.303. */
+.d-axis {
+  stroke: var(--bp);
+  stroke-width: var(--lw-hair);
+  stroke-dasharray: 16 4 2.5 4;
+  opacity: 0.5;
+}
+
+.d-axis-mark {
+  stroke: var(--bp);
+  stroke-width: var(--lw-main);
+  opacity: 0.85;
+}
+
+.d-room-n {
+  stroke: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.7;
+}
+
+/* Разомкнутая линия сечения — толще контура сечения. */
+.d-cut-mark {
+  stroke: var(--bp);
+  stroke-width: 3.4px;
+  stroke-linecap: butt;
+}
+
+/* Полотно двери и отсечная гидроизоляция. */
+.d-leaf {
+  stroke: var(--bp);
+  stroke-width: var(--lw-main);
+  opacity: 0.8;
+}
+
+/* Дуга открывания — тоньше полотна. */
+.d-arc {
+  stroke: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.45;
+}
+
+/* Линия обрыва. */
+.d-break {
+  stroke: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.7;
+}
+
+.d-fig {
+  stroke: var(--bp);
+  stroke-width: var(--lw-thin);
+  opacity: 0.55;
+}
+
+.d-dot {
+  fill: var(--bp);
+  stroke: none;
+  opacity: 0.9;
+}
+
+.d-node {
+  stroke: var(--bp);
+  stroke-width: var(--lw-main);
+  stroke-dasharray: 7 5;
+  opacity: 0.55;
+}
+
+/* Проём: перекрывает поше стены цветом фона секции. */
+.d-void {
+  fill: var(--dw-ground, var(--bg, var(--d)));
+  stroke: none;
+}
+
+/* --- Заливки сечений ------------------------------------------------------- */
+
+.d-poche {
+  stroke: none;
+}
+
+/* Сплошная заливка сечения — для мелких масштабов, где штриховка не читается. */
+.d-solid {
+  fill: var(--bp);
+  opacity: 0.3;
+}
+
+.d-hatch {
+  stroke: var(--bp);
+  stroke-width: 0.62px;
+  opacity: 0.58;
+  fill: none;
+}
+
+.d-hatch-dot {
+  fill: var(--bp);
+  stroke: none;
+  opacity: 0.55;
+}
+
+.d-grid {
+  stroke: var(--bp);
+  stroke-width: 0.5px;
+  opacity: 0.07;
+  fill: none;
+}
+
+/* --- Отметки уровня -------------------------------------------------------- */
+
+.d-lvl {
+  stroke: var(--g);
+  stroke-width: var(--lw-main);
+  fill: none;
+}
+
+.d-lvl-txt {
+  fill: var(--g);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Текст ----------------------------------------------------------------- */
+
+.d-txt {
+  font-size: 11.5px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.d-txt-s {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.72;
+}
+
+.d-txt-xs {
+  font-size: 8.6px;
+  font-weight: 500;
+  opacity: 0.62;
+  letter-spacing: 0.01em;
+}
+
+.d-dim-txt {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+
+.d-axis-txt {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.d-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.95;
+}
+
+.d-title-lg {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  opacity: 0.98;
+}
+
+.d-tb-name {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.d-tb-val {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Штамп приёмки --------------------------------------------------------- */
+
+.d-ok-box {
+  stroke: var(--ok);
+  stroke-width: var(--lw-main);
+  opacity: 0.85;
+}
+
+.d-ok-tick {
+  stroke: var(--ok);
+  stroke-width: 3.2px;
+  stroke-linecap: square;
+}
+
+.d-ok-t {
+  fill: var(--ok);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.d-ok-s {
+  fill: var(--ok);
+  font-size: 9px;
+  font-weight: 500;
+  opacity: 0.85;
+  letter-spacing: 0.04em;
+}
+
+/* --- Отрисовка линиями при появлении ---------------------------------------
+   Прочерчиваются только контуры. Штриховка, текст и штамп проявляются следом:
+   заливку нельзя «провести карандашом», а текст, ползущий по букве, выглядит
+   аттракционом, а не чертежом. */
+
+.dw-svg[data-draw] :is(.d-cut, .d-main, .d-thin, .d-dim, .d-dim-ext, .d-tick, .d-leaf, .d-arc, .d-break, .d-axis-mark, .d-room-n, .d-cut-mark, .d-lvl, .d-ok-box, .d-ok-tick) {
+  stroke-dasharray: 5200;
+  stroke-dashoffset: 5200;
+  transition: stroke-dashoffset 1.6s var(--ease);
+}
+
+.dw-svg[data-draw] .d-axis {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease) 0.2s;
+}
+
+.dw-svg[data-draw] :is(.d-poche, .d-fig, .d-dot, .d-arrow, .d-node, text) {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease) 0.75s;
+}
+
+.dw-svg[data-draw].drawn .d-solid {
+  opacity: 0.3;
+}
+
+.dw-svg[data-draw].drawn :is(.d-cut, .d-main, .d-thin, .d-dim, .d-dim-ext, .d-tick, .d-leaf, .d-arc, .d-break, .d-axis-mark, .d-room-n, .d-cut-mark, .d-lvl, .d-ok-box, .d-ok-tick) {
+  stroke-dashoffset: 0;
+}
+
+.dw-svg[data-draw].drawn .d-axis {
+  opacity: 0.5;
+}
+
+.dw-svg[data-draw].drawn :is(.d-poche, .d-fig, .d-dot, .d-arrow, .d-node) {
+  opacity: 1;
+}
+
+.dw-svg[data-draw].drawn text {
+  opacity: 1;
+}
+
+/* Без JS класс .drawn не появится, поэтому чертёж должен быть виден сразу. */
+html:not(.js) .dw-svg :is(line, path, rect, circle) {
+  stroke-dashoffset: 0 !important;
+}
+
+html:not(.js) .dw-svg :is(.d-poche, .d-fig, .d-dot, .d-arrow, .d-axis, .d-node, text) {
+  opacity: 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dw-svg :is(line, path, rect, circle) {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+
+  .dw-svg :is(.d-poche, .d-fig, .d-dot, .d-arrow, .d-node, text) {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .dw-svg .d-axis {
+    opacity: 0.5 !important;
+    transition: none !important;
+  }
+}
