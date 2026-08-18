@@ -244,17 +244,29 @@ log('\n=== 9. Файлы для роботов ===');
 {
   const robots = await readFile(join(DIST, 'robots.txt'), 'utf8').catch(() => '');
   log(`  robots.txt: ${robots ? 'есть' : 'НЕТ'}`);
-  for (const need of ['Sitemap:', 'Host:', 'Clean-param:']) {
-    if (!robots.includes(need)) flag('robots.txt', `нет строки ${need}`);
+
+  /* Справочный режим: сборка закрыта от индексации намеренно (production
+     в src/data/site.ts). Требовать от неё Host, Sitemap и разрешений для
+     роботов бессмысленно — проверяем ровно обратное. */
+  const closed = /^\s*Disallow:\s*\/\s*$/m.test(robots) && !/Allow:/.test(robots);
+  if (closed) {
+    log('  режим: справочная сборка, индексация закрыта целиком');
+    const open = pages.filter((p) => !p.robots.includes('noindex'));
+    log(`  страниц без noindex: ${open.length} (должно быть 0)`);
+    open.forEach((p) => flag(p.url, 'открыта для индексации в справочной сборке'));
+  } else {
+    for (const need of ['Sitemap:', 'Host:', 'Clean-param:']) {
+      if (!robots.includes(need)) flag('robots.txt', `нет строки ${need}`);
+    }
+    const ai = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'ClaudeBot', 'Google-Extended', 'YandexAdditional'];
+    const known = ai.filter((b) => robots.includes(b));
+    log(`  явно названо роботов языковых моделей: ${known.length} из ${ai.length}${known.length ? ' — ' + known.join(', ') : ''}`);
+    if (!known.length) flag('robots.txt', 'роботы языковых моделей не названы — ни разрешены, ни запрещены явно');
   }
-  const ai = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'ClaudeBot', 'Google-Extended', 'YandexAdditional'];
-  const known = ai.filter((b) => robots.includes(b));
-  log(`  явно названо роботов языковых моделей: ${known.length} из ${ai.length}${known.length ? ' — ' + known.join(', ') : ''}`);
-  if (!known.length) flag('robots.txt', 'роботы языковых моделей не названы — ни разрешены, ни запрещены явно');
 
   const sm = await readFile(join(DIST, 'sitemap-0.xml'), 'utf8').catch(() => '');
   const inSitemap = new Set(all(sm, /<loc>([^<]+)<\/loc>/g).map(([, u]) => new URL(u).pathname.replace(/\/$/, '') || '/'));
-  const missing = pages.filter((p) => !inSitemap.has(p.url) && !p.robots.includes('noindex'));
+  const missing = closed ? [] : pages.filter((p) => !inSitemap.has(p.url) && !p.robots.includes('noindex'));
   log(`  в sitemap: ${inSitemap.size} адресов, не попало страниц: ${missing.length}`);
   missing.forEach((p) => flag(p.url, 'нет в sitemap'));
   log(`  lastmod в sitemap: ${/lastmod/.test(sm) ? 'есть' : 'НЕТ'}`);

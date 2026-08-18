@@ -1,5 +1,5 @@
 ---
-import { site } from '../data/site';
+import { production, site } from '../data/site';
 import { offerCatalog, webPage } from '../lib/schema';
 
 export interface Props {
@@ -118,8 +118,14 @@ const graph = {
 <link rel="canonical" href={canonical} />
 <link rel="alternate" hreflang="ru-RU" href={canonical} />
 <link rel="alternate" hreflang="x-default" href={canonical} />
-{noindex && <meta name="robots" content="noindex, follow" />}
-{!noindex && <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+{/* Справочная сборка целиком закрыта от индексации — см. комментарий
+    к production в src/data/site.ts. */}
+{(noindex || !production) && (
+  <meta name="robots" content={production ? 'noindex, follow' : 'noindex, nofollow'} />
+)}
+{!noindex && production && (
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+)}
 
 <meta property="og:type" content={ogType} />
 <meta property="og:site_name" content={site.name} />
