@@ -1,5 +1,4 @@
 import {
-  DEFS,
   breakLine,
   mmLabels,
   mmTotal,
@@ -20,6 +19,7 @@ import {
   titleBlock,
   txt,
 } from './draw';
+import { akt, smeta, strojgenplan, zhurnal } from './sheets';
 
 /**
  * Четыре листа. Геометрия считается в миллиметрах объекта и переводится в
@@ -211,7 +211,7 @@ export function plan() {
     }),
   );
 
-  return `${DEFS}${s.join('')}`;
+  return s.join('');
 }
 
 /* ═══ РАЗРЕЗ 1—1 ═══════════════════════════════════════════════════════════
@@ -329,7 +329,7 @@ export function section() {
     }),
   );
 
-  return `${DEFS}${s.join('')}`;
+  return s.join('');
 }
 
 /* ═══ ТИТУЛЬНЫЙ ЛИСТ ТОМА ══════════════════════════════════════════════════
@@ -390,7 +390,7 @@ export function title() {
     }),
   );
 
-  return `${DEFS}${s.join('')}`;
+  return s.join('');
 }
 
 /* ═══ УЗЕЛ ПРИМЫКАНИЯ ══════════════════════════════════════════════════════
@@ -494,7 +494,7 @@ export function node() {
 
   s.push(
     titleBlock(400, 528, 312, {
-      name: 'Узел 1. Примыкание',
+      name: 'Узел 1',
       sheet: 'Корпус 2 · монолит',
       stage: 'Р',
       num: '58',
@@ -503,9 +503,11 @@ export function node() {
     }),
   );
 
-  return `${DEFS}${s.join('')}`;
+  return s.join('');
 }
 
-export const KINDS = { plan, section, title, node } as const;
+export { DEFS } from './draw';
+
+export const KINDS = { plan, section, title, node, strojgenplan, akt, zhurnal, smeta } as const;
 export type DrawingKind = keyof typeof KINDS;
 export const VIEWBOX = `0 0 ${W} ${H}`;

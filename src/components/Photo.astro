@@ -1,0 +1,77 @@
+---
+import { Image } from 'astro:assets';
+import Drawing from './Drawing.astro';
+import { photos, type PhotoId } from '../data/photos';
+
+/**
+ * Место под фотографию.
+ *
+ * Если в `src/assets/foto/` лежит файл с именем места — показывается он:
+ * Astro сам пережмёт его, отдаст AVIF и WebP и проставит ширину с высотой,
+ * поэтому вёрстка не прыгает при загрузке. Если файла нет — на этом месте
+ * стоит чертёж, а не серая заглушка: пустой прямоугольник с надписью
+ * «фото» выглядит как недоделанный сайт, чертёж — как осознанный выбор.
+ *
+ * Ключ места и имя файла совпадают: hero.jpg, obekt-vdnh.jpg. Ничего
+ * подключать руками не нужно, список мест — в src/data/photos.ts.
+ */
+
+const files = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/foto/*.{jpg,jpeg,png,webp,avif}',
+  { eager: true },
+);
+
+const byName = new Map(
+  Object.entries(files).map(([p, m]) => [p.split('/').pop()!.replace(/\.[^.]+$/, ''), m.default]),
+);
+
+export interface Props {
+  id: PhotoId;
+  class?: string;
+  /** Перебить подпись из реестра. Пустая строка — убрать подпись совсем. */
+  caption?: string;
+  /** Первый экран: грузим сразу, а не лениво. */
+  eager?: boolean;
+  /** Как чертёж-заместитель ведёт себя в широком месте: обрезать или вписать. */
+  fit?: 'meet' | 'slice';
+}
+
+const { id, class: cls = '', caption, eager = false, fit = 'meet' } = Astro.props;
+const slot = photos[id];
+const img = byName.get(id);
+const cap = caption === undefined ? slot.caption : caption || undefined;
+---
+
+{
+  img ? (
+    <figure class={`ph ${cls}`} style={`--ph-ar:${slot.ratio[0]}/${slot.ratio[1]}`}>
+      <Image
+        class="ph-img"
+        src={img}
+        alt={slot.alt}
+        widths={[480, 800, 1280, 1800]}
+        sizes={slot.sizes}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+      {cap && <figcaption class="dw-cap">{cap}</figcaption>}
+    </figure>
+  ) : (
+    <Drawing kind={slot.fallback} class={cls} label={slot.fallbackAlt} caption={cap} fit={fit} />
+  )
+}
+
+<style>
+  .ph {
+    margin: 0;
+  }
+
+  .ph-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: var(--ph-ar);
+    object-fit: cover;
+    border-radius: var(--r-card);
+  }
+</style>

@@ -14,6 +14,13 @@
   --lw-hair: 0.45px; /* осевые и подложка */
 }
 
+.dw-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 .dw-svg :where(line, path, rect, circle, polyline) {
   vector-effect: non-scaling-stroke;
   fill: none;
@@ -131,6 +138,22 @@
   stroke-width: var(--lw-main);
   stroke-dasharray: 7 5;
   opacity: 0.55;
+}
+
+/* Волосяная линия: разграфка бланков, шпалы кранового пути, строки таблиц.
+   Тоньше .d-thin — иначе бланк из тридцати строк выглядит как решётка. */
+.d-hair {
+  stroke: var(--bp);
+  stroke-width: var(--lw-hair);
+  opacity: 0.45;
+}
+
+/* Росчерк в графе подписи. Не буквы: подпись на чертеже — жест, а не текст. */
+.d-sign {
+  stroke: var(--bp);
+  stroke-width: var(--lw-main);
+  stroke-linecap: round;
+  opacity: 0.75;
 }
 
 /* Проём: перекрывает поше стены цветом фона секции. */
@@ -281,7 +304,7 @@
    заливку нельзя «провести карандашом», а текст, ползущий по букве, выглядит
    аттракционом, а не чертежом. */
 
-.dw-svg[data-draw] :is(.d-cut, .d-main, .d-thin, .d-dim, .d-dim-ext, .d-tick, .d-leaf, .d-arc, .d-break, .d-axis-mark, .d-room-n, .d-cut-mark, .d-lvl, .d-ok-box, .d-ok-tick) {
+.dw-svg[data-draw] :is(.d-cut, .d-main, .d-thin, .d-dim, .d-dim-ext, .d-tick, .d-leaf, .d-arc, .d-break, .d-axis-mark, .d-room-n, .d-cut-mark, .d-lvl, .d-hair, .d-sign, .d-ok-box, .d-ok-tick) {
   stroke-dasharray: 5200;
   stroke-dashoffset: 5200;
   transition: stroke-dashoffset 1.6s var(--ease);
@@ -301,7 +324,7 @@
   opacity: 0.3;
 }
 
-.dw-svg[data-draw].drawn :is(.d-cut, .d-main, .d-thin, .d-dim, .d-dim-ext, .d-tick, .d-leaf, .d-arc, .d-break, .d-axis-mark, .d-room-n, .d-cut-mark, .d-lvl, .d-ok-box, .d-ok-tick) {
+.dw-svg[data-draw].drawn :is(.d-cut, .d-main, .d-thin, .d-dim, .d-dim-ext, .d-tick, .d-leaf, .d-arc, .d-break, .d-axis-mark, .d-room-n, .d-cut-mark, .d-lvl, .d-hair, .d-sign, .d-ok-box, .d-ok-tick) {
   stroke-dashoffset: 0;
 }
 

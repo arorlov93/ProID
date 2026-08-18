@@ -237,6 +237,26 @@ a:hover {
   padding-block: var(--s9);
 }
 
+/* Чертёжная сетка на тёмных секциях. Без неё промежутки между блоками
+   читались сплошным чёрным полем — «экран не загрузился». Растворяется
+   книзу, чтобы не спорить с текстом и таблицами. */
+.sec[data-theme='dark']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--tex-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tex-line) 1px, transparent 1px);
+  background-size: var(--tex-step) var(--tex-step);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 62%);
+}
+
+.sec > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
 /* Тонкая линия между двумя секциями одного тона — граница читается, каши нет. */
 .sec + .sec[data-theme='dark'] {
   border-top: 1px solid var(--bd-d-soft);

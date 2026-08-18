@@ -373,5 +373,42 @@ log('\n=== 11. Самые тяжёлые файлы сборки ===');
   log(`  всего в dist: ${(total / 1024 / 1024).toFixed(2)} МБ, файлов: ${files.length}`);
 }
 
+/* ── 12. Цена на каждой посадочной ────────────────────────────────────────────
+   Раздел с услугой, на котором не написано, сколько это стоит, отправляет
+   человека обратно в поиск. Проверяем не наличие символа рубля где-нибудь
+   на странице, а цену в первом экране — до прокрутки. */
+log('\n=== 12. Цена в первом экране посадочных ===');
+{
+  const landings = [
+    '/', '/uslugi', '/ceny',
+    '/oformlenie-id', '/vedenie-id', '/vosstanovlenie-id',
+    '/autsorsing-pto', '/ppr', '/smety', '/audit-komplekta',
+  ];
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+  let bad = 0;
+  for (const url of landings) {
+    await page.goto(BASE + url, { waitUntil: 'domcontentloaded' });
+    const found = await page.evaluate(() => {
+      const seen = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const t = n.nodeValue.trim();
+        if (!/[₽]|бесплатн/i.test(t)) continue;
+        const el = n.parentElement;
+        if (!el || !el.offsetParent) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top < 0 || r.top > 900 || r.width === 0) continue;
+        seen.push(t.replace(/\s+/g, ' ').slice(0, 40));
+      }
+      return seen;
+    });
+    if (!found.length) bad++;
+    log(`  ${url.padEnd(22)} ${found.length ? found[0] : 'ЦЕНЫ В ПЕРВОМ ЭКРАНЕ НЕТ'}`);
+  }
+  log(`  посадочных без цены до прокрутки: ${bad} из ${landings.length}`);
+  await ctx.close();
+}
+
 await browser.close();
 console.log('\n— конец —');

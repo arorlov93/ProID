@@ -6,7 +6,10 @@ import Calculator from '../components/Calculator.astro';
 import Faq from '../components/Faq.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { breadcrumbs, faqSchema } from '../lib/schema';
-import { prices } from '../data/prices';
+import { byId, fmt, prices } from '../data/prices';
+
+/* Опорные цены первого экрана — из того же прайса, что и таблица ниже. */
+const anchors = [byId.aosr, byId.komplekt, byId['abon-s']];
 
 const crumbs = [{ href: '/ceny', t: 'Цены' }];
 
@@ -56,6 +59,19 @@ const schema = [breadcrumbs(crumbs), faqSchema(faq)];
         считать вы можете до звонка, а не после трёх переговоров. Цены действуют для Москвы, области и
         дистанционной работы по России.
       </p>
+      {/* Три опорные цены до прокрутки. Страница «Цены», на первом экране
+          которой нет ни одной цифры, работает против самой себя. */}
+      <ul class="ce-anchor">
+        {
+          anchors.map((p) => (
+            <li>
+              <b class="num acc">от {fmt(p.from)} ₽</b>
+              <span class="xs dim">за {p.unit}</span>
+            </li>
+          ))
+        }
+      </ul>
+
       <div class="btn-row ce-btns">
         <a class="btn btn--lg" href="#kalkulyator">Посчитать по своим объёмам</a>
         <a class="btn btn--2 btn--lg" href="#zayavka">Обсудить объём</a>
@@ -121,6 +137,23 @@ const schema = [breadcrumbs(crumbs), faqSchema(faq)];
 
 <style>
   .ce-lead { margin-top: var(--s6); }
+  .ce-anchor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4) var(--s8);
+    list-style: none;
+    margin-top: var(--s7);
+  }
+
+  .ce-anchor li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s2);
+    white-space: nowrap;
+  }
+
+  .ce-anchor b { font-size: var(--fs-h4); }
+
   .ce-btns { margin-top: var(--s7); }
   .ce-note { margin-top: var(--s8); }
   @media (max-width: 620px) { .ce-btns .btn { width: 100%; } }

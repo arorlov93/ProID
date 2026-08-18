@@ -6,6 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Popup from '../components/Popup.astro';
 import { site } from '../data/site';
+import { DEFS } from '../lib/drawings';
 
 export interface Props {
   title: string;
@@ -43,6 +44,11 @@ const { popup = true, ...seo } = Astro.props;
   </head>
 
   <body>
+    {/* Штриховки и сетка чертежей — один раз на страницу. Раньше каждый лист
+        нёс свою копию <defs>, и на главной девять чертежей давали девять
+        блоков с одинаковыми идентификаторами: лишний вес и невалидный HTML. */}
+    <svg class="dw-defs" aria-hidden="true" focusable="false" width="0" height="0" set:html={DEFS} />
+
     <Header />
 
     <main id="main">

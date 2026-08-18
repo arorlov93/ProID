@@ -36,7 +36,7 @@ const services = defineCollection({
     /** Перелинковка: 3–5 ссылок на смежные услуги и статьи. */
     related: z.array(z.object({ href: z.string(), t: z.string(), d: z.string() })).min(3).max(5),
     /** Что рисовать в шапке страницы. */
-    drawing: z.enum(['plan', 'section', 'title', 'node']).default('plan'),
+    drawing: z.enum(['plan', 'section', 'title', 'node', 'strojgenplan', 'akt', 'zhurnal', 'smeta']).default('plan'),
     card: z.object({ short: z.string(), tag: z.string() }),
   }),
 });
@@ -50,6 +50,8 @@ const blog = defineCollection({
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     cluster: z.enum(['Б', 'В']),
+    /** Лист, который стоит в шапке карточки статьи. */
+    drawing: z.enum(['plan', 'section', 'title', 'node', 'strojgenplan', 'akt', 'zhurnal', 'smeta']).default('title'),
     /** Аннотация для листинга и og:description. */
     excerpt: z.string().min(90).max(280),
     readingMin: z.number(),
@@ -75,7 +77,7 @@ const objects = defineCollection({
     spec: z.array(z.object({ k: z.string(), v: z.string() })),
     scope: z.array(z.string()).min(4),
     result: z.string(),
-    drawing: z.enum(['plan', 'section', 'title', 'node']).default('plan'),
+    drawing: z.enum(['plan', 'section', 'title', 'node', 'strojgenplan', 'akt', 'zhurnal', 'smeta']).default('plan'),
   }),
 });
 

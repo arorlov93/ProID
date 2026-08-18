@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Drawing from '../components/Drawing.astro';
+import Photo from '../components/Photo.astro';
 import Icon from '../components/Icon.astro';
 import Faq from '../components/Faq.astro';
 import Calculator from '../components/Calculator.astro';
@@ -8,7 +8,8 @@ import PriceTable from '../components/PriceTable.astro';
 import LeadForm from '../components/LeadForm.astro';
 import { site, stats } from '../data/site';
 import { servicesNav } from '../data/nav';
-import { byId, priceLabel } from '../data/prices';
+import type { PhotoId } from '../data/photos';
+import { byId, fmt, priceLabel } from '../data/prices';
 import { faqSchema, itemListSchema } from '../lib/schema';
 import { getCollection } from 'astro:content';
 
@@ -33,24 +34,24 @@ const process = [
   { n: '04', t: 'Защищаем на приёмке', d: 'Отрабатываем замечания технадзора и заказчика до подписи. Замечания после сдачи закрываем без доплаты.' },
 ] as const;
 
+/* Три опорные цены первого экрана — из прайса, а не набранные руками. */
+const heroPrices = [byId.aosr, byId.komplekt, byId['abon-s']];
+
 const scenes = [
   {
-    dw: 'plan',
+    ph: 'razbor',
     t: 'Разбор проекта',
     d: 'Начинаем не с бланков, а с проекта. Ищем, где рабочая документация разошлась со стройкой: перенесённые оси, изменённые узлы, снятые с производства материалы. Это те места, откуда потом приходят возвраты.',
-    label: 'План этажа с осями и размерными цепочками — разбор проектной документации',
   },
   {
-    dw: 'section',
+    ph: 'vedenie',
     t: 'Ведение по ходу работ',
     d: 'Акт закрывается, пока работа видна, а не через полгода по памяти прораба. Отметки берём из исполнительной геодезии, ссылки на нормативы подставляем сразу, а не при сдаче.',
-    label: 'Разрез здания с отметками уровней и башенным краном — ведение документации по ходу работ',
   },
   {
-    dw: 'title',
+    ph: 'komplekt',
     t: 'Приёмка комплекта',
     d: 'Том уходит с описью, реестром и титулом, прошитый и пронумерованный. Если у комиссии возникают вопросы, на них отвечает инженер, который этот комплект вёл, а не менеджер.',
-    label: 'Титульный лист тома исполнительной документации со штампом приёмки',
   },
 ] as const;
 
@@ -114,6 +115,25 @@ const schema = [
           <a class="btn btn--2 btn--lg" href="/audit-komplekta">Проверить комплект</a>
         </div>
 
+        {/* Цена в первом экране. Раздел с услугой, на котором не написано,
+            сколько это стоит, отправляет человека обратно в поиск: считать
+            он всё равно будет, но уже на чужом сайте. Числа берутся из
+            прайса, поэтому разойтись с таблицей не могут. */}
+        <p class="hero-price">
+          {
+            heroPrices.map((p, i) => (
+              <>
+                {i > 0 && <span class="hero-price-sep" aria-hidden="true">·</span>}
+                <span class="hero-price-i">
+                  <b class="num acc">от {fmt(p.from)} ₽</b>
+                  <span class="xs dim">за {p.unit}</span>
+                </span>
+              </>
+            ))
+          }
+          <a class="tlink hero-price-l" href="/ceny">Весь прайс</a>
+        </p>
+
         <p class="hero-badge">
           <span class="pulse" aria-hidden="true"></span>
           {site.responsePromise}
@@ -137,11 +157,7 @@ const schema = [
       </div>
 
       <div class="hero-r">
-        <Drawing
-          kind="plan"
-          label="План этажа с осями, размерными цепочками и штампом приёмки — исполнительная документация"
-          caption="План с размерными цепочками, осями и штампом приёмки — то, как комплект выглядит после нас"
-        />
+        <Photo id="hero" eager />
       </div>
     </div>
   </section>
@@ -194,8 +210,8 @@ const schema = [
         {
           objects.map((o) => (
             <a class="card card--link obj" href={`/obekty/${o.id}`} data-reveal>
-              <div class="obj-dw" aria-hidden="true">
-                <Drawing kind={o.data.drawing} label="" />
+              <div class="obj-media">
+                <Photo id={`obekt-${o.id}` as PhotoId} caption="" />
               </div>
               <div class="obj-tx">
                 <p class="eyebrow">
@@ -314,8 +330,12 @@ const schema = [
 
       <div class="grid grid--3">
         {
-          services.map((s) => (
-            <a class="card card--link srv" href={`/${s.id}`} data-reveal>
+          services.map((s, i) => (
+            <a
+              class={`card card--link srv${i === services.length - 1 ? ' srv--wide' : ''}`}
+              href={`/${s.id}`}
+              data-reveal
+            >
               <p class="eyebrow">{s.data.card.tag}</p>
               <h3>{s.data.h1}</h3>
               <p>{s.data.card.short}</p>
@@ -449,9 +469,19 @@ const schema = [
   <!-- ═══ 9. Процесс ═══════════════════════════════════════════════════ -->
   <section class="sec" data-theme="dark" id="process">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Процесс</p>
-        <h2>Четыре шага от заявки до подписи</h2>
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Процесс</p>
+          <h2>Четыре шага от заявки до подписи</h2>
+        </div>
+        <p class="mut">
+          От первого разговора до подписи на титуле. Каждый шаг заканчивается документом, который можно
+          показать: вилкой цены, договором, разделом комплекта, подписанным актом.
+        </p>
+      </div>
+
+      <div class="band" data-reveal>
+        <Photo id="ploshchadka" fit="slice" />
       </div>
 
       <ol class="steps">
@@ -481,7 +511,7 @@ const schema = [
           scenes.map((s, i) => (
             <article class={`scene ${i % 2 ? 'scene--rev' : ''}`} data-reveal>
               <div class="scene-dw">
-                <Drawing kind={s.dw as 'plan'} label={s.label} />
+                <Photo id={s.ph as PhotoId} caption="" />
               </div>
               <div class="scene-tx">
                 <p class="eyebrow">Сцена {String(i + 1).padStart(2, '0')}</p>
@@ -639,6 +669,38 @@ const schema = [
     margin-top: var(--s8);
   }
 
+  .hero-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s2) var(--s5);
+    margin-top: var(--s7);
+  }
+
+  .hero-price-i {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s2);
+    white-space: nowrap;
+  }
+
+  .hero-price-i b {
+    font-size: var(--fs-h4);
+  }
+
+  .hero-price-sep {
+    color: var(--tx-dim);
+  }
+
+  .hero-price-l {
+    margin-left: var(--s2);
+  }
+
+  @media (max-width: 520px) {
+    .hero-price-sep { display: none; }
+    .hero-price { gap: var(--s2) var(--s5); }
+  }
+
   .hero-badge {
     display: inline-flex;
     align-items: center;
@@ -748,34 +810,57 @@ const schema = [
   }
 
   .obj {
-    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    min-height: 300px;
-    padding: var(--s7);
+    padding: 0;
     overflow: hidden;
   }
 
-  .obj-dw {
-    position: absolute;
-    inset: -4% -10% auto auto;
-    width: 62%;
-    opacity: 0.34;
-    pointer-events: none;
-    /* Чертёж-подложка растворяется к краю карточки: жёсткий обрез
-       рассекает штамп посреди слова и читается как дефект вёрстки. */
-    mask-image: linear-gradient(200deg, #000 30%, transparent 78%);
+  /* Изображение занимает верх карточки целиком, а не подмешивается под текст.
+     Подложка из чертежа с растворением к краю выглядела грязью: на карточке
+     шириной 300 px от листа оставался нечитаемый обрезок штампа. */
+  .obj-media {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--bd-soft);
+    background: var(--d-deep);
+    --dw-ground: var(--d-deep);
+  }
+
+  .obj-media :global(.dw),
+  .obj-media :global(.ph) {
+    height: 100%;
+  }
+
+  .obj-media :global(.dw-svg) {
+    height: 100%;
+    aspect-ratio: auto;
+    padding: var(--s4);
+    opacity: 0.78;
     transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
   }
 
-  .obj:hover .obj-dw {
-    opacity: 0.55;
-    transform: translateY(-4px);
+  .obj-media :global(.ph-img) {
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    transition: transform var(--t-slow) var(--ease);
+  }
+
+  .obj:hover .obj-media :global(.dw-svg) {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  .obj:hover .obj-media :global(.ph-img) {
+    transform: scale(1.03);
   }
 
   .obj-tx {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--s6) var(--s7) var(--s7);
   }
 
   .obj h3 {
@@ -792,7 +877,6 @@ const schema = [
 
   @media (max-width: 700px) {
     .obj-grid { grid-template-columns: minmax(0, 1fr); }
-    .obj { min-height: 260px; }
   }
 
   .sec-more {
@@ -868,6 +952,54 @@ const schema = [
     font-size: var(--fs-h4);
   }
 
+  /* Семь услуг в три колонки оставляли две пустые клетки в правом нижнем
+     углу — самый заметный провал вёрстки на странице. Последняя карточка
+     занимает строку целиком и раскладывается в ряд. */
+  .srv--wide {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 641px) {
+    .srv--wide {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto;
+      grid-template-rows: auto auto;
+      column-gap: var(--s8);
+      row-gap: var(--s3);
+      align-items: center;
+    }
+
+    .srv--wide > .eyebrow {
+      grid-area: 1 / 1;
+      align-self: end;
+      margin: 0;
+    }
+
+    .srv--wide h3 {
+      grid-area: 2 / 1;
+      align-self: start;
+      margin: 0;
+    }
+
+    .srv--wide > p:not(.srv-p):not(.eyebrow) {
+      grid-area: 1 / 2 / 3 / 3;
+      margin: 0;
+    }
+
+    .srv--wide .srv-p {
+      grid-area: 1 / 3;
+      align-self: end;
+      margin: 0;
+      padding: 0;
+      border-top: 0;
+    }
+
+    .srv--wide .tlink {
+      grid-area: 2 / 3;
+      align-self: start;
+    }
+  }
+
   /* ── Свой или внешний ─────────────────────────────────────────────────── */
   .calc2 {
     display: grid;
@@ -938,6 +1070,39 @@ const schema = [
   }
 
   /* ── Процесс ──────────────────────────────────────────────────────────── */
+  /* Широкая полоса изображения перед шагами. Без неё раздел был четырьмя
+     колонками текста на чёрном — самое плоское место на странице. */
+  .band {
+    margin-bottom: var(--s9);
+    overflow: hidden;
+    border: 1px solid var(--bd-soft);
+    border-radius: var(--r-block);
+    background: var(--d-deep);
+    --dw-ground: var(--d-deep);
+  }
+
+  /* Лист обрезается по широкому месту, а не вписывается целиком: вписанный
+     чертёж занимал бы 40% полосы, остальное оставалось пустым чёрным. */
+  .band :global(.dw-svg) {
+    aspect-ratio: 21 / 8;
+  }
+
+  .band :global(.ph-img) {
+    border-radius: 0;
+  }
+
+  .band :global(.dw-cap) {
+    margin: 0;
+    padding: var(--s5) var(--s7) var(--s6);
+    border-top: 1px solid var(--bd-soft);
+  }
+
+  @media (max-width: 700px) {
+    .band :global(.dw-svg) {
+      aspect-ratio: 36 / 31;
+    }
+  }
+
   .steps {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1007,6 +1172,7 @@ const schema = [
 
   .scene-dw {
     background: var(--d);
+    --dw-ground: var(--d);
     border: 1px solid var(--bd);
     border-radius: var(--r-block);
     padding: var(--s6);

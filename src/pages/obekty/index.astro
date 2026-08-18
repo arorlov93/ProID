@@ -2,7 +2,8 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import Drawing from '../../components/Drawing.astro';
+import Photo from '../../components/Photo.astro';
+import type { PhotoId } from '../../data/photos';
 import CtaBand from '../../components/CtaBand.astro';
 import { breadcrumbs, itemListSchema } from '../../lib/schema';
 
@@ -39,8 +40,8 @@ const schema = [
         {
           objects.map((o) => (
             <a class="card card--link obc" href={`/obekty/${o.id}`} data-reveal>
-              <div class="obc-dw" aria-hidden="true">
-                <Drawing kind={o.data.drawing} label="" />
+              <div class="obc-media">
+                <Photo id={`obekt-${o.id}` as PhotoId} caption="" />
               </div>
               <div class="obc-tx">
                 <p class="eyebrow">{o.data.city}</p>
@@ -82,29 +83,53 @@ const schema = [
   }
 
   .obc {
-    position: relative;
     overflow: hidden;
-    min-height: 340px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    padding: 0;
   }
 
-  .obc-dw {
-    position: absolute;
-    inset: -6% -12% auto auto;
-    width: 60%;
-    opacity: 0.3;
-    pointer-events: none;
-    /* Чертёж-подложка растворяется к краю карточки: жёсткий обрез
-       рассекает штамп посреди слова и читается как дефект вёрстки. */
-    mask-image: linear-gradient(200deg, #000 30%, transparent 78%);
-    transition: opacity var(--t-slow) var(--ease);
+  /* Изображение занимает верх карточки целиком. Прежняя подложка с чертежом,
+     растворяющимся к краю, давала нечитаемый обрезок штампа и читалась
+     грязью, а не иллюстрацией. */
+  /* Чертёж рисуется чертёжным синим, рассчитанным на тёмный фон: на светлой
+     карточке он выцветал. Подложке задаётся тёмный тон и --dw-ground, иначе
+     проёмы в стенах заливались светлым и выглядели дырами. */
+  .obc-media {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--bd-soft);
+    background: var(--d);
+    --dw-ground: var(--d);
   }
 
-  .obc:hover .obc-dw { opacity: 0.5; }
+  .obc-media :global(.dw),
+  .obc-media :global(.ph) { height: 100%; }
 
-  .obc-tx { position: relative; }
+  .obc-media :global(.dw-svg) {
+    height: 100%;
+    aspect-ratio: auto;
+    padding: var(--s4);
+    opacity: 0.72;
+    transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
+  }
+
+  .obc-media :global(.ph-img) {
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    transition: transform var(--t-slow) var(--ease);
+  }
+
+  .obc:hover .obc-media :global(.dw-svg) { opacity: 1; transform: scale(1.02); }
+  .obc:hover .obc-media :global(.ph-img) { transform: scale(1.03); }
+
+  .obc-tx {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--s6) var(--s7) var(--s7);
+  }
 
   .obc h2 {
     font-size: var(--fs-h3);

@@ -19,9 +19,11 @@ export interface Props {
   caption?: string;
   /** Описание для читающих с экрана. Пустая строка — чертёж декоративный. */
   label: string;
+  /** 'slice' — заполнить место обрезкой полей, 'meet' — вписать целиком. */
+  fit?: 'meet' | 'slice';
 }
 
-const { kind, class: cls = '', caption, label } = Astro.props;
+const { kind, class: cls = '', caption, label, fit = 'meet' } = Astro.props;
 const svg = KINDS[kind]();
 const decorative = label === '';
 ---
@@ -31,7 +33,7 @@ const decorative = label === '';
     class="dw-svg"
     viewBox={VIEWBOX}
     data-draw
-    preserveAspectRatio="xMidYMid meet"
+    preserveAspectRatio={`xMidYMid ${fit}`}
     role={decorative ? 'presentation' : 'img'}
     aria-label={decorative ? undefined : label}
     aria-hidden={decorative ? 'true' : undefined}

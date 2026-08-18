@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Drawing from '../../components/Drawing.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import { breadcrumbs, itemListSchema } from '../../lib/schema';
 
@@ -41,6 +42,9 @@ const fmtDate = (d: Date) =>
         {
           posts.map((p) => (
             <article class="card card--hover bl-i" data-reveal>
+              <div class="bl-media">
+                <Drawing kind={p.data.drawing} label="" fit="slice" />
+              </div>
               <div class="bl-meta">
                 <span class="eyebrow">Кластер {p.data.cluster}</span>
                 <span class="xs dim num">
@@ -76,6 +80,29 @@ const fmtDate = (d: Date) =>
 
 <style>
   .bl-lead { margin-top: var(--s6); }
+
+  /* Шапка карточки: фрагмент листа, о котором статья. Три текстовых карточки
+     подряд читались как список ссылок, а не как материалы. */
+  .bl-media {
+    aspect-ratio: 16 / 7;
+    margin: calc(var(--s7) * -1) calc(var(--s7) * -1) var(--s6);
+    overflow: hidden;
+    border-bottom: 1px solid var(--bd-soft);
+    border-radius: var(--r-card) var(--r-card) 0 0;
+    background: var(--d);
+    --dw-ground: var(--d);
+  }
+
+  .bl-media :global(.dw-svg) {
+    height: 100%;
+    aspect-ratio: auto;
+    opacity: 0.75;
+    transition: opacity var(--t-slow) var(--ease);
+  }
+
+  .bl-i:hover .bl-media :global(.dw-svg) {
+    opacity: 1;
+  }
 
   .bl {
     display: grid;
