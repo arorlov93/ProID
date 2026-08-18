@@ -8,11 +8,16 @@ import CtaBand from '../../components/CtaBand.astro';
 import { breadcrumbs } from '../../lib/schema';
 
 export const getStaticPaths = (async () => {
-  const items = await getCollection('objects');
-  return items.map((o) => ({ params: { object: o.id }, props: { entry: o } }));
+  const items = (await getCollection('objects')).sort((a, b) => a.data.order - b.data.order);
+  return items.map((o) => ({
+    params: { object: o.id },
+    /* Остальные объекты передаём сразу: без перекрёстных ссылок карточка
+       объекта собирала всего две входящие — из листинга и из главной. */
+    props: { entry: o, others: items.filter((x) => x.id !== o.id) },
+  }));
 }) satisfies GetStaticPaths;
 
-const { entry } = Astro.props;
+const { entry, others } = Astro.props;
 const d = entry.data;
 const path = `/obekty/${entry.id}`;
 const { Content } = await render(entry);
@@ -31,7 +36,7 @@ const crumbs = [
         <div>
           <p class="eyebrow eyebrow--accent">{d.city}</p>
           <h1>{d.h1}</h1>
-          <p class="lead oh-lead">{d.kind}</p>
+          <p class="lead oh-lead">{d.lead}</p>
 
           <dl class="oh-spec">
             {
@@ -73,6 +78,35 @@ const crumbs = [
     </div>
   </section>
 
+  <section class="sec sec--tight" data-theme="light">
+    <div class="wrap">
+      <div class="sec-head sec-head--split">
+        <div>
+          <p class="eyebrow">Ещё объекты</p>
+          <h2>Другие типы объектов и приёмок</h2>
+        </div>
+        <p class="mut">
+          Состав комплекта и порядок приёмки на них устроены по-разному — от объекта наследия
+          до портовой гидротехники.
+        </p>
+      </div>
+      <ul class="ob-more">
+        {
+          others.map((o) => (
+            <li>
+              <a class="card card--link ob-more-i" href={`/obekty/${o.id}`}>
+                <p class="eyebrow">{o.data.city}</p>
+                <h3>{o.data.h1}</h3>
+                <p class="mut">{o.data.kind}</p>
+                <span class="tlink">Что делали</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
   <CtaBand
     eyebrow="Похожая задача"
     title="Обсудим ваш объект"
@@ -89,6 +123,34 @@ const crumbs = [
     gap: var(--s10);
     align-items: center;
     padding-block: var(--s6) var(--s8);
+  }
+
+  .ob-more {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-card);
+    list-style: none;
+  }
+
+  .ob-more-i {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .ob-more-i h3 {
+    font-size: var(--fs-h4);
+    margin-block: var(--s2) var(--s3);
+  }
+
+  .ob-more-i p.mut {
+    flex: 1;
+    font-size: var(--fs-sm);
+    margin-bottom: var(--s5);
+  }
+
+  @media (max-width: 860px) {
+    .ob-more { grid-template-columns: minmax(0, 1fr); }
   }
 
   .oh-lead { margin-top: var(--s5); }

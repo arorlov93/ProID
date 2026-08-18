@@ -146,6 +146,36 @@ CORS: приёмник должен разрешать запросы с бое�
 
 ---
 
+## Поиск и языковые модели
+
+Что уже настроено и почему это стоит понимать, прежде чем править:
+
+- **`/llms.txt`** — карта сайта для языковых моделей: описание компании, все
+  услуги с ценами, весь прайс, объекты, статьи и оговорки для цитирования.
+  Собирается на сборке из `prices.ts`, `site.ts` и коллекций, поэтому
+  разойтись с сайтом не может. Править сам файл нельзя — он генерируется.
+- **`robots.txt`** называет роботов языковых моделей поимённо и открывает им
+  доступ: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot,
+  Google-Extended, YandexAdditional, Applebot-Extended. Молчание такие роботы
+  трактуют по-разному, поэтому решение записано явно. Закрыть доступ —
+  поменять `Allow` на `Disallow` у нужного робота.
+- **Микроразметка**: на каждой странице граф из `Organization`,
+  `ProfessionalService`, `WebSite` и `WebPage`; у услуг — `Service` с ценой,
+  у прайса — `AggregateOffer`, у главной, услуг и цен — `OfferCatalog`
+  со всеми 28 позициями. У организации заполнен `knowsAbout` — список тем,
+  по которым её должны находить без упоминания названия.
+- **`speakable`** на статьях и посадочных: первый абзац и `.lead` помечены как
+  пригодные для голосового и краткого ответа.
+- **Прямой ответ после h1.** На каждой странице первый абзац самодостаточен:
+  читается отдельно от заголовка и от остального текста. Это то, что модель
+  вытащит в ответ. Проверяется `scripts/seo.mjs`, норма — 120–600 знаков.
+
+Ключевое правило при правке текстов: **не сокращайте главную фразу до
+аббревиатуры в title и h1**. «ИД» в заголовке экономит место и теряет запрос —
+люди набирают «исполнительная документация».
+
+---
+
 ## Аналитика и цели
 
 Метрика подключается одним полем `analytics.yandexMetrika`. Пока оно пустое,
@@ -189,8 +219,8 @@ CORS: приёмник должен разрешать запросы с бое�
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name profid.ru;
-    root /var/www/profid/dist;
+    server_name pro-pto.com;
+    root /var/www/pro-pto/dist;
 
     error_page 404 /404.html;
     gzip on;
@@ -203,14 +233,14 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name www.profid.ru;
-    return 301 https://profid.ru$request_uri;
+    server_name www.pro-pto.com;
+    return 301 https://pro-pto.com$request_uri;
 }
 
 server {
     listen 80;
-    server_name profid.ru www.profid.ru;
-    return 301 https://profid.ru$request_uri;
+    server_name pro-pto.com www.pro-pto.com;
+    return 301 https://pro-pto.com$request_uri;
 }
 ```
 
@@ -255,7 +285,7 @@ src/
     └── typograf.js     русская типографика по готовому HTML
 
 public/                 robots.txt, favicon, иконки, манифест
-scripts/                audit.mjs, checks.mjs, shots.mjs — проверки
+scripts/                audit.mjs, seo.mjs, checks.mjs, shots.mjs — проверки
 ```
 
 **Правило по стилям.** Ни одного магического числа вне `tokens.css`. Нужен новый
@@ -287,6 +317,9 @@ npm run build && npm run preview   # в отдельном окне
 node scripts/audit.mjs    # текст без JS, вес, контраст, формы, разметка,
                           # метатеги, запрещённые обороты, типографика, ссылки,
                           # цена в первом экране каждой посадочной
+node scripts/seo.mjs      # метатеги, иерархия заголовков, canonical,
+                          # микроразметка, прямой ответ после h1, перелинковка,
+                          # robots.txt, sitemap, llms.txt
 node scripts/checks.mjs   # 320 px, цели нажатия, работа без JS,
                           # prefers-reduced-motion
 node scripts/shots.mjs    # скриншоты всех страниц: 1440 и 390

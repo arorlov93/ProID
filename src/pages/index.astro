@@ -9,7 +9,7 @@ import LeadForm from '../components/LeadForm.astro';
 import { site, stats } from '../data/site';
 import { servicesNav } from '../data/nav';
 import type { PhotoId } from '../data/photos';
-import { byId, fmt, priceLabel } from '../data/prices';
+import { byId, fmt, priceLabel, unitAcc } from '../data/prices';
 import { faqSchema, itemListSchema } from '../lib/schema';
 import { getCollection } from 'astro:content';
 
@@ -97,6 +97,8 @@ const schema = [
   description="Внешний отдел ПТО: оформление, ведение и восстановление исполнительной документации, ППР и сметы. Москва и область, дистанционно по России. Прайс открыт."
   path="/"
   schema={schema}
+  offers
+  speakable
 >
   <!-- ═══ 1. Первый экран ═══════════════════════════════════════════════ -->
   <section class="sec hero" data-theme="dark">
@@ -126,7 +128,7 @@ const schema = [
                 {i > 0 && <span class="hero-price-sep" aria-hidden="true">·</span>}
                 <span class="hero-price-i">
                   <b class="num acc">от {fmt(p.from)} ₽</b>
-                  <span class="xs dim">за {p.unit}</span>
+                  <span class="xs dim">за {unitAcc(p.unit)}</span>
                 </span>
               </>
             ))
@@ -344,7 +346,7 @@ const schema = [
                   {s.data.price.from === 0 ? 'бесплатно' : `от ${s.data.price.from.toLocaleString('ru-RU')} ₽`}
                 </b>
                 <span class="xs dim">
-                  {s.data.price.from === 0 ? 'до 30 позиций' : `за ${s.data.price.unit}`}
+                  {s.data.price.from === 0 ? 'до 30 позиций' : `за ${unitAcc(s.data.price.unit)}`}
                 </span>
               </p>
               <span class="tlink">Подробно</span>

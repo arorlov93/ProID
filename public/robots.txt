@@ -1,3 +1,4 @@
+# Обычные поисковые роботы
 User-agent: *
 Allow: /
 Disallow: /404
@@ -8,5 +9,48 @@ Allow: /
 Disallow: /404
 Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&yclid&gclid&from&_openstat
 
-Host: https://profid.ru
-Sitemap: https://profid.ru/sitemap-index.xml
+# Роботы языковых моделей и ответных сервисов.
+#
+# Названы поимённо намеренно. Молчание такие роботы трактуют по-разному:
+# часть считает его разрешением, часть — запретом, и сайт то появляется
+# в ответах, то нет. Здесь доступ открыт: для отдела ПТО попасть в ответ
+# нейросети на вопрос «сколько стоит АОСР» ценнее, чем закрыть от неё прайс,
+# который и так открыт всем. Карта для машинного чтения — /llms.txt
+#
+# Чтобы закрыть доступ, поменяйте Allow на Disallow у нужного робота.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: YandexAdditional
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Host: https://pro-pto.com
+Sitemap: https://pro-pto.com/sitemap-index.xml

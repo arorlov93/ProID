@@ -7,6 +7,9 @@ export interface Props {
   kind?: 'zayavka' | 'call' | 'checklist';
   id?: string;
   title?: string;
+  /** Уровень заголовков формы. 2 — когда форма идёт сразу после h1 страницы:
+      пропуск уровня h1 → h3 ломает разбор структуры роботом. */
+  level?: 2 | 3;
   note?: string;
   submit?: string;
   compact?: boolean;
@@ -18,6 +21,7 @@ const {
   kind = 'zayavka',
   id = kind,
   title,
+  level = 3,
   note,
   submit = kind === 'checklist' ? 'Прислать чек-лист' : kind === 'call' ? 'Перезвоните мне' : 'Отправить заявку',
   compact = false,
@@ -25,6 +29,7 @@ const {
 } = Astro.props;
 
 const thanksId = `${id}-thanks`;
+const H = `h${level}` as 'h2' | 'h3';
 ---
 
 <div class="lf" data-form-wrap>
@@ -35,7 +40,7 @@ const thanksId = `${id}-thanks`;
     id={id}
     novalidate
   >
-    {title && <h3 class="lf-t">{title}</h3>}
+    {title && <H class="lf-t">{title}</H>}
 
     <div class="lf-grid">
       <label class="field">
@@ -146,9 +151,9 @@ const thanksId = `${id}-thanks`;
         ><path d="M7 14.5l4.5 4.5L21 9" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" /></svg
       >
     </div>
-    <h3>
+    <H>
       {kind === 'checklist' ? 'Чек-лист отправлен' : 'Заявка принята'}
-    </h3>
+    </H>
     <p>
       {
         kind === 'checklist'
@@ -259,7 +264,7 @@ const thanksId = `${id}-thanks`;
     color: var(--ok-tx);
   }
 
-  .lf-thanks h3 {
+  .lf-thanks :is(h2, h3) {
     margin-bottom: var(--s3);
   }
 

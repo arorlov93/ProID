@@ -17,6 +17,10 @@ export interface Props {
   schema?: Record<string, unknown>[];
   publishedAt?: Date;
   updatedAt?: Date;
+  /** Ставить ли весь прайс в микроразметку: главная, услуги, цены. */
+  offers?: boolean;
+  /** Размечать ли первый абзац как пригодный для голосового ответа. */
+  speakable?: boolean;
   /** Всплывающее окно с чек-листом. Выключаем на самом чек-листе и на служебных. */
   popup?: boolean;
 }

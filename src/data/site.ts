@@ -11,14 +11,14 @@ export const site = {
   name: 'ПрофИД',
   legalName: 'ООО «ПрофИД»', // TODO(владелец): точное наименование юрлица
   tagline: 'Внешний отдел ПТО',
-  domain: 'profid.ru', // TODO(владелец): подтвердить домен
-  url: 'https://profid.ru',
+  domain: 'pro-pto.com',
+  url: 'https://pro-pto.com',
 
   // TODO(владелец): реальный номер. Формат хранения — E.164, для показа форматируется ниже.
   phone: '+74951234567',
   phoneHuman: '+7 495 123-45-67',
 
-  email: 'info@profid.ru', // TODO(владелец): рабочая почта
+  email: 'info@pro-pto.com',
   telegram: 'profid_pto', // TODO(владелец): реальный аккаунт
   telegramUrl: 'https://t.me/profid_pto',
 

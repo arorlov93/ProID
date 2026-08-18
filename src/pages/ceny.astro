@@ -5,8 +5,8 @@ import PriceTable from '../components/PriceTable.astro';
 import Calculator from '../components/Calculator.astro';
 import Faq from '../components/Faq.astro';
 import CtaBand from '../components/CtaBand.astro';
-import { breadcrumbs, faqSchema } from '../lib/schema';
-import { byId, fmt, prices } from '../data/prices';
+import { aggregateOffer, breadcrumbs, faqSchema } from '../lib/schema';
+import { byId, fmt, prices, unitAcc } from '../data/prices';
 
 /* Опорные цены первого экрана — из того же прайса, что и таблица ниже. */
 const anchors = [byId.aosr, byId.komplekt, byId['abon-s']];
@@ -40,13 +40,15 @@ const faq = [
   },
 ];
 
-const schema = [breadcrumbs(crumbs), faqSchema(faq)];
+const schema = [breadcrumbs(crumbs), faqSchema(faq), aggregateOffer()];
 ---
 
 <Base
   title="Исполнительная документация: цена — прайс ПрофИД"
   description="Исполнительная документация: цена от 750 ₽ за акт, комплект по объекту от 45 000 ₽, аутсорсинг ПТО от 60 000 ₽ в месяц. Открытый прайс на 28 позиций."
   path="/ceny"
+  offers
+  speakable
   schema={schema}
 >
   <section class="sec sec--tight" data-theme="dark">
@@ -66,7 +68,7 @@ const schema = [breadcrumbs(crumbs), faqSchema(faq)];
           anchors.map((p) => (
             <li>
               <b class="num acc">от {fmt(p.from)} ₽</b>
-              <span class="xs dim">за {p.unit}</span>
+              <span class="xs dim">за {unitAcc(p.unit)}</span>
             </li>
           ))
         }

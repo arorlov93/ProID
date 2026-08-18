@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import typograf from './src/integrations/typograf.js';
 
-export const SITE = 'https://profid.ru';
+export const SITE = 'https://pro-pto.com';
 
 export default defineConfig({
   site: SITE,

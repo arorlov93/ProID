@@ -6,7 +6,7 @@ import { servicesNav, mainNav } from '../data/nav';
 ---
 
 <Base
-  title="Страница не найдена — ПрофИД"
+  title="Страница не найдена — ПрофИД, внешний отдел ПТО"
   description="Страница не найдена. Здесь навигация по всем разделам сайта ПрофИД и форма заявки: опишите задачу, и инженер ответит на неё в течение часа в рабочее время."
   path="/404"
   noindex
@@ -42,7 +42,7 @@ import { servicesNav, mainNav } from '../data/nav';
         </div>
 
         <div class="nf-r">
-          <div class="block"><LeadForm kind="zayavka" id="nf-form" compact title="Опишите задачу" /></div>
+          <div class="block"><LeadForm kind="zayavka" id="nf-form" compact level={2} title="Опишите задачу" /></div>
           <Drawing kind="plan" class="nf-dw" label="План этажа — техническая графика" />
         </div>
       </div>

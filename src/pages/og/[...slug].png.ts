@@ -2,6 +2,7 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import sharp from 'sharp';
 import { site } from '../../data/site';
+import { unitAcc } from '../../data/prices';
 
 /**
  * Открытая графика 1200×630 для каждой страницы.
@@ -45,7 +46,7 @@ export const getStaticPaths = (async () => {
       slug: s.id,
       eyebrow: s.data.eyebrow,
       title: s.data.h1,
-      note: s.data.price.from === 0 ? 'Экспресс-проверка бесплатно' : `от ${s.data.price.from.toLocaleString('ru-RU')} ₽ за ${s.data.price.unit}`,
+      note: s.data.price.from === 0 ? 'Экспресс-проверка бесплатно' : `от ${s.data.price.from.toLocaleString('ru-RU')} ₽ за ${unitAcc(s.data.price.unit)}`,
     });
   }
   for (const p of posts) {

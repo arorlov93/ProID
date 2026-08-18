@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import { offerCatalog, webPage } from '../lib/schema';
 
 export interface Props {
   title: string;
@@ -12,6 +13,11 @@ export interface Props {
   schema?: Record<string, unknown>[];
   publishedAt?: Date;
   updatedAt?: Date;
+  /** Ставить ли весь прайс в разметку. Только главная, услуги и цены:
+      четыре килобайта на каждой странице ради одного и того же узла — трата. */
+  offers?: boolean;
+  /** Размечать ли первый абзац как пригодный для голосового ответа. */
+  speakable?: boolean;
 }
 
 const {
@@ -23,6 +29,8 @@ const {
   schema = [],
   publishedAt,
   updatedAt,
+  offers = false,
+  speakable = false,
 } = Astro.props;
 
 const canonical = site.url + (path === '/' ? '/' : path);
@@ -40,6 +48,19 @@ const org = {
   telephone: site.phone,
   areaServed: site.serviceArea.map((n) => ({ '@type': 'AdministrativeArea', name: n })),
   sameAs: [site.telegramUrl],
+  /* Темы, в которых компания разбирается. Помогает и поиску, и языковой
+     модели связать организацию с запросом, в котором её имени нет. */
+  knowsAbout: [
+    'исполнительная документация в строительстве',
+    'акт освидетельствования скрытых работ',
+    'общий журнал работ по РД-11-05-2007',
+    'состав исполнительной документации по СП 68.13330',
+    'проект производства работ (ППР)',
+    'сметная документация, ФЕР, ГЭСН, КС-2 и КС-3',
+    'приёмка объекта капитального строительства',
+    'аутсорсинг производственно-технического отдела',
+  ],
+  ...(offers ? { hasOfferCatalog: offerCatalog() } : {}),
   ...(site.inn ? { taxID: site.inn } : {}),
 };
 
@@ -75,12 +96,28 @@ const website = {
   publisher: { '@id': `${site.url}/#org` },
 };
 
-const graph = { '@context': 'https://schema.org', '@graph': [org, localBusiness, website, ...schema] };
+const page = webPage({
+  path,
+  title,
+  description,
+  image: ogImage,
+  hasBreadcrumb: schema.some((n) => n['@type'] === 'BreadcrumbList'),
+  published: publishedAt,
+  updated: updatedAt,
+  speakable,
+});
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [org, localBusiness, website, page, ...schema],
+};
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="ru-RU" href={canonical} />
+<link rel="alternate" hreflang="x-default" href={canonical} />
 {noindex && <meta name="robots" content="noindex, follow" />}
 {!noindex && <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
 
