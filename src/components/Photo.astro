@@ -2,18 +2,20 @@
 import { Image } from 'astro:assets';
 import Drawing from './Drawing.astro';
 import { photos, type PhotoId } from '../data/photos';
+import { SCENES } from '../lib/scenes';
 
 /**
- * Место под фотографию.
+ * Изображение в подготовленном месте. Три состояния, в порядке приоритета:
  *
- * Если в `src/assets/foto/` лежит файл с именем места — показывается он:
- * Astro сам пережмёт его, отдаст AVIF и WebP и проставит ширину с высотой,
- * поэтому вёрстка не прыгает при загрузке. Если файла нет — на этом месте
- * стоит чертёж, а не серая заглушка: пустой прямоугольник с надписью
- * «фото» выглядит как недоделанный сайт, чертёж — как осознанный выбор.
+ * 1. В `src/assets/foto/` лежит снимок с именем места — показывается он.
+ *    Astro пережмёт, отдаст AVIF и WebP, проставит ширину с высотой.
+ * 2. Для места нарисована сцена (`src/lib/scenes.ts`) — показывается она.
+ *    Сцены растрируются в WebP на сборке и ведут себя как фотографии.
+ * 3. Ни того, ни другого — стоит инженерный лист.
  *
- * Ключ места и имя файла совпадают: hero.jpg, obekt-vdnh.jpg. Ничего
- * подключать руками не нужно, список мест — в src/data/photos.ts.
+ * Настоящий снимок всегда сильнее нарисованного: своя площадка и свой
+ * комплект убедительнее любой графики. Поэтому порядок именно такой,
+ * и подменять сцену на фотографию не нужно — достаточно положить файл.
  */
 
 const files = import.meta.glob<{ default: ImageMetadata }>(
@@ -39,18 +41,35 @@ export interface Props {
 const { id, class: cls = '', caption, eager = false, fit = 'meet' } = Astro.props;
 const slot = photos[id];
 const img = byName.get(id);
+const scene = id in SCENES ? SCENES[id as keyof typeof SCENES] : null;
 const cap = caption === undefined ? slot.caption : caption || undefined;
+const ratio = `${slot.ratio[0]}/${slot.ratio[1]}`;
 ---
 
 {
   img ? (
-    <figure class={`ph ${cls}`} style={`--ph-ar:${slot.ratio[0]}/${slot.ratio[1]}`}>
+    <figure class={`ph ${cls}`} style={`--ph-ar:${ratio}`}>
       <Image
         class="ph-img"
         src={img}
         alt={slot.alt}
         widths={[480, 800, 1280, 1800]}
         sizes={slot.sizes}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+      {cap && <figcaption class="dw-cap">{cap}</figcaption>}
+    </figure>
+  ) : scene ? (
+    <figure class={`ph ${cls}`} style={`--ph-ar:${ratio}`}>
+      <img
+        class="ph-img"
+        src={`/scene/${id}-1800.webp`}
+        srcset={`/scene/${id}-900.webp 900w, /scene/${id}-1800.webp 1800w`}
+        sizes={slot.sizes}
+        width={scene.w}
+        height={scene.h}
+        alt={slot.alt}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
       />

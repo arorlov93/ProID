@@ -6,7 +6,7 @@ import Faq from '../components/Faq.astro';
 import Calculator from '../components/Calculator.astro';
 import PriceTable from '../components/PriceTable.astro';
 import LeadForm from '../components/LeadForm.astro';
-import { site, stats } from '../data/site';
+import { hasPhone, site, stats } from '../data/site';
 import { servicesNav } from '../data/nav';
 import type { PhotoId } from '../data/photos';
 import { byId, fmt, priceLabel, unitAcc } from '../data/prices';
@@ -88,12 +88,12 @@ const faq = [
 
 const schema = [
   faqSchema(faq),
-  itemListSchema('Услуги ПрофИД', servicesNav.map((s) => ({ href: s.href, t: s.t }))),
+  itemListSchema('Услуги ПроПТО', servicesNav.map((s) => ({ href: s.href, t: s.t }))),
 ];
 ---
 
 <Base
-  title="Исполнительная документация: заказать в Москве — ПрофИД"
+  title="Исполнительная документация: заказать в Москве — ПроПТО"
   description="Внешний отдел ПТО: оформление, ведение и восстановление исполнительной документации, ППР и сметы. Москва и область, дистанционно по России. Прайс открыт."
   path="/"
   schema={schema}
@@ -289,7 +289,7 @@ const schema = [
                 <th scope="col">Что важно</th>
                 <th scope="col">Разовый подрядчик</th>
                 <th scope="col">Штатный инженер</th>
-                <th scope="col" class="vs-us">ПрофИД</th>
+                <th scope="col" class="vs-us">ПроПТО</th>
               </tr>
             </thead>
             <tbody>
@@ -575,11 +575,26 @@ const schema = [
           </p>
 
           <ul class="ct-list">
-            <li>
-              <Icon name="clock" size={18} />
-              <div><b>{site.phoneHuman}</b><span class="xs dim">{site.hours}</span></div>
-              <a class="ct-cover" href={`tel:${site.phone}`} data-goal="tel" aria-label="Позвонить"></a>
-            </li>
+            {
+              hasPhone ? (
+                <li>
+                  <Icon name="clock" size={18} />
+                  <div>
+                    <b>{site.phoneHuman}</b>
+                    <span class="xs dim">{site.hours}</span>
+                  </div>
+                  <a class="ct-cover" href={`tel:${site.phone}`} data-goal="tel" aria-label="Позвонить" />
+                </li>
+              ) : (
+                <li>
+                  <Icon name="clock" size={18} />
+                  <div>
+                    <b>Пн–Пт 09:00–19:00</b>
+                    <span class="xs dim">Заявки и сообщения принимаем круглосуточно</span>
+                  </div>
+                </li>
+              )
+            }
             <li>
               <Icon name="chat" size={18} />
               <div><b>@{site.telegram}</b><span class="xs dim">Быстрее всего — файлы и голосовые тоже</span></div>

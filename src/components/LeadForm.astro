@@ -1,5 +1,5 @@
 ---
-import { site } from '../data/site';
+import { hasPhone, site } from '../data/site';
 import { servicesNav } from '../data/nav';
 
 export interface Props {
@@ -162,8 +162,14 @@ const H = `h${level}` as 'h2' | 'h3';
       }
     </p>
     <p class="lf-fast">
-      Нужно быстрее — <a href={site.telegramUrl} rel="noopener" data-goal="tg">напишите в Telegram</a> или
-      <a class="num" href={`tel:${site.phone}`} data-goal="tel">позвоните</a>.
+      Нужно быстрее — <a href={site.telegramUrl} rel="noopener" data-goal="tg">напишите в Telegram</a>{
+        hasPhone && (
+          <>
+            {' или '}
+            <a class="num" href={`tel:${site.phone}`} data-goal="tel">позвоните</a>
+          </>
+        )
+      }.
     </p>
   </div>
 </div>

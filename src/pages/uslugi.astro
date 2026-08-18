@@ -11,7 +11,7 @@ const services = (await getCollection('services')).sort((a, b) => a.data.order -
 const crumbs = [{ href: '/uslugi', t: 'Услуги' }];
 const schema = [
   breadcrumbs(crumbs),
-  itemListSchema('Услуги ПрофИД', services.map((s) => ({ href: `/${s.id}`, t: s.data.h1 }))),
+  itemListSchema('Услуги ПроПТО', services.map((s) => ({ href: `/${s.id}`, t: s.data.h1 }))),
 ];
 ---
 

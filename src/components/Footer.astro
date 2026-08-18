@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import { footerNav } from '../data/nav';
-import { site } from '../data/site';
+import { hasPhone, site } from '../data/site';
 
 const year = new Date().getFullYear();
 ---
@@ -10,14 +10,14 @@ const year = new Date().getFullYear();
   <div class="wrap">
     <div class="ft-top">
       <div class="ft-brand">
-        <Logo variant="full" tone="dark" height={38} title="ПрофИД" />
+        <Logo variant="full" tone="dark" height={38} title="ПроПТО" />
         <p class="ft-about">
           Внешний отдел ПТО. Оформляем, ведём и восстанавливаем исполнительную документацию,
           разрабатываем ППР, считаем и проверяем сметы. Москва и область — с выездом,
           остальная Россия — дистанционно.
         </p>
         <ul class="ft-contacts">
-          <li><a class="num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a></li>
+          {hasPhone && <li><a class="num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a></li>}
           <li><a href={`mailto:${site.email}`} data-goal="mail">{site.email}</a></li>
           <li><a href={site.telegramUrl} rel="noopener" data-goal="tg">Telegram: @{site.telegram}</a></li>
           <li class="dim">{site.hours}</li>
@@ -50,7 +50,6 @@ const year = new Date().getFullYear();
         © {year} {site.legalName}
         {site.inn && <>, ИНН {site.inn}</>}
         {site.ogrn && <>, ОГРН {site.ogrn}</>}
-        {!site.inn && <span class="todo">реквизиты не заполнены</span>}
       </p>
       <p class="xs dim">
         <a href="/privacy">Политика конфиденциальности</a> · Информация на сайте не является публичной офертой
@@ -144,10 +143,6 @@ const year = new Date().getFullYear();
     max-width: none;
   }
 
-  .todo {
-    color: var(--warn);
-    font-weight: 600;
-  }
 
   @media (max-width: 900px) {
     .ft-top {

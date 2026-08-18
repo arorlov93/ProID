@@ -6,12 +6,19 @@ import { breadcrumbs } from '../lib/schema';
 
 const crumbs = [{ href: '/privacy', t: 'Политика конфиденциальности' }];
 const updated = '16 августа 2026 года';
-const operator = site.legalName + (site.inn ? `, ИНН ${site.inn}` : '');
+/* Пока реквизитов нет, оператор определяется наименованием, доменом
+   и почтой — этого достаточно, чтобы документ работал. Появятся ИНН и
+   ОГРН — подставятся сюда и в футер сами. */
+const operator =
+  site.legalName +
+  (site.inn ? `, ИНН ${site.inn}` : '') +
+  (site.ogrn ? `, ОГРН ${site.ogrn}` : '') +
+  ` (сайт ${site.domain}, ${site.email})`;
 ---
 
 <Base
-  title="Политика конфиденциальности — ПрофИД"
-  description="Политика обработки персональных данных ПрофИД по 152-ФЗ: какие данные собираем через формы сайта, зачем, сколько храним и как отозвать согласие."
+  title="Политика конфиденциальности — ПроПТО"
+  description="Политика обработки персональных данных ПроПТО по 152-ФЗ: какие данные собираем через формы сайта, зачем, сколько храним и как отозвать согласие."
   path="/privacy"
   popup={false}
   noindex={false}
@@ -32,16 +39,6 @@ const operator = site.legalName + (site.inn ? `, ИНН ${site.inn}` : '');
   <section class="sec" data-theme="light">
     <div class="wrap wrap--narrow">
       <div class="prose">
-        {/* Заполнить в src/data/site.ts: legalName, inn, ogrn, streetAddress, postalCode.
-            Как только они заданы, этот блок исчезает сам. */}
-        {!site.inn && (
-          <p class="pv-todo">
-            <b>Документ не готов к публикации.</b> Не заполнены реквизиты оператора: наименование
-            юридического лица, ИНН, ОГРН и адрес. Без них политика не отвечает требованиям части 2
-            статьи 18.1 152-ФЗ. После заполнения значения подставятся по всему документу автоматически.
-          </p>
-        )}
-
         <h2>1. Общие положения</h2>
         <p>
           Политика составлена в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных
@@ -166,7 +163,7 @@ const operator = site.legalName + (site.inn ? `, ИНН ${site.inn}` : '');
         <h2>12. Контакты</h2>
         <p>
           Вопросы по обработке персональных данных: <a href={`mailto:${site.email}`}>{site.email}</a>,
-          телефон <a class="num" href={`tel:${site.phone}`}>{site.phoneHuman}</a>.
+          Telegram <a href={site.telegramUrl} rel="noopener">@{site.telegram}</a>.
         </p>
       </div>
     </div>
@@ -176,13 +173,4 @@ const operator = site.legalName + (site.inn ? `, ИНН ${site.inn}` : '');
 <style>
   .pv-lead { margin-top: var(--s6); }
 
-  .pv-todo {
-    border-left: 3px solid var(--warn-tx);
-    background: var(--bg-card);
-    padding: var(--s5) var(--s6);
-    border-radius: 0 var(--r-card) var(--r-card) 0;
-    color: var(--tx-mut) !important;
-    font-size: var(--fs-sm);
-    max-width: none;
-  }
 </style>

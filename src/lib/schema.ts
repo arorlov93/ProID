@@ -115,7 +115,7 @@ export function offerCatalog() {
   return {
     '@type': 'OfferCatalog',
     '@id': `${site.url}/#catalog`,
-    name: 'Прайс ПрофИД',
+    name: 'Прайс ПроПТО',
     url: abs('/ceny'),
     numberOfItems: prices.length,
     itemListElement: priceGroups.map((g) => ({

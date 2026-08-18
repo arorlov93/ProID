@@ -272,7 +272,7 @@ document.querySelectorAll<HTMLFormElement>('form[data-form]').forEach((f) => {
       } else {
         // Заглушка: приёмник не подключён. Заявка не уходит никуда,
         // но интерфейс отрабатывает целиком, и цель в Метрике срабатывает.
-        console.info('[ПрофИД] форма отправлена в заглушку:', payload);
+        console.info('[ПроПТО] форма отправлена в заглушку:', payload);
         await new Promise((res) => setTimeout(res, 420));
       }
       localStorage.setItem(RATE_KEY, String(Date.now()));

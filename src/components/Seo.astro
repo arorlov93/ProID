@@ -45,7 +45,7 @@ const org = {
   logo: { '@type': 'ImageObject', url: `${site.url}/logo.svg`, width: 512, height: 512 },
   description: 'Внешний отдел ПТО: исполнительная документация, ППР, сметы. Москва и область, дистанционно по России.',
   email: site.email,
-  telephone: site.phone,
+  ...(site.phone ? { telephone: site.phone } : {}),
   areaServed: site.serviceArea.map((n) => ({ '@type': 'AdministrativeArea', name: n })),
   sameAs: [site.telegramUrl],
   /* Темы, в которых компания разбирается. Помогает и поиску, и языковой
@@ -70,7 +70,7 @@ const localBusiness = {
   name: `${site.name} — ${site.tagline}`,
   parentOrganization: { '@id': `${site.url}/#org` },
   url: site.url,
-  telephone: site.phone,
+  ...(site.phone ? { telephone: site.phone } : {}),
   email: site.email,
   priceRange: '₽₽',
   image: `${site.url}/logo.svg`,

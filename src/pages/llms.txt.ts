@@ -39,7 +39,7 @@ export const GET: APIRoute = async () => {
   );
   put();
   put(`Сайт: ${site.url}`);
-  put(`Почта: ${site.email} · Телефон: ${site.phoneHuman} · Telegram: ${site.telegramUrl}`);
+  put(`Почта: ${site.email}${site.phoneHuman ? ` · Телефон: ${site.phoneHuman}` : ''} · Telegram: ${site.telegramUrl}`);
   put(`Часы работы: ${site.hours}`);
   put(`Регионы: ${site.serviceArea.join(', ')}`);
   put();

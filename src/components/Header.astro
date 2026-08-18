@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import { mainNav, servicesNav } from '../data/nav';
-import { site } from '../data/site';
+import { hasPhone, site } from '../data/site';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isServices = servicesNav.some((s) => s.href === path) || path === '/uslugi';
@@ -11,10 +11,10 @@ const isServices = servicesNav.some((s) => s.href === path) || path === '/uslugi
 
 <header class="site-header" data-theme="dark" id="hdr">
   <div class="wrap hd">
-    {/* Имя ссылке даёт сам знак: в нём видимый текст «ПрофИД» и «Внешний отдел
+    {/* Имя ссылке даёт сам знак: в нём видимый текст «ПроПТО» и «Внешний отдел
         ПТО», и доступное имя обязано его содержать. */}
     <a class="hd-logo" href="/">
-      <Logo variant="full" tone="dark" height={34} title="ПрофИД — внешний отдел ПТО, на главную" />
+      <Logo variant="full" tone="dark" height={34} title="ПроПТО — внешний отдел ПТО, на главную" />
     </a>
 
     <nav class="hd-nav" aria-label="Основная навигация">
@@ -54,7 +54,13 @@ const isServices = servicesNav.some((s) => s.href === path) || path === '/uslugi
     </nav>
 
     <div class="hd-act">
-      <a class="hd-tel num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a>
+      {
+        hasPhone ? (
+          <a class="hd-tel num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a>
+        ) : (
+          <a class="hd-tel" href={site.telegramUrl} rel="noopener" data-goal="tg">@{site.telegram}</a>
+        )
+      }
       <a class="btn" href="/kontakty#zayavka">Оставить заявку</a>
     </div>
 
@@ -75,7 +81,13 @@ const isServices = servicesNav.some((s) => s.href === path) || path === '/uslugi
       </ul>
       <div class="mnav-act">
         <a class="btn btn--wide" href="/kontakty#zayavka">Оставить заявку</a>
-        <a class="btn btn--2 btn--wide num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a>
+        {
+          hasPhone ? (
+            <a class="btn btn--2 btn--wide num" href={`tel:${site.phone}`} data-goal="tel">{site.phoneHuman}</a>
+          ) : (
+            <a class="btn btn--2 btn--wide" href={site.telegramUrl} rel="noopener" data-goal="tg">Написать в Telegram</a>
+          )
+        }
       </div>
     </div>
   </div>

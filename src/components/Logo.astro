@@ -1,6 +1,6 @@
 ---
 /**
- * Логотип — вариант A из logo.html: угловой штамп чертежа с галочкой приёмки.
+ * Логотип — угловой штамп чертежа с галочкой приёмки.
  * Знак несёт обещание «принято с первого раза», а не украшение.
  */
 export interface Props {
@@ -37,7 +37,7 @@ const w = variant === 'full' ? Math.round((height * 250) / 74) : height;
       <path d="M1 21h60M1 51h60M16 6v15M16 51v15" stroke={line} stroke-width="1" opacity=".45" />
       <path class="logo-tick" d="M18 37.5l9 9 17-19" stroke={line} stroke-width="4.5" stroke-linecap="square" />
       <text x="78" y="38" font-size="27" font-weight="600" letter-spacing="-.4" font-family="var(--font)">
-        <tspan fill={word}>Проф</tspan><tspan fill={line}>ИД</tspan>
+        <tspan fill={word}>Про</tspan><tspan fill={line}>ПТО</tspan>
       </text>
       <text x="80" y="56" fill={sub} font-size="10" letter-spacing="1.6" font-family="var(--font)">
         ВНЕШНИЙ ОТДЕЛ ПТО

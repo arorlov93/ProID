@@ -156,7 +156,7 @@ export function strojgenplan() {
       stage: 'ППР',
       num: '4',
       total: '38',
-      org: 'ПрофИД · внешний отдел ПТО',
+      org: 'ПроПТО · внешний отдел ПТО',
     }),
   );
 
