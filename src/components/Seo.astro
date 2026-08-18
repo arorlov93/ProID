@@ -139,6 +139,9 @@ const graph = {
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
 
+{site.verify.yandex && <meta name="yandex-verification" content={site.verify.yandex} />}
+{site.verify.google && <meta name="google-site-verification" content={site.verify.google} />}
+
 <meta name="geo.region" content="RU-MOW" />
 <meta name="geo.placename" content="Москва" />
 

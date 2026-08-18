@@ -36,10 +36,21 @@ export const footerNav: { t: string; items: NavItem[] }[] = [
     t: 'Читать',
     items: [
       { href: '/blog', t: 'Все статьи' },
-      { href: '/blog/prichiny-vozvrata-id', t: '12 причин возврата ИД' },
+      { href: '/blog/akt-osvidetelstvovaniya-skrytyh-rabot', t: 'Акт освидетельствования: разбор формы' },
+      { href: '/blog/obshchiy-zhurnal-rabot', t: 'Общий журнал работ' },
       { href: '/blog/sostav-ispolnitelnoy-dokumentacii', t: 'Состав ИД по СП 68.13330' },
-      { href: '/blog/id-ne-velas', t: 'Если ИД не велась с начала стройки' },
-      { href: '/privacy', t: 'Политика конфиденциальности' },
+      { href: '/blog/prichiny-vozvrata-id', t: '12 причин возврата ИД' },
+    ],
+  },
+  {
+    t: 'Разборы',
+    items: [
+      { href: '/blog/ispolnitelnye-shemy', t: 'Исполнительные схемы' },
+      { href: '/blog/rd-11-02-2006-sostav-form', t: 'Формы по РД-11-02-2006' },
+      { href: '/blog/id-i-proektnaya-dokumentaciya', t: 'ИД и проектная документация' },
+      { href: '/blog/ne-podpisyvayut-ks-2', t: 'Не подписывают КС-2' },
+      { href: '/blog/kogda-nuzhen-ppr', t: 'Когда нужен ППР' },
+      { href: '/blog/id-ne-velas', t: 'Если ИД не велась' },
     ],
   },
 ];
