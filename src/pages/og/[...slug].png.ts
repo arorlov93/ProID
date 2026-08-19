@@ -36,7 +36,7 @@ export const getStaticPaths = (async () => {
     { slug: 'o-kompanii', eyebrow: 'О компании', title: 'Внешний отдел ПТО', note: 'Опыт приёмки со стороны заказчика' },
     { slug: 'kontakty', eyebrow: 'Контакты', title: 'Напишите — посмотрим ваш комплект', note: 'Первая консультация бесплатна' },
     { slug: 'blog', eyebrow: 'Блог', title: 'Как это устроено на практике', note: 'Разборы, а не пересказ сводов правил' },
-    { slug: 'checklist', eyebrow: 'Бесплатно', title: 'Чек-лист состава ИД: 84 позиции', note: 'По СП 68.13330 и РД-11-02-2006' },
+    { slug: 'checklist', eyebrow: 'Бесплатно', title: 'Чек-лист состава ИД: 84 позиции', note: 'По СП 68.13330 и приказу 344/пр' },
     { slug: 'privacy', eyebrow: 'Документ', title: 'Политика конфиденциальности', note: site.domain },
     { slug: '404', eyebrow: 'Ошибка 404', title: 'Такой страницы нет', note: site.domain },
   ];

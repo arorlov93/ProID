@@ -410,5 +410,46 @@ log('\n=== 12. Цена в первом экране посадочных ===');
   await ctx.close();
 }
 
+/* ── 13. Отменённые нормативы ─────────────────────────────────────────────────
+   Для сайта, который продаёт экспертизу в ПТО, ссылка на отменённый документ
+   как на действующий — худшая из возможных ошибок: аудитория ловит её
+   с первого абзаца. Проверка держит реестр src/data/normative.ts честным:
+   упоминание документа со статусом repealed допустимо только рядом со словами
+   об отмене. */
+log('\n=== 13. Ссылки на отменённые нормативы ===');
+{
+  const { repealed, REPEAL_MARKERS } = await import('../src/data/normative.ts');
+  const URLS = htmlFiles.map(urlOf).filter((u) => u !== '/404');
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+  let bad = 0;
+  let mentions = 0;
+  for (const url of URLS) {
+    await page.goto(BASE + url, { waitUntil: 'domcontentloaded' });
+    /* Тире нормализуются: проверка не должна зависеть от того, каким знаком
+       набран номер после типографики. Иначе она молча показывает ноль. */
+    const dash = (x) => x.replace(/[\u2010-\u2015\u2212]/g, '-');
+    const text = dash((await page.innerText('main')).replace(/\s+/g, ' '));
+    for (const doc of repealed) {
+      let from = 0;
+      for (;;) {
+        const i = text.indexOf(dash(doc.short), from);
+        if (i === -1) break;
+        mentions++;
+        from = i + doc.short.length;
+        /* Оговорка ищется в окне вокруг упоминания: отмена обычно называется
+           в том же предложении или в соседнем. */
+        const around = text.slice(Math.max(0, i - 260), i + 260).toLowerCase();
+        if (!REPEAL_MARKERS.some((m) => around.includes(m.toLowerCase()))) {
+          bad++;
+          log(`  БЕЗ ОГОВОРКИ: ${url} — «${doc.short}»: …${text.slice(Math.max(0, i - 60), i + 80)}…`);
+        }
+      }
+    }
+  }
+  log(`  упоминаний отменённых документов: ${mentions}, из них без оговорки об отмене: ${bad}`);
+  await ctx.close();
+}
+
 await browser.close();
 console.log('\n— конец —');

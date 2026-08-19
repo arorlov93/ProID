@@ -46,7 +46,7 @@ export const footerNav: { t: string; items: NavItem[] }[] = [
     t: 'Разборы',
     items: [
       { href: '/blog/ispolnitelnye-shemy', t: 'Исполнительные схемы' },
-      { href: '/blog/rd-11-02-2006-sostav-form', t: 'Формы по РД-11-02-2006' },
+      { href: '/blog/prikaz-344-pr', t: 'Приказ 344/пр вместо РД-11-02-2006' },
       { href: '/blog/id-i-proektnaya-dokumentaciya', t: 'ИД и проектная документация' },
       { href: '/blog/ne-podpisyvayut-ks-2', t: 'Не подписывают КС-2' },
       { href: '/blog/kogda-nuzhen-ppr', t: 'Когда нужен ППР' },
