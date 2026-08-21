@@ -23,6 +23,54 @@
 - Не писать «сделано» без числа. Не писать число, которое
   не измерено командой.
 
+════════════════════════════════════════════════════════════════
+ОТКУДА ЧТО БРАТЬ
+
+Всё готовое лежит в справочной сборке — репозиторий arorlov93/ProID,
+ветка claude/profid-production-build-2hkvfm.
+
+Забрать один раз:
+
+  git clone --depth 1 --branch claude/profid-production-build-2hkvfm \
+    https://github.com/arorlov93/ProID.git /tmp/propto-ref
+
+Что откуда:
+
+  /tmp/propto-ref/photos/themes.json         27 тем: страница, роль,
+                                             запросы, что брать, что
+                                             отбраковывать
+  /tmp/propto-ref/scripts/photos/fetch.mjs   поиск и загрузка кандидатов
+  /tmp/propto-ref/scripts/photos/sheet.mjs   контактный лист для выбора
+  /tmp/propto-ref/scripts/photos/grade.mjs   единая обработка + реестр
+  /tmp/propto-ref/photos/README.md           как это устроено и почему
+
+  /tmp/propto-ref/src/data/normative.ts      реестр нормативов — образец
+                                             структуры для раздела 4
+  /tmp/propto-ref/src/pages/checklist.astro  чек-лист на 84 позиции
+                                             в семи разделах
+  /tmp/propto-ref/ZAPUSK.md                  тексты для Яндекс.Бизнеса,
+                                             цели Метрики, подтверждение
+                                             в Вебмастере
+
+Скопировать к себе:
+
+  mkdir -p photos scripts/photos
+  cp /tmp/propto-ref/photos/themes.json photos/
+  cp /tmp/propto-ref/photos/README.md photos/
+  cp /tmp/propto-ref/scripts/photos/*.mjs scripts/photos/
+
+Скрипты — обычный Node ESM, из зависимостей только sharp.
+Поставить, если его нет: npm i -D sharp
+
+Дальше три команды, по порядку:
+
+  node scripts/photos/fetch.mjs      найти и скачать кандидатов
+  node scripts/photos/sheet.mjs      открыть photos/sheet.html, выбрать
+  node scripts/photos/grade.mjs      обработать и собрать реестр
+
+Выбор кадров делаешь ты по контактному листу, руководствуясь полем
+want каждой темы. Владелец кадры не подбирает.
+
 Порядок разделов важен: фотографии идут первыми, потому что
 38 снимков меняют и CLS, и производительность — мерить их
 имеет смысл после, а не до.
