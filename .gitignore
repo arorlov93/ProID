@@ -9,3 +9,8 @@ scripts/tmp/
 
 # Готовые файлы для переноса в боевой проект — нужны в истории
 !export/
+
+# Кандидаты и собранные фотографии — результат работы scripts/photos
+photos/raw/
+photos/sheet.html
+public/photos/

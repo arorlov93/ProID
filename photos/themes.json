@@ -1,0 +1,127 @@
+{
+  "note": "Темы кадров по страницам. Источник правды для поиска и для реестра. queries — что искать, no — что отбраковывать, role задаёт пропорцию.",
+  "roles": {
+    "hero":    { "ratio": "16:7",  "widths": [1200, 2400] },
+    "section": { "ratio": "3:2",   "widths": [900, 1800] },
+    "card":    { "ratio": "4:3",   "widths": [600, 1200] }
+  },
+  "targets": {
+    "saturation": 0.22,
+    "temperature": 1.02,
+    "note": "saturation — средняя насыщенность в HSL, temperature — отношение среднего R к среднему B. К этим числам подтягивается каждый снимок."
+  },
+  "commonNegative": [
+    "smiling", "portrait", "face", "model", "businessman", "suit", "handshake deal office",
+    "thumbs up", "teamwork meeting", "3d render", "illustration", "vector", "mockup",
+    "money", "banknote", "coin", "piggy bank", "isolated white background"
+  ],
+  "themes": [
+    { "id": "kontakty", "page": "/kontakty", "role": "section",
+      "queries": ["handshake hands close up", "two hands shaking sleeves", "agreement handshake desk"],
+      "want": "Кадр по кистям и предплечьям. Лиц нет. Фон нейтральный, свет мягкий." },
+
+    { "id": "stoimost", "page": "/stoimost", "role": "section",
+      "queries": ["invoice on desk pen calculator", "signing document desk pen", "estimate spreadsheet paper desk"],
+      "want": "Стол, подписанный документ, счёт, ручка, калькулятор. Купюр и монет нет." },
+
+    { "id": "uslugi", "page": "/uslugi", "role": "section",
+      "queries": ["stack of document folders archive", "binders shelf documents", "pile of paper folders office"],
+      "want": "Стопка томов и папок. Бумага настоящая, не студийная." },
+
+    { "id": "o-kompanii", "page": "/o-kompanii", "role": "section",
+      "queries": ["engineer desk blueprint monitor", "drafting table workspace", "technical drawing desk lamp"],
+      "want": "Рабочее место инженера. Человека нет или он со спины." },
+
+    { "id": "checklist", "page": "/checklist", "role": "section",
+      "queries": ["printed checklist ticks pen", "paper list handwritten marks", "clipboard checklist document"],
+      "want": "Распечатанный список с отметками от руки." },
+
+    { "id": "oformlenie-id", "page": "/uslugi/oformlenie-id", "role": "section",
+      "queries": ["signing construction document hands", "folder documents construction site", "paperwork stamp signature"],
+      "want": "Папки, подписание акта, кадр по кистям рук." },
+
+    { "id": "ppr", "page": "/uslugi/ppr", "role": "section",
+      "queries": ["unrolled blueprint drawing table", "architectural rolls plans", "scale ruler blueprint"],
+      "want": "Развёрнутый чертёж, рулоны, масштабная линейка." },
+
+    { "id": "smety", "page": "/uslugi/smety", "role": "section",
+      "queries": ["spreadsheet printout calculator pencil", "cost estimate table paper", "budget sheet desk"],
+      "want": "Таблицы, калькулятор, карандаш." },
+
+    { "id": "vosstanovlenie-id", "page": "/uslugi/vosstanovlenie-id", "role": "section",
+      "queries": ["archive boxes documents", "old folders archive shelf", "dusty document boxes storage"],
+      "want": "Архив, коробки, старые папки." },
+
+    { "id": "audit-komplekta", "page": "/uslugi/audit-komplekta", "role": "section",
+      "queries": ["reviewing documents sticky notes", "document stack bookmarks tabs", "checking paperwork magnifier"],
+      "want": "Проверка документов, стопка с закладками." },
+
+    { "id": "vedenie-id", "page": "/uslugi/vedenie-id", "role": "section",
+      "queries": ["site logbook construction journal", "notebook construction site", "writing journal site office"],
+      "want": "Журнал на месте работ." },
+
+    { "id": "autsorsing-pto", "page": "/uslugi/autsorsing-pto", "role": "section",
+      "queries": ["meeting table documents hands", "two people documents desk overhead", "discussion drawings table"],
+      "want": "Переговорный стол, документы, две пары рук. Лиц нет." },
+
+    { "id": "akt-skrytyh-rabot", "page": "статья: АОСР", "role": "card",
+      "queries": ["concrete rebar formwork close up", "reinforcement bars construction", "hidden works inspection"],
+      "want": "Скрытые работы: арматура, опалубка, узел до закрытия." },
+
+    { "id": "obshchiy-zhurnal", "page": "статья: общий журнал работ", "role": "card",
+      "queries": ["handwritten logbook pages", "ledger book columns", "open journal desk pen"],
+      "want": "Разворот журнала, рукописные записи." },
+
+    { "id": "ispolnitelnye-shemy", "page": "статья: исполнительные схемы", "role": "card",
+      "queries": ["surveying total station site", "geodetic instrument tripod", "surveyor equipment construction"],
+      "want": "Геодезия на объекте, инструмент." },
+
+    { "id": "prikaz-344", "page": "статья: приказ 344/пр", "role": "card",
+      "queries": ["official document stamp paper", "legal document desk", "regulation paper binder"],
+      "want": "Официальный документ, печать, подшивка." },
+
+    { "id": "proektnaya-dokumentaciya", "page": "статья: ИД и проектная документация", "role": "card",
+      "queries": ["blueprint stack rolls", "project drawings sheets", "technical documentation set"],
+      "want": "Комплект чертежей, листы." },
+
+    { "id": "ks-2", "page": "статья: не подписывают КС-2", "role": "card",
+      "queries": ["contract papers pen desk", "signature line document close up", "paper stack waiting signature"],
+      "want": "Бумага, ожидающая подписи." },
+
+    { "id": "vozvrat-id", "page": "статья: причины возврата ИД", "role": "card",
+      "queries": ["red pen corrections document", "marked up paper edits", "rejected paperwork notes"],
+      "want": "Правки на документе, пометки." },
+
+    { "id": "sostav-id", "page": "статья: состав ИД", "role": "card",
+      "queries": ["labeled binders row", "index tabs folders", "organized document shelf"],
+      "want": "Подписанные папки в ряд, разделители." },
+
+    { "id": "id-ne-velas", "page": "статья: ИД не велась", "role": "card",
+      "queries": ["empty folder desk", "messy papers pile", "disorganized documents table"],
+      "want": "Беспорядок в бумагах, пустая папка." },
+
+    { "id": "priemka", "page": "статья: приёмка", "role": "card",
+      "queries": ["building handover keys documents", "finished building interior empty", "inspection walkthrough site"],
+      "want": "Приёмка, законченный объект." },
+
+    { "id": "nadzor", "page": "статья: надзор", "role": "card",
+      "queries": ["construction inspection clipboard", "site supervision documents", "safety inspection notes"],
+      "want": "Проверка на объекте, планшет с бумагами." },
+
+    { "id": "beton", "page": "статья: бетонные работы", "role": "card",
+      "queries": ["concrete pouring site", "fresh concrete surface", "concrete slab construction"],
+      "want": "Бетонные работы, фактура." },
+
+    { "id": "montazh", "page": "статья: монтажные работы", "role": "card",
+      "queries": ["steel structure assembly", "pipe installation site", "mounting works construction"],
+      "want": "Монтаж конструкций или инженерных систем." },
+
+    { "id": "arhiv-elektronnyy", "page": "статья: электронная ИД", "role": "card",
+      "queries": ["scanner documents office", "digital archive screen files", "scanned papers laptop desk"],
+      "want": "Оцифровка, сканер, экран с файлами." },
+
+    { "id": "obekt-obshchiy", "page": "запасной кадр для объектов", "role": "card",
+      "queries": ["construction site crane wide", "building under construction facade", "site overview scaffolding"],
+      "want": "Общий вид стройплощадки. Без узнаваемых вывесок и адресов." }
+  ]
+}
