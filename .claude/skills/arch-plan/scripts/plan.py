@@ -83,6 +83,7 @@ class Plan:
         self.stage, self.author, self.note = stage, author, note
         self.sw, self.sh = SHEETS[sheet]
         self.walls, self.rooms, self.dims, self.axes, self.marks = [], [], [], [], []
+        self.notes = []
 
     # ── набор модели ───────────────────────────────────────────────────────
     def wall(self, p1, p2, t=100):
@@ -132,6 +133,17 @@ class Plan:
 
     def axis_y(self, y, label, x_from=None):
         self.axes.append(dict(axis='y', v=y, label=label, base=x_from))
+        return self
+
+    def note_block(self, items):
+        """Примечания к чертежу — нумерованным списком в поле листа.
+
+        Всё, что нужно сказать словами (принятые допущения, что подлежит
+        уточнению, откуда взяты размеры), должно стоять здесь, а не выноской
+        посреди помещения: выноска в пустоту читается как ошибка вёрстки,
+        а на чертеже по фотографиям таких оговорок обычно несколько.
+        """
+        self.notes = list(items)
         return self
 
     def mark(self, xy, text):
@@ -255,6 +267,7 @@ class Plan:
             g.append(self._axis_svg(a, X, Y, bb))
         for m in self.marks:
             g.append(self._mark_svg(m, X, Y))
+        g.append(self._notes())
         g.append(self._explication())
         g.append(self._title_block())
         g.append('</g></svg>')
@@ -433,6 +446,17 @@ class Plan:
                 f'<line x1="{x+10:.2f}" y1="{y-8:.2f}" x2="{x+26:.2f}" y2="{y-8:.2f}" '
                 f'stroke="#000" stroke-width="{W_DIM}"/>'
                 f'<text x="{x+10:.2f}" y="{y-9:.2f}" font-size="{F_DIM}">{m["text"]}</text>')
+
+    def _notes(self):
+        if not self.notes:
+            return ''
+        x, y = 27, self.sh - 5 - 8 - 4.6 * len(self.notes)
+        out = [f'<text x="{x}" y="{y-4:.1f}" font-size="{F_DIM}" '
+               f'font-weight="bold">Примечания</text>']
+        for i, t in enumerate(self.notes):
+            out.append(f'<text x="{x}" y="{y + i*4.6:.1f}" font-size="{F_DIM}">'
+                       f'{i+1}. {t}</text>')
+        return ''.join(out)
 
     def _explication(self):
         if not self.rooms:
