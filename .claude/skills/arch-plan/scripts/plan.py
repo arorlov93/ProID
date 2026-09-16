@@ -448,14 +448,36 @@ class Plan:
                 f'<text x="{x+10:.2f}" y="{y-9:.2f}" font-size="{F_DIM}">{m["text"]}</text>')
 
     def _notes(self):
+        """Примечания с переносом по ширине колонки.
+
+        SVG сам текст не переносит, а длинное примечание молча уезжает
+        под штамп — заметить это можно только на растре, поэтому строки
+        режутся здесь, а ширина колонки ограничена полем слева от штампа.
+        """
         if not self.notes:
             return ''
-        x, y = 27, self.sh - 5 - 8 - 4.6 * len(self.notes)
-        out = [f'<text x="{x}" y="{y-4:.1f}" font-size="{F_DIM}" '
-               f'font-weight="bold">Примечания</text>']
+        x = 27
+        col = self.sw - 25 - 185 - x - 8          # до левого края штампа
+        per_char = F_DIM * 0.50                   # средняя ширина знака
+        limit = max(20, int(col / per_char))
+
+        lines = []
         for i, t in enumerate(self.notes):
-            out.append(f'<text x="{x}" y="{y + i*4.6:.1f}" font-size="{F_DIM}">'
-                       f'{i+1}. {t}</text>')
+            words, cur = f'{i+1}. {t}'.split(), ''
+            for w in words:
+                if cur and len(cur) + 1 + len(w) > limit:
+                    lines.append(cur)
+                    cur = '   ' + w               # висячий отступ продолжения
+                else:
+                    cur = f'{cur} {w}'.strip() if cur else w
+            lines.append(cur)
+
+        y = self.sh - 5 - 8 - 4.2 * len(lines)
+        out = [f'<text x="{x}" y="{y-4.4:.1f}" font-size="{F_DIM}" '
+               f'font-weight="bold">Примечания</text>']
+        for i, ln in enumerate(lines):
+            out.append(f'<text x="{x}" y="{y + i*4.2:.1f}" font-size="{F_DIM}" '
+                       f'xml:space="preserve">{ln}</text>')
         return ''.join(out)
 
     def _explication(self):
