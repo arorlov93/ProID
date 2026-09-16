@@ -78,7 +78,13 @@ class Plan:
     STD_SCALES = (20, 25, 50, 100, 200, 500)
 
     def __init__(self, scale='auto', title='', obj='', sheet='A3',
-                 stage='Эскиз', author='', note=''):
+                 stage='Эскиз', author='', note='', dimensions=True):
+        """dimensions=False — схема без размеров: ни цепочек, ни площадей,
+        ни масштаба. Это осмысленный самостоятельный вид документа: она
+        показывает состав и расположение проёмов, но ничего не утверждает
+        о величинах, и её нельзя обмерить линейкой по распечатке. Такой лист
+        помечается «Без масштаба», иначе масштаб сам становится размером."""
+        self.dimensions = dimensions
         self.scale, self.title, self.obj = scale, title, obj
         self.stage, self.author, self.note = stage, author, note
         self.sw, self.sh = SHEETS[sheet]
@@ -176,10 +182,10 @@ class Plan:
             net = sum(r['area'] for r in self.rooms)
             if net > gross * 1.001:
                 out.append(f'площади помещений {net:.1f} больше габарита {gross:.1f}')
-        if not self.dims:
+        if self.dimensions and not self.dims:
             out.append('нет ни одной размерной цепочки')
         if not self.rooms:
-            out.append('нет ни одного помещения с площадью')
+            out.append('нет ни одного помещения')
         bb = self._bbox()
         for i, w in enumerate(self.walls):
             for o in w.openings:
@@ -261,8 +267,9 @@ class Plan:
             g.append(self._wall_svg(w, X, Y, k))
         for r in self.rooms:
             g.append(self._room_svg(r, X, Y))
-        for d in self.dims:
-            g.append(self._dim_svg(d, X, Y, bb))
+        if self.dimensions:
+            for d in self.dims:
+                g.append(self._dim_svg(d, X, Y, bb))
         for a in self.axes:
             g.append(self._axis_svg(a, X, Y, bb))
         for m in self.marks:
@@ -372,6 +379,13 @@ class Plan:
     def _room_svg(self, r, X, Y):
         xs = [p[0] for p in r['pts']]; ys = [p[1] for p in r['pts']]
         cx = X(sum(xs) / len(xs)); cy = Y(sum(ys) / len(ys))
+        if not self.dimensions:
+            return (f'<circle cx="{cx:.2f}" cy="{cy-4.6:.2f}" r="2.6" fill="#fff" '
+                    f'stroke="#000" stroke-width="{W_THIN}"/>'
+                    f'<text x="{cx:.2f}" y="{cy-3.7:.2f}" font-size="{F_DIM}" '
+                    f'text-anchor="middle">{r["num"]}</text>'
+                    f'<text x="{cx:.2f}" y="{cy+1.4:.2f}" font-size="{F_ROOM}" '
+                    f'text-anchor="middle">{r["name"]}</text>')
         a = f'{r["area"]:.2f}'.replace('.', ',')
         wdt = len(a) * F_ROOM * 0.58
         return (f'<circle cx="{cx:.2f}" cy="{cy-4.6:.2f}" r="2.6" fill="#fff" '
@@ -487,9 +501,13 @@ class Plan:
         height = (len(self.rooms) + 1) * h_row + 7
         x = self.sw - 25 - 90
         y = self.sh - 5 - 55 - 6 - height + 7
-        rows = [('№', 'Наименование', 'Пл., м²')] + [
-            (str(r['num']), r['name'], f'{r["area"]:.2f}'.replace('.', ','))
-            for r in self.rooms]
+        if self.dimensions:
+            rows = [('№', 'Наименование', 'Пл., м²')] + [
+                (str(r['num']), r['name'], f'{r["area"]:.2f}'.replace('.', ','))
+                for r in self.rooms]
+        else:
+            rows = [('№', 'Наименование', '')] + [
+                (str(r['num']), r['name'], '') for r in self.rooms]
         h = h_row
         out = [f'<text x="{x:.1f}" y="{y-2:.1f}" font-size="{F_DIM}">'
                f'Экспликация помещений</text>']
@@ -500,17 +518,19 @@ class Plan:
                        f'fill="none" stroke="#000" stroke-width="{W_DIM}"/>')
             out.append(f'<line x1="{x+10:.1f}" y1="{yy:.1f}" x2="{x+10:.1f}" '
                        f'y2="{yy+h:.1f}" stroke="#000" stroke-width="{W_DIM}"/>')
-            out.append(f'<line x1="{x+72:.1f}" y1="{yy:.1f}" x2="{x+72:.1f}" '
-                       f'y2="{yy+h:.1f}" stroke="#000" stroke-width="{W_DIM}"/>')
+            if self.dimensions:
+                out.append(f'<line x1="{x+72:.1f}" y1="{yy:.1f}" x2="{x+72:.1f}" '
+                           f'y2="{yy+h:.1f}" stroke="#000" stroke-width="{W_DIM}"/>')
             out.append(f'<text x="{x+5:.1f}" y="{yy+3.5:.1f}" font-size="{F_DIM}" '
                        f'text-anchor="middle"{bold}>{a}</text>')
             out.append(f'<text x="{x+12:.1f}" y="{yy+3.5:.1f}" font-size="{F_DIM}"{bold}>{b}</text>')
             out.append(f'<text x="{x+81:.1f}" y="{yy+3.5:.1f}" font-size="{F_DIM}" '
                        f'text-anchor="middle"{bold}>{c}</text>')
-        total = f'{sum(r["area"] for r in self.rooms):.2f}'.replace('.', ',')
-        yy = y + len(rows) * h
-        out.append(f'<text x="{x:.1f}" y="{yy+3.5:.1f}" font-size="{F_DIM}" '
-                   f'font-weight="bold">Итого {total} м\u00b2</text>')
+        if self.dimensions:
+            total = f'{sum(r["area"] for r in self.rooms):.2f}'.replace('.', ',')
+            yy = y + len(rows) * h
+            out.append(f'<text x="{x:.1f}" y="{yy+3.5:.1f}" font-size="{F_DIM}" '
+                       f'font-weight="bold">Итого {total} м\u00b2</text>')
         return ''.join(out)
 
     def _title_block(self):
@@ -527,8 +547,8 @@ class Plan:
         o.append(f'<text x="{x+3}" y="{y+9}" font-size="{F_DIM}">{self.obj}</text>')
         o.append(f'<text x="{x+3}" y="{y+24}" font-size="{F_NAME}" '
                  f'font-weight="bold">{self.title}</text>')
-        o.append(f'<text x="{x+3}" y="{y+37}" font-size="{F_DIM}">'
-                 f'Масштаб 1:{self.scale}</text>')
+        sc = f'Масштаб 1:{self.scale}' if self.dimensions else 'Без масштаба'
+        o.append(f'<text x="{x+3}" y="{y+37}" font-size="{F_DIM}">{sc}</text>')
         o.append(f'<text x="{x+3}" y="{y+48}" font-size="{F_DIM}">{self.note}</text>')
         o.append(f'<text x="{x+123}" y="{y+9}" font-size="{F_DIM}">Стадия</text>')
         o.append(f'<text x="{x+123}" y="{y+24}" font-size="{F_NAME}">{self.stage}</text>')
