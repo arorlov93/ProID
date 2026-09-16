@@ -14,3 +14,7 @@ scripts/tmp/
 photos/raw/
 photos/sheet.html
 public/photos/
+
+# Кэш питона в скиллах
+__pycache__/
+*.pyc
