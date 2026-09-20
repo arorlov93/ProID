@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Презентация</title>
+<style>
+/* ── Токены ───────────────────────────────────────────────────────────────
+   Меняются только здесь. Один акцент на всю презентацию: если акцентных
+   цветов два, ни один не работает. */
+:root{
+  --paper:#F5F4F0; --ink:#14171A; --muted:#5C646C; --rule:#D6D3CC;
+  --accent:#17414F; --accent-soft:#E3EAEC;
+  --font:"Inter","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+  /* Кегли на холсте 1920×1080. Меньше 28px основной текст не опускать:
+     с пятого ряда уже не читается. */
+  --t-display:104px; --t-h1:64px; --t-h2:44px; --t-body:30px;
+  --t-small:24px; --t-eyebrow:20px;
+  --pad:80px; --gap:32px;
+  --dur-in:200ms; --dur-move:420ms; --dur-section:600ms;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0d0f11;font-family:var(--font);
+  -webkit-font-smoothing:antialiased}
+
+/* ── Сцена: холст 1920×1080 масштабируется под окно ─────────────────────── */
+#stage{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
+#canvas{width:1920px;height:1080px;position:relative;transform-origin:center;
+  background:var(--paper);color:var(--ink)}
+.slide{position:absolute;inset:0;padding:var(--pad);display:none;
+  flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.enter{animation:slide-in var(--dur-section) cubic-bezier(.22,.61,.36,1)}
+@keyframes slide-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── Шаги появления ──────────────────────────────────────────────────────
+   Элемент с data-build ждёт своей очереди. В печати и при reduced-motion
+   все шаги показаны сразу — слайд обязан читаться и без анимации. */
+[data-build]{opacity:0;transform:translateY(10px);
+  transition:opacity var(--dur-in) ease-out,transform var(--dur-in) ease-out}
+[data-build].shown{opacity:1;transform:none}
+
+/* ── Раскладки ───────────────────────────────────────────────────────────── */
+.eyebrow{font-family:var(--mono);font-size:var(--t-eyebrow);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+h1{font-size:var(--t-h1);line-height:1.08;letter-spacing:-.02em;font-weight:700;
+  max-width:24ch}
+h2{font-size:var(--t-h2);line-height:1.15;font-weight:600;max-width:26ch}
+p,li{font-size:var(--t-body);line-height:1.45;max-width:64ch;color:var(--ink)}
+.small{font-size:var(--t-small);color:var(--muted)}
+.slide ul{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:40px}
+.slide ul li{padding-left:34px;position:relative}
+.slide ul li::before{content:"";position:absolute;left:0;top:.62em;width:14px;
+  height:2px;background:var(--accent)}
+.lead{font-size:var(--t-h2);line-height:1.25;max-width:30ch;font-weight:500}
+
+[data-layout="title"]{justify-content:flex-end}
+[data-layout="title"] h1{font-size:var(--t-display);max-width:20ch}
+[data-layout="title"] .meta{margin-top:48px;display:flex;gap:40px;
+  color:var(--muted);font-size:var(--t-small)}
+
+[data-layout="section"]{background:var(--accent);color:var(--paper);
+  justify-content:center}
+[data-layout="section"] h1{color:var(--paper);font-size:var(--t-display)}
+[data-layout="section"] .eyebrow{color:rgba(245,244,240,.7)}
+
+[data-layout="statement"]{justify-content:center;align-items:flex-start}
+[data-layout="statement"] h1{font-size:88px;max-width:18ch}
+
+[data-layout="split"] .cols{display:grid;grid-template-columns:1fr 1fr;
+  gap:72px;margin-top:48px;align-items:start}
+
+[data-layout="stat"] .stats{display:grid;grid-auto-flow:column;gap:72px;
+  margin-top:56px}
+.stat .n{font-size:96px;font-weight:700;line-height:1;letter-spacing:-.03em;
+  color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .c{font-size:var(--t-small);color:var(--muted);margin-top:14px;max-width:18ch}
+
+[data-layout="quote"]{justify-content:center}
+[data-layout="quote"] blockquote{font-size:56px;line-height:1.25;max-width:22ch;
+  font-weight:500}
+[data-layout="quote"] .who{margin-top:40px;color:var(--muted);
+  font-size:var(--t-small)}
+
+table{border-collapse:collapse;margin-top:40px;font-size:var(--t-small);width:100%}
+th,td{text-align:left;padding:16px 20px;border-bottom:1px solid var(--rule);
+  font-variant-numeric:tabular-nums}
+th{font-weight:600;color:var(--muted);font-size:var(--t-eyebrow);
+  text-transform:uppercase;letter-spacing:.08em}
+td.num,th.num{text-align:right}
+tr.hi td{background:var(--accent-soft);font-weight:600}
+
+figure{margin-top:40px}
+figure img{width:100%;height:auto;display:block}
+figcaption{margin-top:16px;color:var(--muted);font-size:var(--t-small)}
+.full-bleed{position:absolute;inset:0;padding:0}
+.full-bleed img{width:100%;height:100%;object-fit:cover}
+.scrim{position:absolute;inset:0;background:linear-gradient(90deg,
+  rgba(20,23,26,.82) 0%,rgba(20,23,26,.35) 60%,transparent 100%)}
+.full-bleed .text{position:absolute;inset:0;padding:var(--pad);
+  display:flex;flex-direction:column;justify-content:center;color:#fff}
+.full-bleed h1,.full-bleed p{color:#fff}
+
+/* ── Хром: прогресс, номер, заметки, обзор ──────────────────────────────── */
+#bar{position:absolute;left:0;bottom:0;height:4px;background:var(--accent);
+  transition:width var(--dur-move) ease-out;z-index:5}
+#num{position:absolute;right:36px;bottom:26px;font-family:var(--mono);
+  font-size:18px;color:var(--muted);z-index:5}
+[data-layout="section"] ~ #num{color:rgba(245,244,240,.7)}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;
+  background:#12151800;color:#e9e7e2;padding:20px 28px;font-size:15px;
+  line-height:1.5;display:none;z-index:10;background:#121518;border-top:2px solid var(--accent)}
+#notes.on{display:block}
+#notes b{color:#fff}
+#timer{float:right;font-family:var(--mono);color:#9aa3ab}
+.notes{display:none}
+#help{position:fixed;left:14px;bottom:10px;color:#6b7278;font-size:12px;
+  font-family:var(--mono);z-index:10}
+
+#grid{position:fixed;inset:0;background:#0d0f11;overflow:auto;padding:28px;
+  display:none;grid-template-columns:repeat(4,1fr);gap:18px;z-index:20}
+#grid.on{display:grid}
+#grid .thumb{background:var(--paper);aspect-ratio:16/9;border-radius:4px;
+  overflow:hidden;position:relative;cursor:pointer;outline:2px solid transparent}
+#grid .thumb:hover{outline-color:var(--accent)}
+#grid .thumb .mini{width:1920px;height:1080px;transform-origin:top left;
+  pointer-events:none}
+#grid .thumb .tag{position:absolute;left:8px;bottom:6px;color:#fff;
+  background:#000a;font:600 12px var(--mono);padding:2px 6px;border-radius:3px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  [data-build]{opacity:1!important;transform:none!important}
+}
+
+/* ── Печать: все шаги видны, один слайд на страницу ─────────────────────── */
+@media print{
+  html,body{background:#fff;height:auto}
+  #stage{position:static;display:block;overflow:visible}
+  #canvas{transform:none!important;width:1920px;height:1080px}
+  .slide{display:flex!important;position:relative;page-break-after:always;
+    break-after:page;animation:none!important}
+  [data-build]{opacity:1!important;transform:none!important}
+  #bar,#notes,#help,#grid{display:none!important}
+}
+</style>
+
+<div id="stage"><div id="canvas">
+
+<!-- ═══ СЛАЙДЫ. Один слайд — одно утверждение в заголовке. ═══════════════
+     data-build на элементе = он появляется по очереди.
+     <aside class="notes"> = заметки докладчика, на слайде не видны.        -->
+
+<section class="slide" data-layout="title">
+  <div class="eyebrow">Надзаголовок · дата</div>
+  <h1>Заголовок — утверждение, а не тема</h1>
+  <div class="meta"><span>Кто выступает</span><span>Для кого</span></div>
+  <aside class="notes">Что сказать на этом слайде.</aside>
+</section>
+
+<section class="slide" data-layout="statement">
+  <div class="eyebrow">Раздел</div>
+  <h1>Главная мысль одной фразой</h1>
+  <p class="small" data-build style="margin-top:32px">Пояснение, если нужно.</p>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Раздел</div>
+  <h1>Утверждение, которое доказывает слайд</h1>
+  <ul>
+    <li data-build>Первый довод с цифрой</li>
+    <li data-build>Второй довод</li>
+    <li data-build>Третий довод</li>
+  </ul>
+</section>
+
+<section class="slide" data-layout="stat">
+  <div class="eyebrow">Раздел</div>
+  <h1>Три числа, которые решают</h1>
+  <div class="stats">
+    <div class="stat" data-build><div class="n">206,8</div><div class="c">ft² полезной площади</div></div>
+    <div class="stat" data-build><div class="n">9</div><div class="c">дней медиана оплаты счёта</div></div>
+    <div class="stat" data-build><div class="n">0,838</div><div class="c">корреляция с днём списания</div></div>
+  </div>
+</section>
+
+<section class="slide" data-layout="section">
+  <div class="eyebrow">Часть 2</div>
+  <h1>Название раздела</h1>
+</section>
+
+</div></div>
+
+<div id="notes"><span id="timer">00:00</span><div id="notes-body"></div></div>
+<div id="grid"></div>
+<div id="help">← → слайды · N заметки · O обзор · F полный экран · P печать</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('canvas');
+  const slides = [...document.querySelectorAll('.slide')];
+  const bar = document.createElement('div'); bar.id = 'bar'; canvas.append(bar);
+  const num = document.createElement('div'); num.id = 'num'; canvas.append(num);
+  const notes = document.getElementById('notes');
+  const notesBody = document.getElementById('notes-body');
+  const grid = document.getElementById('grid');
+  let i = 0, step = 0, started = null;
+
+  /* Холст фиксированный, подгоняем масштабом: так все размеры в px
+     абсолютны и слайд выглядит одинаково на любом экране. */
+  const fit = () => {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    canvas.style.transform = `scale(${s})`;
+  };
+  addEventListener('resize', fit); fit();
+
+  const builds = (n) => [...slides[n].querySelectorAll('[data-build]')];
+
+  function render(dir = 0) {
+    slides.forEach((s, k) => s.classList.toggle('on', k === i));
+    if (dir) { slides[i].classList.remove('enter'); void slides[i].offsetWidth;
+               slides[i].classList.add('enter'); }
+    builds(i).forEach((el, k) => el.classList.toggle('shown', k < step));
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    num.textContent = (i + 1) + ' / ' + slides.length;
+    const n = slides[i].querySelector('.notes');
+    notesBody.innerHTML = n ? n.innerHTML : '<i style="color:#6b7278">заметок нет</i>';
+    location.hash = i + 1;
+  }
+
+  function next() {
+    if (step < builds(i).length) { step++; render(); }
+    else if (i < slides.length - 1) { i++; step = 0; render(1); }
+  }
+  function prev() {
+    if (step > 0) { step--; render(); }
+    else if (i > 0) { i--; step = builds(i).length; render(-1); }
+  }
+  const go = (n) => { i = Math.max(0, Math.min(slides.length - 1, n)); step = 0; render(1); };
+
+  addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+    else if (e.key.toLowerCase() === 'n') { notes.classList.toggle('on'); if (!started) started = Date.now(); }
+    else if (e.key.toLowerCase() === 'o') toggleGrid();
+    else if (e.key.toLowerCase() === 'f') document.documentElement.requestFullscreen?.();
+    else if (e.key.toLowerCase() === 'p') print();
+    else if (/^[0-9]$/.test(e.key)) { buf += e.key; clearTimeout(bt);
+      bt = setTimeout(() => { go(+buf - 1); buf = ''; }, 500); }
+  });
+  let buf = '', bt;
+
+  addEventListener('click', (e) => { if (!grid.classList.contains('on')) next(); });
+  let tx = 0;
+  addEventListener('touchstart', (e) => tx = e.touches[0].clientX, {passive:true});
+  addEventListener('touchend', (e) => {
+    const d = e.changedTouches[0].clientX - tx;
+    if (Math.abs(d) > 50) (d < 0 ? next : prev)();
+  }, {passive:true});
+
+  function toggleGrid() {
+    if (grid.classList.toggle('on')) {
+      grid.innerHTML = '';
+      slides.forEach((s, k) => {
+        const t = document.createElement('div'); t.className = 'thumb';
+        const m = document.createElement('div'); m.className = 'mini';
+        m.innerHTML = s.outerHTML;
+        m.firstChild.style.display = 'flex';
+        m.firstChild.querySelectorAll('[data-build]').forEach(b => b.classList.add('shown'));
+        t.append(m);
+        const tag = document.createElement('div'); tag.className = 'tag';
+        tag.textContent = k + 1; t.append(tag);
+        t.onclick = (ev) => { ev.stopPropagation(); grid.classList.remove('on'); go(k); };
+        grid.append(t);
+        requestAnimationFrame(() => m.style.transform = 'scale(' + (t.clientWidth / 1920) + ')');
+      });
+    }
+  }
+
+  setInterval(() => {
+    if (!started) return;
+    const s = Math.floor((Date.now() - started) / 1000);
+    document.getElementById('timer').textContent =
+      String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }, 1000);
+
+  /* Печать: показать все шаги, чтобы PDF не потерял содержание. */
+  addEventListener('beforeprint', () =>
+    document.querySelectorAll('[data-build]').forEach(b => b.classList.add('shown')));
+  addEventListener('afterprint', () => render());
+
+  if (location.hash) i = Math.max(0, Math.min(slides.length - 1, +location.hash.slice(1) - 1));
+  render();
+})();
+</script>
