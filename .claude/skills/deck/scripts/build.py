@@ -115,6 +115,46 @@ CONTACT = r"""
 """
 
 
+PRINT_CHECK = r"""
+(n) => {
+  /* Печатная раскладка живёт по своим правилам, и её поломка не видна ни
+     на экране, ни на контактном листе: он собирается клонированием
+     слайдов и печатные правила обходит. Поэтому меряем прямо здесь. */
+  const out = [], s = [...document.querySelectorAll('.slide')];
+  s.forEach((x, i) => {
+    const r = x.getBoundingClientRect();
+    const w = Math.round(r.width), h = Math.round(r.height);
+    if (w !== 1920 || h !== 1080)
+      out.push({slide: i + 1, kind: 'печать: размер слайда',
+                detail: w + '×' + h + ' вместо 1920×1080'});
+  });
+  const dh = document.documentElement.scrollHeight;
+  if (Math.abs(dh - n * 1080) > 4)
+    out.push({slide: 0, kind: 'печать: слайды наложены',
+              detail: 'высота документа ' + dh + ' вместо ' + n * 1080});
+  const miss = [...document.images].filter(i => !i.complete || !i.naturalWidth);
+  if (miss.length)
+    out.push({slide: 0, kind: 'печать: снимки не загрузились',
+              detail: miss.length + ' из ' + document.images.length});
+  return out;
+}
+"""
+
+
+def wait_images(page, timeout=30000):
+    """Дождаться, пока догрузятся все снимки.
+
+    Без этого PDF собирается из полузагруженной страницы: фотографии в нём
+    просто отсутствуют, и видно это только по размеру файла, а не глазами
+    на контактном листе, который снимается позже и успевает подхватить их.
+    """
+    page.wait_for_load_state('load')
+    page.wait_for_function(
+        "() => [...document.images].every(i => i.complete && "
+        "(i.naturalWidth > 0 || !i.getAttribute('src')))", timeout=timeout)
+    page.wait_for_timeout(250)
+
+
 def main():
     src = pathlib.Path(sys.argv[1]).resolve()
     pdf = src.with_suffix('.pdf')
@@ -126,15 +166,19 @@ def main():
         b = pw.chromium.launch(executable_path=exe) if exe else pw.chromium.launch()
         p = b.new_page(viewport={'width': W, 'height': H})
         p.goto(src.as_uri())
-        p.wait_for_timeout(400)
+        wait_images(p)
         n = p.evaluate("document.querySelectorAll('.slide').length")
 
         issues = p.evaluate(CHECKS)
+        p.emulate_media(media='print')
+        p.wait_for_timeout(300)
+        issues += p.evaluate(PRINT_CHECK, n)
         p.pdf(path=str(pdf), width=f'{W}px', height=f'{H}px', print_background=True,
               margin={'top': '0', 'bottom': '0', 'left': '0', 'right': '0'})
+        p.emulate_media(media='screen')
 
         p.goto(src.as_uri())
-        p.wait_for_timeout(300)
+        wait_images(p)
         size = p.evaluate(CONTACT, cols)
         p.set_viewport_size({'width': int(size['w']), 'height': int(size['h'])})
         p.wait_for_timeout(200)

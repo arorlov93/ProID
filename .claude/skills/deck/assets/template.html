@@ -24,9 +24,13 @@ html,body{height:100%;background:#0d0f11;font-family:var(--font);
   -webkit-font-smoothing:antialiased}
 
 /* ── Сцена: холст 1920×1080 масштабируется под окно ─────────────────────── */
-#stage{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
-#canvas{width:1920px;height:1080px;position:relative;transform-origin:center;
-  background:var(--paper);color:var(--ink)}
+/* Центрируем холст переносом, а не выравниванием сетки: grid не центрирует
+   элемент, который больше своей области, — Chromium ставит его в ноль, и
+   слайд съезжает вправо-вниз. На экране 1920×1080 масштаб равен единице,
+   поэтому в PDF и на контактном листе поломки не видно вообще. */
+#stage{position:fixed;inset:0;overflow:hidden}
+#canvas{width:1920px;height:1080px;position:absolute;left:50%;top:50%;
+  transform-origin:0 0;background:var(--paper);color:var(--ink)}
 .slide{position:absolute;inset:0;padding:var(--pad);display:none;
   flex-direction:column;justify-content:center}
 .slide.on{display:flex}
@@ -135,15 +139,26 @@ figcaption{margin-top:16px;color:var(--muted);font-size:var(--t-small)}
   [data-build]{opacity:1!important;transform:none!important}
 }
 
-/* ── Печать: все шаги видны, один слайд на страницу ─────────────────────── */
+/* ── Печать: все шаги видны, один слайд на страницу ─────────────────────
+   Размер слайда здесь задаётся явно. На экране его давал inset:0 при
+   position:absolute, а в печати слайды переводятся в поток — и высота
+   схлопывается в ноль, потому что на фотослайдах всё содержимое
+   позиционировано абсолютно. Внешне это выглядит как пустые страницы
+   с наложенным друг на друга текстом, и на контактном листе не видно
+   совсем: он собирается клонированием слайдов, минуя печатные правила. */
 @media print{
   html,body{background:#fff;height:auto}
   #stage{position:static;display:block;overflow:visible}
-  #canvas{transform:none!important;width:1920px;height:1080px}
-  .slide{display:flex!important;position:relative;page-break-after:always;
-    break-after:page;animation:none!important}
+  #canvas{transform:none!important;position:relative;left:0;top:0;
+    width:1920px;height:auto;overflow:visible}
+  .slide{display:flex!important;position:relative;
+    width:1920px;height:1080px;overflow:hidden;
+    page-break-after:always;break-after:page;animation:none!important}
+  .slide:last-child{page-break-after:auto;break-after:auto}
   [data-build]{opacity:1!important;transform:none!important}
-  #bar,#notes,#help,#grid{display:none!important}
+  /* Прогресс, номер и хром привязаны к холсту, а не к слайду: в печати
+     они уехали бы в конец документа единственной строкой. */
+  #bar,#num,#notes,#help,#grid{display:none!important}
 }
 </style>
 
@@ -212,7 +227,10 @@ figcaption{margin-top:16px;color:var(--muted);font-size:var(--t-small)}
      абсолютны и слайд выглядит одинаково на любом экране. */
   const fit = () => {
     const s = Math.min(innerWidth / 1920, innerHeight / 1080);
-    canvas.style.transform = `scale(${s})`;
+    /* Порядок важен: translate применяется первым, в своей системе
+       координат, и уже его результат масштабируется — поэтому холст
+       оказывается ровно по центру при любом масштабе. */
+    canvas.style.transform = `scale(${s}) translate(-50%, -50%)`;
   };
   addEventListener('resize', fit); fit();
 
