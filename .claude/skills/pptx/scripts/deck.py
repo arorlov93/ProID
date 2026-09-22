@@ -207,7 +207,7 @@ class Deck:
         self._src(s, src, '#A9B2B8'); self._notes(s, notes)
         return s
 
-    def duo(self, title, left, right, notes=''):
+    def duo(self, title, left, right, notes='', src=None):
         """Два кадра рядом с крупным числом на каждом — раскладка «контраст»."""
         s = self._slide(bg='#16181B')
         half = W / 2
@@ -228,7 +228,7 @@ class Deck:
         band.line.fill.background(); band.shadow.inherit = False
         _transparency(band, 22)
         self._tb(s, PAD, .48, W - PAD * 2, .9, title, 26, '#FFFFFF', bold=True)
-        self._notes(s, notes)
+        self._src(s, src, '#A9B2B8'); self._notes(s, notes)
         return s
 
     # ── картинки ─────────────────────────────────────────────────────────
@@ -269,12 +269,19 @@ class Deck:
             v.line.fill.background(); v.shadow.inherit = False
             _transparency(v, 18)
         else:
-            for i, (top, tr) in enumerate(((3.1, 62), (4.2, 34), (5.1, 12))):
+            # Градиентную заливку pptx умеет, но прозрачность её стопов
+            # приходится дописывать в XML, а проверить результат без
+            # PowerPoint нечем. Три крупных слоя давали видимую полосу на
+            # стыке, поэтому берём много тонких: каждый идёт до низа кадра,
+            # и накопленная плотность складывается в ровную растяжку.
+            N, START, STEP = 20, 2.9, 11
+            for i in range(N):
+                top = START + (H - START) * i / N
                 v = s.shapes.add_shape(1, 0, Inches(top), self.p.slide_width,
                                        Inches(H - top))
                 v.fill.solid(); v.fill.fore_color.rgb = rgb('#080A0C')
                 v.line.fill.background(); v.shadow.inherit = False
-                _transparency(v, tr)
+                _transparency(v, 100 - STEP)
 
     def save(self, path):
         self.p.save(path)
