@@ -1,0 +1,50 @@
+# Загрузка фотографий для презентации.
+#
+# Зачем через Actions: среда, в которой собирается презентация, сидит за
+# прокси с белым списком и не имеет доступа ни к одному фотохостингу.
+# У раннера GitHub интернет открыт, поэтому кадры забираются здесь и
+# кладутся в репозиторий, откуда их уже видно сборке.
+name: fetch-photos
+
+on:
+  workflow_dispatch:
+    inputs:
+      alt:
+        description: 'Заменить отдельные кадры, например: metro=3 baikal=2'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Скачать кадры с Викисклада
+        run: python3 scripts/photos/commons.py photos/deck ${{ inputs.alt }}
+
+      - name: Показать, что получилось
+        run: |
+          ls -la photos/deck
+          cat photos/deck/CREDITS.txt
+
+      - name: Закоммитить кадры
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add photos/deck
+          if git diff --cached --quiet; then
+            echo 'кадры не изменились'
+          else
+            git commit -m 'photos: кадры для презентации с Викисклада'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
