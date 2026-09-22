@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       alt:
-        description: 'Заменить отдельные кадры, например: metro=3 baikal=2'
+        description: 'Аргументы сборщика, например: --only village business  или  metro=3'
         required: false
         default: ''
 

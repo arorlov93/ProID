@@ -3,6 +3,7 @@
 
     python3 scripts/photos/commons.py photos/deck            все темы
     python3 scripts/photos/commons.py photos/deck metro=3    для метро — третий кандидат
+    python3 scripts/photos/commons.py photos/deck --only village business
     python3 scripts/photos/commons.py --list
 
 Викисклад выбран по двум причинам: не нужен ключ и все файлы под
@@ -21,28 +22,48 @@ UA = 'propto-deck-photos/1.0 (https://github.com/arorlov93/ProID)'
 MIN_W = 1500
 MIN_RATIO = 1.25          # только горизонтальные: слайд 16:9
 
+# Поиск Викисклада ранжирует по тексту описания, а не по содержанию кадра,
+# поэтому на «Moscow International Business Center» первым приходит снимок
+# пустого зала на 40-м этаже, а на «izba» — сарай изнутри. Дешевле всего
+# это лечится отсевом по названию файла.
+BAN = ('interior', 'inside', 'indoor', ' hall', 'floor', 'room', 'stairs',
+       'plan', 'map', 'diagram', 'scheme', 'coat of arms', 'logo', 'sign',
+       'construction', 'scaffold', 'under repair')
+
+# slug → (запросы по убыванию точности, дополнительный отсев)
 SHOTS = {
-    'red-square':    ["Saint Basil's Cathedral Red Square evening",
-                      'Red Square Moscow panorama', 'Red Square Moscow'],
-    'st-basil':      ["Saint Basil's Cathedral domes",
-                      "Saint Basil's Cathedral Moscow", 'Pokrovsky Cathedral Moscow'],
-    'metro':         ['Komsomolskaya metro station Moscow',
-                      'Mayakovskaya metro station Moscow',
-                      'Moscow Metro station interior hall'],
-    'baikal':        ['Lake Baikal ice winter', 'Lake Baikal landscape', 'Baikal lake'],
-    'market':        ['Russian supermarket interior vegetables',
-                      'grocery store produce shelves',
-                      'farmers market vegetables stall'],
-    'business':      ['Moscow International Business Center daytime',
-                      'Moscow City skyscrapers', 'Moscow International Business Center'],
-    'moscow-city':   ['Moscow International Business Center night',
-                      'Moscow City skyline evening', 'Moscow skyscrapers night'],
-    'village':       ['Russian village wooden house izba',
-                      'Russian wooden house village', 'izba Russia village'],
-    'dacha':         ['dacha Russia garden summer', 'dacha wooden house Russia',
-                      'Russian country house garden'],
-    'kremlin-night': ['Moscow Kremlin sunset Moskva River',
-                      'Moscow Kremlin panorama evening', 'Moscow Kremlin river view'],
+    'red-square':    (['Red Square Moscow night',
+                       'Red Square Moscow winter panorama',
+                       "Saint Basil's Cathedral Red Square panorama"],
+                      ('gum ', 'parade', 'mausoleum')),
+    'st-basil':      (["Saint Basil's Cathedral domes",
+                       "Saint Basil's Cathedral Moscow",
+                       'Pokrovsky Cathedral Moscow'], ()),
+    'metro':         (['Komsomolskaya metro station Moscow',
+                       'Mayakovskaya metro station Moscow',
+                       'Moscow Metro station platform'], ('train', 'carriage')),
+    'baikal':        (['Lake Baikal ice winter', 'Lake Baikal landscape',
+                       'Baikal lake'], ()),
+    'market':        (['Russian supermarket vegetables shelves',
+                       'grocery store produce shelves',
+                       'farmers market vegetables stall'], ('empty',)),
+    'business':      (['Moscow City skyscrapers panorama day',
+                       'Moscow International Business Center panorama',
+                       'Moskva City towers'],
+                      ('space', 'office', 'lobby', 'window', 'view from')),
+    'moscow-city':   (['Moscow City skyline evening',
+                       'Moscow International Business Center night',
+                       'Moscow skyscrapers night'],
+                      ('space', 'office', 'lobby', 'view from')),
+    'village':       (['Russian village street wooden houses',
+                       'village Russia wooden houses landscape',
+                       'izba wooden house exterior'],
+                      ('yard', 'barn', 'stove', 'museum', 'fence detail')),
+    'dacha':         (['dacha Russia garden summer', 'dacha wooden house Russia',
+                       'Russian country house garden'], ('mansion', 'palace')),
+    'kremlin-night': (['Moscow Kremlin sunset Moskva River',
+                       'Moscow Kremlin panorama evening',
+                       'Moscow Kremlin river view'], ()),
 }
 
 
@@ -58,7 +79,7 @@ def get(url, binary=False, tries=4):
             time.sleep(2 * 2 ** a)
 
 
-def search(query, limit=10):
+def search(query, limit=10, ban=()):
     u = API + '?' + urllib.parse.urlencode({
         'action': 'query', 'format': 'json', 'generator': 'search',
         'gsrsearch': f'filetype:bitmap {query}', 'gsrnamespace': '6',
@@ -74,6 +95,9 @@ def search(query, limit=10):
         if not url or w < MIN_W or not h or w / h < MIN_RATIO:
             continue
         if re.search(r'\.(svg|pdf|tiff?|gif)$', ii.get('url', ''), re.I):
+            continue
+        low = pg['title'].lower()
+        if any(b in low for b in BAN) or any(b in low for b in ban):
             continue
         m = ii.get('extmetadata') or {}
         author = re.sub(r'<[^>]+>', '', (m.get('Artist') or {}).get('value', '')).strip()
@@ -91,23 +115,37 @@ def search(query, limit=10):
 def main():
     args = sys.argv[1:]
     if not args or '--list' in args:
-        for slug, qs in SHOTS.items():
+        for slug, (qs, _) in SHOTS.items():
             print(f'{slug:<14} {qs[0]}')
         return
     out = pathlib.Path(args[0])
     out.mkdir(parents=True, exist_ok=True)
-    alt = {}
-    for a in args[1:]:
+    alt, only = {}, []
+    rest = args[1:]
+    if '--only' in rest:
+        i = rest.index('--only')
+        only = [x for x in rest[i + 1:] if not x.startswith('--') and '=' not in x]
+        rest = rest[:i]
+    for a in rest:
         if '=' in a:
             k, v = a.split('=', 1)
             alt[k] = int(v)
 
     credits, ok = [], 0
-    for slug, queries in SHOTS.items():
+    todo = [s for s in SHOTS if not only or s in only]
+    # При точечном перезапросе строки остальных кадров в CREDITS нужно сохранить.
+    keep = {}
+    cr = out / 'CREDITS.txt'
+    if cr.exists():
+        for line in cr.read_text(encoding='utf-8').splitlines():
+            if ' — ' in line:
+                keep[line.split('.jpg')[0]] = line
+    for slug in todo:
+        queries, ban = SHOTS[slug]
         hits = []
         used = queries[0]
         for q in queries:
-            hits = search(q, max(6, alt.get(slug, 1)))
+            hits = search(q, max(6, alt.get(slug, 1)), ban)
             if hits:
                 used = q
                 break
@@ -116,12 +154,13 @@ def main():
             continue
         h = hits[min(alt.get(slug, 1), len(hits)) - 1]
         (out / f'{slug}.jpg').write_bytes(get(h['url'], binary=True))
-        credits.append(f'{slug}.jpg — {h["author"]} · {h["licence"]} · {h["page"]}')
+        keep[slug] = f'{slug}.jpg — {h["author"]} · {h["licence"]} · {h["page"]}'
         ok += 1
         print(f'{slug:<14} {h["w"]}×{h["h"]}  «{used}»  {h["author"][:40]}')
-    (out / 'CREDITS.txt').write_text('\n'.join(credits) + '\n', encoding='utf-8')
-    print(f'\nскачано {ok} из {len(SHOTS)}, авторы в {out}/CREDITS.txt')
-    if ok < len(SHOTS):
+    lines = [keep[s] for s in SHOTS if s in keep]
+    (out / 'CREDITS.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    print(f'\nскачано {ok} из {len(todo)}, авторы в {out}/CREDITS.txt')
+    if ok < len(todo):
         sys.exit(1)
 
 
