@@ -82,12 +82,17 @@ SHOTS = {
     # «market» и «vegetable» в обязательных словах пропускали любой
     # прилавок — приходили яблоки. Слайд про картофель, лук и помидоры,
     # поэтому обязательным оставлен только сам товар.
-    'local-food': (['potatoes for sale market',
-                    'onions for sale market stall',
-                    'potatoes shop sacks'],
+    'local-food': (['potatoes supermarket shelf',
+                    'onions supermarket shelf vegetables',
+                    'potatoes greengrocer shop vegetables'],
                    ('dpla', 'ranch', 'negative', 'archive', 'collection',
                     'historic', 'postcard', 'engraving', 'field', 'blossom',
-                    'disease', 'plant', 'apple', 'flower'),
+                    'disease', 'plant', 'apple', 'flower',
+                    # Слайд сравнивает Россию и США: рынок в тропиках на нём
+                    # вводит в заблуждение, как и сладкий картофель вместо
+                    # обычного — это другой товар с другой ценой.
+                    'sweet potato', 'yam', 'cassava', 'kaduna', 'nigeria',
+                    'india', 'africa', 'monday market', 'sack'),
                    ('potato', 'onion')),
     'processed-food': (['roasted coffee beans close up',
                         'roasted coffee beans pile',
