@@ -83,25 +83,16 @@ SHOTS = {
               ('mansion', 'palace'), ()),
     # Локальная и переработанная еда — две половины вывода первой части:
     # дешевле то, что растёт рядом, дороже то, что прошло завод или границу.
-    # На «potatoes» Викисклад охотно отдаёт архив: первым пришёл снимок
-    # уборки картофеля 1910-х из DPLA. Отсеиваем архивные признаки в названии.
-    # «market» и «vegetable» в обязательных словах пропускали любой
-    # прилавок — приходили яблоки. Слайд про картофель, лук и помидоры,
-    # поэтому обязательным оставлен только сам товар.
-    'local-food': (['potatoes supermarket shelf',
-                    'onions supermarket shelf vegetables',
-                    'potatoes greengrocer shop vegetables'],
-                   ('dpla', 'ranch', 'negative', 'archive', 'collection',
-                    'historic', 'postcard', 'engraving', 'field', 'blossom',
-                    'disease', 'plant', 'apple', 'flower',
-                    # Слайд сравнивает Россию и США: рынок в тропиках на нём
-                    # вводит в заблуждение, как и сладкий картофель вместо
-                    # обычного — это другой товар с другой ценой.
-                    'sweet potato', 'yam', 'cassava', 'kaduna', 'nigeria',
-                    'india', 'africa', 'monday market', 'sack',
-                    'chips', 'crisps', 'snack', 'package', 'convenience',
-                    '7-11', 'seven eleven', 'calbee', 'fries'),
-                   ('potato', 'onion')),
+    # Отдельного кадра «локальная еда» здесь нет намеренно. Корпус
+    # Викисклада на такой запрос отдаёт архив, тропический рынок или
+    # пачку чипсов — восемь кандидатов подряд оказались негодными. На
+    # слайд про картофель и лук идёт market: овощной отдел «Магнита»,
+    # ровно тот товар и та страна. Разделитель первой части берёт store.
+    'store': (['supermarket interior Russia aisles',
+               'Magnit supermarket interior',
+               'grocery store interior aisles'],
+              ('empty', 'vegetable', 'produce', 'fruit', 'construction'),
+              ('supermarket', 'magnit', 'pyaterochka', 'superbazaro', 'grocery')),
     'processed-food': (['roasted coffee beans close up',
                         'roasted coffee beans pile',
                         'roasted coffee beans texture'],
