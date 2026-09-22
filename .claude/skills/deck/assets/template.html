@@ -9,7 +9,7 @@
    цветов два, ни один не работает. */
 :root{
   --paper:#F5F4F0; --ink:#14171A; --muted:#5C646C; --rule:#D6D3CC;
-  --accent:#17414F; --accent-soft:#E3EAEC;
+  --accent:#17414F; --accent-soft:#E3EAEC; --on-accent:#F5F4F0;
   --font:"Inter","Helvetica Neue",Arial,sans-serif;
   --mono:"JetBrains Mono","SF Mono",Consolas,monospace;
   /* Кегли на холсте 1920×1080. Меньше 28px основной текст не опускать:
@@ -59,10 +59,12 @@ p,li{font-size:var(--t-body);line-height:1.45;max-width:64ch;color:var(--ink)}
 [data-layout="title"] .meta{margin-top:48px;display:flex;gap:40px;
   color:var(--muted);font-size:var(--t-small)}
 
-[data-layout="section"]{background:var(--accent);color:var(--paper);
+/* На акцентной плашке цвет текста задаётся отдельным токеном: инверсия
+   «цвет бумаги» ломается, как только палитра становится тёмной. */
+[data-layout="section"]{background:var(--accent);color:var(--on-accent);
   justify-content:center}
-[data-layout="section"] h1{color:var(--paper);font-size:var(--t-display)}
-[data-layout="section"] .eyebrow{color:rgba(245,244,240,.7)}
+[data-layout="section"] h1{color:var(--on-accent);font-size:var(--t-display)}
+[data-layout="section"] .eyebrow{color:var(--on-accent);opacity:.75}
 
 [data-layout="statement"]{justify-content:center;align-items:flex-start}
 [data-layout="statement"] h1{font-size:88px;max-width:18ch}

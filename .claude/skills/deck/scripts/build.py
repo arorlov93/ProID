@@ -62,10 +62,11 @@ CHECKS = r"""
       const fs = parseFloat(st.fontSize);
       /* Надзаголовки, подписи и номера — метки, им мелкий кегль положен.
          Проверяем только то, что зритель читает как текст. */
-      const isLabel = el.closest('.eyebrow, figcaption, .tag, .who, .c, #num, #help, .notes');
+      const isLabel = el.closest('.eyebrow, figcaption, .tag, .who, .c, .src, .usd, .q, .lbl, #num, #help, .notes');
       if (fs < 24 && !isLabel)
         out.push({slide:n, kind:'мелкий шрифт',
                   detail:fs.toFixed(0) + 'px: ' + el.textContent.trim().slice(0,40)});
+      if (el.closest('.q')) return;          // заглушка фото, исчезнет со снимком
       const l1 = lum(st.color), l2 = lum(bgOf(el));
       if (l1 !== null && l2 !== null) {
         const cr = (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);
