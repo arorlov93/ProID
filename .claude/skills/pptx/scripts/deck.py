@@ -90,11 +90,33 @@ class Deck:
         self._src(s, src); self._notes(s, notes)
         return s
 
-    def stats(self, title, items, eyebrow=None, notes='', src=None):
-        """items: [(число, подпись[, мелкая приписка]), ...] — до четырёх."""
+    def stats(self, title, items, eyebrow=None, notes='', src=None,
+              photo_right=None):
+        """items: [(число, подпись[, мелкая приписка]), ...] — до четырёх.
+
+        photo_right кладёт кадр в правую половину слайда, а числа
+        выстраивает в столбец: так видно, о каком товаре идёт речь, и при
+        этом цифры остаются на светлом фоне.
+        """
         s = self._slide()
         if eyebrow:
             self._eyebrow(s, eyebrow)
+        if photo_right:
+            half = W * .44
+            self._cover(s, photo_right, W - half, 0, half, H)
+            self._tb(s, PAD, 1.25, W - half - PAD - .5, 1.5, title, 27,
+                     self.ink, bold=True)
+            y = 3.0
+            for it in items:
+                self._tb(s, PAD, y, 1.9, .9, it[0], 40, self.accent, bold=True)
+                self._tb(s, PAD + 2.0, y + .12, W - half - PAD - 2.4, .5,
+                         it[1], 15, self.ink)
+                if len(it) > 2 and it[2]:
+                    self._tb(s, PAD + 2.0, y + .58, W - half - PAD - 2.4, .4,
+                             it[2], 11, self.muted, mono=True, label=True)
+                y += 1.15
+            self._src(s, src); self._notes(s, notes)
+            return s
         self._tb(s, PAD, 1.25, W - PAD * 2 - 1.0, 1.3, title, 30, self.ink, bold=True)
         n = len(items)
         colw = (W - PAD * 2) / n
@@ -189,14 +211,18 @@ class Deck:
         """Полный кадр + текст снизу. Кроп считаем сами: cover в pptx нет."""
         s = self._slide(bg='#16181B')
         self._cover(s, img, 0, 0, W, H)
-        self._veil(s, mid)
-        y = 2.9 if mid else 4.15
+        # Титульный слайд несёт сразу надзаголовок, заголовок в две строки,
+        # подпись и блок цифр — при позиции по умолчанию подпись садилась
+        # на числа, поэтому текст поднимается, когда есть и то и другое.
+        y = 2.9 if mid else (3.72 if (sub and stats) else 4.15)
+        self._veil(s, mid, top=y - 1.7)
         if eyebrow:
             self._tb(s, PAD, y - .45, W - PAD * 2, .3, eyebrow, 11, '#E2C9C5',
                      mono=True, caps=True, label=True)
         self._tb(s, PAD, y, W * .72, 1.3, title, 32, '#FFFFFF', bold=True)
         if sub:
-            self._tb(s, PAD, y + 1.35, W * .62, .5, sub, 13, '#CBD3D8')
+            self._tb(s, PAD, y + (1.0 if stats else 1.35), W * .62, .5,
+                     sub, 13, '#CBD3D8')
         if stats:
             colw = (W - PAD * 2) / max(len(stats), 3)
             for i, it in enumerate(stats):
@@ -207,7 +233,7 @@ class Deck:
         self._src(s, src, '#A9B2B8'); self._notes(s, notes)
         return s
 
-    def duo(self, title, left, right, notes='', src=None):
+    def duo(self, title, left, right, notes='', src=None, sub=None):
         """Два кадра рядом с крупным числом на каждом — раскладка «контраст»."""
         s = self._slide(bg='#16181B')
         half = W / 2
@@ -219,15 +245,19 @@ class Deck:
             v.fill.solid(); v.fill.fore_color.rgb = rgb('#0A0C0E')
             v.line.fill.background(); v.shadow.inherit = False
             _transparency(v, 28)
-            self._tb(s, x + .42, 5.35, half - .9, .9, num, 40, '#FFFFFF', bold=True)
-            self._tb(s, x + .42, 6.25, half - 1.0, .7, cap, 13, '#E8EAEC', line=1.2)
-            self._tb(s, x + .42, 6.85, half - 1.0, .4, unit, 12, '#F2B8B1',
+            self._tb(s, x + .42, 4.85, half - .9, .9, num, 40, '#FFFFFF', bold=True)
+            self._tb(s, x + .42, 5.62, half - 1.0, .7, cap, 13, '#E8EAEC', line=1.2)
+            self._tb(s, x + .42, 6.12, half - 1.0, .4, unit, 12, '#F2B8B1',
                      mono=True, label=True)
-        band = s.shapes.add_shape(1, 0, 0, self.p.slide_width, Inches(1.5))
+        band = s.shapes.add_shape(1, 0, 0, self.p.slide_width,
+                                  Inches(2.3 if sub else 1.5))
         band.fill.solid(); band.fill.fore_color.rgb = rgb('#0A0C0E')
         band.line.fill.background(); band.shadow.inherit = False
         _transparency(band, 22)
-        self._tb(s, PAD, .48, W - PAD * 2, .9, title, 26, '#FFFFFF', bold=True)
+        self._tb(s, PAD, .42, W - PAD * 2, .9, title, 26, '#FFFFFF', bold=True)
+        if sub:
+            self._tb(s, PAD, 1.22, W - PAD * 2 - 1.0, .9, sub, 14, '#DDE3E6',
+                     line=1.3)
         self._src(s, src, '#A9B2B8'); self._notes(s, notes)
         return s
 
@@ -260,7 +290,7 @@ class Deck:
             img = str(out)
         s.shapes.add_picture(img, Inches(x), Inches(y), Inches(w), Inches(h))
 
-    def _veil(self, s, mid):
+    def _veil(self, s, mid, top=2.9):
         """Тень под текстом. На слайде с текстом по центру нужна ровная вуаль:
         градиент снизу оставляет заголовок на самом светлом месте кадра."""
         if mid:
@@ -274,7 +304,7 @@ class Deck:
             # PowerPoint нечем. Три крупных слоя давали видимую полосу на
             # стыке, поэтому берём много тонких: каждый идёт до низа кадра,
             # и накопленная плотность складывается в ровную растяжку.
-            N, START, STEP = 20, 2.9, 11
+            N, START, STEP = 20, max(1.2, top), 11
             for i in range(N):
                 top = START + (H - START) * i / N
                 v = s.shapes.add_shape(1, 0, Inches(top), self.p.slide_width,

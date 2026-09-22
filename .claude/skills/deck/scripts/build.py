@@ -45,9 +45,15 @@ CHECKS = r"""
     const n = i + 1;
     if (!s.querySelector('h1,h2,blockquote'))
       out.push({slide:n, kind:'нет заголовка', detail:'слайд без утверждения'});
-    const li = s.querySelectorAll('ul li');
-    if (li.length > 5)
-      out.push({slide:n, kind:'длинный список', detail:li.length + ' пунктов, больше пяти'});
+    /* Считаем пункты по каждому списку отдельно. Правило про пять пунктов
+       — о тезисах, которые зритель читает подряд; перечень из четырёх
+       коротких колонок читается как таблица и под него не попадает. */
+    s.querySelectorAll('ul').forEach(ul => {
+      const li = ul.querySelectorAll(':scope > li');
+      if (li.length > 5)
+        out.push({slide:n, kind:'длинный список',
+                  detail:li.length + ' пунктов в одном списке, больше пяти'});
+    });
     const box = s.getBoundingClientRect();
     s.querySelectorAll('*').forEach(el => {
       if (!el.offsetParent && getComputedStyle(el).position !== 'absolute') return;
@@ -149,9 +155,12 @@ def wait_images(page, timeout=30000):
     на контактном листе, который снимается позже и успевает подхватить их.
     """
     page.wait_for_load_state('load')
-    page.wait_for_function(
-        "() => [...document.images].every(i => i.complete && "
-        "(i.naturalWidth > 0 || !i.getAttribute('src')))", timeout=timeout)
+    # Ждём именно завершения загрузки, а не успеха: у снимка, которого нет,
+    # complete тоже становится true, а naturalWidth остаётся нулём. Если
+    # ждать успеха, отсутствующий файл вешает сборку до таймаута. О самом
+    # отсутствии сообщает проверка печати — это её работа, не ожидания.
+    page.wait_for_function("() => [...document.images].every(i => i.complete)",
+                           timeout=timeout)
     page.wait_for_timeout(250)
 
 
