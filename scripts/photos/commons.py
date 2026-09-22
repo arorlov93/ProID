@@ -79,14 +79,16 @@ SHOTS = {
     # дешевле то, что растёт рядом, дороже то, что прошло завод или границу.
     # На «potatoes» Викисклад охотно отдаёт архив: первым пришёл снимок
     # уборки картофеля 1910-х из DPLA. Отсеиваем архивные признаки в названии.
-    'local-food': (['vegetable market stall potatoes onions',
-                    'greengrocer vegetables display market',
-                    'potatoes onions vegetables counter'],
+    # «market» и «vegetable» в обязательных словах пропускали любой
+    # прилавок — приходили яблоки. Слайд про картофель, лук и помидоры,
+    # поэтому обязательным оставлен только сам товар.
+    'local-food': (['potatoes for sale market',
+                    'onions for sale market stall',
+                    'potatoes shop sacks'],
                    ('dpla', 'ranch', 'negative', 'archive', 'collection',
                     'historic', 'postcard', 'engraving', 'field', 'blossom',
-                    'disease', 'plant'),
-                   ('market', 'stall', 'greengrocer', 'vegetable',
-                    'potato', 'onion')),
+                    'disease', 'plant', 'apple', 'flower'),
+                   ('potato', 'onion')),
     'processed-food': (['roasted coffee beans close up',
                         'roasted coffee beans pile',
                         'roasted coffee beans texture'],
