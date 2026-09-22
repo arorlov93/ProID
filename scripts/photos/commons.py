@@ -30,40 +30,55 @@ BAN = ('interior', 'inside', 'indoor', ' hall', 'floor', 'room', 'stairs',
        'plan', 'map', 'diagram', 'scheme', 'coat of arms', 'logo', 'sign',
        'construction', 'scaffold', 'under repair')
 
-# slug → (запросы по убыванию точности, дополнительный отсев)
+# slug → (запросы по убыванию точности, запрещённые слова в названии,
+# обязательные слова). Обязательные нужны потому, что поиск ранжирует по
+# всему описанию файла: на «Red Square Moscow night» первым пришёл трамвай
+# на Тверской Заставе — в описании есть слово Moscow, и этого хватило.
 SHOTS = {
-    'red-square':    (['Red Square Moscow night',
-                       'Red Square Moscow winter panorama',
-                       "Saint Basil's Cathedral Red Square panorama"],
-                      ('gum ', 'parade', 'mausoleum')),
-    'st-basil':      (["Saint Basil's Cathedral domes",
-                       "Saint Basil's Cathedral Moscow",
-                       'Pokrovsky Cathedral Moscow'], ()),
-    'metro':         (['Komsomolskaya metro station Moscow',
-                       'Mayakovskaya metro station Moscow',
-                       'Moscow Metro station platform'], ('train', 'carriage')),
-    'baikal':        (['Lake Baikal ice winter', 'Lake Baikal landscape',
-                       'Baikal lake'], ()),
-    'market':        (['Russian supermarket vegetables shelves',
-                       'grocery store produce shelves',
-                       'farmers market vegetables stall'], ('empty',)),
-    'business':      (['Moscow City skyscrapers panorama day',
-                       'Moscow International Business Center panorama',
-                       'Moskva City towers'],
-                      ('space', 'office', 'lobby', 'window', 'view from')),
-    'moscow-city':   (['Moscow City skyline evening',
-                       'Moscow International Business Center night',
-                       'Moscow skyscrapers night'],
-                      ('space', 'office', 'lobby', 'view from')),
-    'village':       (['Russian village street wooden houses',
-                       'village Russia wooden houses landscape',
-                       'izba wooden house exterior'],
-                      ('yard', 'barn', 'stove', 'museum', 'fence detail')),
-    'dacha':         (['dacha Russia garden summer', 'dacha wooden house Russia',
-                       'Russian country house garden'], ('mansion', 'palace')),
+    'red-square': (['Red Square Moscow panorama',
+                    'Red Square Moscow night',
+                    "Saint Basil's Cathedral Red Square"],
+                   ('gum ', 'parade', 'mausoleum', 'tver'),
+                   ('red square', 'krasnaya', 'basil', 'kremlin')),
+    'st-basil': (["Saint Basil's Cathedral domes",
+                  "Saint Basil's Cathedral Moscow",
+                  'Pokrovsky Cathedral Moscow'],
+                 (), ('basil', 'pokrov', 'vasil')),
+    'metro': (['Komsomolskaya metro station Moscow',
+               'Mayakovskaya metro station Moscow',
+               'Moscow Metro station platform'],
+              ('train', 'carriage'), ('metro',)),
+    'baikal': (['Lake Baikal ice winter', 'Lake Baikal landscape', 'Baikal lake'],
+               (), ('baikal',)),
+    'market': (['Russian supermarket vegetables shelves',
+                'grocery store produce shelves',
+                'farmers market vegetables stall'],
+               ('empty',),
+               ('supermarket', 'superbazaro', 'market', 'bazar', 'magnit', 'grocery')),
+    'business': (['Moscow City skyscrapers panorama day',
+                  'Moscow International Business Center panorama',
+                  'Moskva City towers'],
+                 ('space', 'lobby', 'view from'),
+                 ('moscow city', 'moskva city', 'business cent', 'federation',
+                  'mercury', 'presnensk')),
+    'moscow-city': (['Moscow City skyline evening',
+                     'Moscow International Business Center night',
+                     'Moscow skyscrapers night'],
+                    ('space', 'lobby', 'view from'),
+                    ('moscow city', 'moskva city', 'business cent', 'presnensk',
+                     'federation')),
+    'village': (['Russian village street wooden houses',
+                 'village Russia wooden houses landscape',
+                 'izba wooden house exterior'],
+                ('yard', 'barn', 'stove', 'museum'),
+                ('village', 'izba', 'derevnya')),
+    'dacha': (['dacha Russia garden summer', 'dacha wooden house Russia',
+               'Russian country house garden'],
+              ('mansion', 'palace'), ()),
     'kremlin-night': (['Moscow Kremlin sunset Moskva River',
                        'Moscow Kremlin panorama evening',
-                       'Moscow Kremlin river view'], ()),
+                       'Moscow Kremlin river view'],
+                      (), ('kremlin',)),
 }
 
 
@@ -79,7 +94,7 @@ def get(url, binary=False, tries=4):
             time.sleep(2 * 2 ** a)
 
 
-def search(query, limit=10, ban=()):
+def search(query, limit=10, ban=(), must=()):
     u = API + '?' + urllib.parse.urlencode({
         'action': 'query', 'format': 'json', 'generator': 'search',
         'gsrsearch': f'filetype:bitmap {query}', 'gsrnamespace': '6',
@@ -99,6 +114,8 @@ def search(query, limit=10, ban=()):
         low = pg['title'].lower()
         if any(b in low for b in BAN) or any(b in low for b in ban):
             continue
+        if must and not any(m in low for m in must):
+            continue
         m = ii.get('extmetadata') or {}
         author = re.sub(r'<[^>]+>', '', (m.get('Artist') or {}).get('value', '')).strip()
         hits.append({
@@ -115,7 +132,7 @@ def search(query, limit=10, ban=()):
 def main():
     args = sys.argv[1:]
     if not args or '--list' in args:
-        for slug, (qs, _) in SHOTS.items():
+        for slug, (qs, *_rest) in SHOTS.items():
             print(f'{slug:<14} {qs[0]}')
         return
     out = pathlib.Path(args[0])
@@ -141,11 +158,11 @@ def main():
             if ' — ' in line:
                 keep[line.split('.jpg')[0]] = line
     for slug in todo:
-        queries, ban = SHOTS[slug]
+        queries, ban, must = SHOTS[slug]
         hits = []
         used = queries[0]
         for q in queries:
-            hits = search(q, max(6, alt.get(slug, 1)), ban)
+            hits = search(q, max(6, alt.get(slug, 1)), ban, must)
             if hits:
                 used = q
                 break
