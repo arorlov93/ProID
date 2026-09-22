@@ -4,6 +4,7 @@
     python3 scripts/photos/commons.py photos/deck            все темы
     python3 scripts/photos/commons.py photos/deck metro=3    для метро — третий кандидат
     python3 scripts/photos/commons.py photos/deck --only village business
+    python3 scripts/photos/commons.py photos/cand --only local-food --candidates 8
     python3 scripts/photos/commons.py --list
 
 Викисклад выбран по двум причинам: не нужен ключ и все файлы под
@@ -14,6 +15,11 @@
 Запросы подобраны под названия файлов Викисклада, а не под обычный поиск
 картинок: у него другой корпус, и общий запрос вроде «Moscow» отдаёт
 карты и гербы.
+
+Когда тема не даётся с первого раза, не надо крутить запрос наугад:
+--candidates N приносит N вариантов в отдельную папку, и кадр выбирается
+глазами. На «potatoes» так и пришлось сделать — подряд приходили архив
+1910-х, рынок в тропиках и пачка чипсов.
 """
 import json, pathlib, re, sys, time, urllib.parse, urllib.request
 
@@ -92,7 +98,9 @@ SHOTS = {
                     # вводит в заблуждение, как и сладкий картофель вместо
                     # обычного — это другой товар с другой ценой.
                     'sweet potato', 'yam', 'cassava', 'kaduna', 'nigeria',
-                    'india', 'africa', 'monday market', 'sack'),
+                    'india', 'africa', 'monday market', 'sack',
+                    'chips', 'crisps', 'snack', 'package', 'convenience',
+                    '7-11', 'seven eleven', 'calbee', 'fries'),
                    ('potato', 'onion')),
     'processed-food': (['roasted coffee beans close up',
                         'roasted coffee beans pile',
@@ -162,8 +170,12 @@ def main():
         return
     out = pathlib.Path(args[0])
     out.mkdir(parents=True, exist_ok=True)
-    alt, only = {}, []
+    alt, only, ncand = {}, [], 0
     rest = args[1:]
+    if '--candidates' in rest:
+        i = rest.index('--candidates')
+        ncand = int(rest[i + 1])
+        rest = rest[:i] + rest[i + 2:]
     if '--only' in rest:
         i = rest.index('--only')
         only = [x for x in rest[i + 1:] if not x.startswith('--') and '=' not in x]
@@ -194,11 +206,26 @@ def main():
         if not hits:
             print(f'{slug:<14} НЕ НАЙДЕНО')
             continue
+        if ncand:
+            box = out / slug
+            box.mkdir(parents=True, exist_ok=True)
+            lines = []
+            for k, c in enumerate(hits[:ncand], 1):
+                (box / f'{k}.jpg').write_bytes(get(c['url'], binary=True))
+                lines.append(f'{k}.jpg — {c["title"]} — {c["author"]} · '
+                             f'{c["licence"]} · {c["page"]}')
+                print(f'  {k}: {c["title"][:70]}')
+            (box / 'LIST.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+            ok += 1
+            continue
         h = hits[min(alt.get(slug, 1), len(hits)) - 1]
         (out / f'{slug}.jpg').write_bytes(get(h['url'], binary=True))
         keep[slug] = f'{slug}.jpg — {h["author"]} · {h["licence"]} · {h["page"]}'
         ok += 1
         print(f'{slug:<14} {h["w"]}×{h["h"]}  «{used}»  {h["author"][:40]}')
+    if ncand:
+        print(f'\nкандидаты в {out}, выбор — глазами')
+        return
     lines = [keep[s] for s in SHOTS if s in keep]
     (out / 'CREDITS.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     print(f'\nскачано {ok} из {len(todo)}, авторы в {out}/CREDITS.txt')

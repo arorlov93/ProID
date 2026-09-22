@@ -13,6 +13,10 @@ on:
         description: 'Аргументы сборщика, например: --only village business  или  metro=3'
         required: false
         default: ''
+      out:
+        description: 'Куда класть кадры (по умолчанию photos/deck)'
+        required: false
+        default: 'photos/deck'
 
 permissions:
   contents: write
@@ -30,18 +34,18 @@ jobs:
           python-version: '3.12'
 
       - name: Скачать кадры с Викисклада
-        run: python3 scripts/photos/commons.py photos/deck ${{ inputs.alt }}
+        run: python3 scripts/photos/commons.py ${{ inputs.out || 'photos/deck' }} ${{ inputs.alt }}
 
       - name: Показать, что получилось
         run: |
-          ls -la photos/deck
-          cat photos/deck/CREDITS.txt
+          ls -laR ${{ inputs.out || 'photos/deck' }}
+          cat ${{ inputs.out || 'photos/deck' }}/CREDITS.txt || true
 
       - name: Закоммитить кадры
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add photos/deck
+          git add photos
           if git diff --cached --quiet; then
             echo 'кадры не изменились'
           else
