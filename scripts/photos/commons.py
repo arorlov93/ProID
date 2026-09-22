@@ -75,6 +75,17 @@ SHOTS = {
     'dacha': (['dacha Russia garden summer', 'dacha wooden house Russia',
                'Russian country house garden'],
               ('mansion', 'palace'), ()),
+    # Локальная и переработанная еда — две половины вывода первой части:
+    # дешевле то, что растёт рядом, дороже то, что прошло завод или границу.
+    'local-food': (['potatoes onions vegetables market stall',
+                    'vegetable market stall potatoes onions',
+                    'potatoes harvest sack'],
+                   ('field', 'flower', 'plant disease', 'blossom'),
+                   ('potato', 'onion', 'vegetable', 'market')),
+    'processed-food': (['roasted coffee beans heap',
+                        'roasted coffee beans', 'ground coffee beans'],
+                       ('plantation', 'tree', 'cherries'),
+                       ('coffee',)),
     'kremlin-night': (['Moscow Kremlin sunset Moskva River',
                        'Moscow Kremlin panorama evening',
                        'Moscow Kremlin river view'],
