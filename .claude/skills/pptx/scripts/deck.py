@@ -135,8 +135,13 @@ class Deck:
         s = self._slide()
         if eyebrow:
             self._eyebrow(s, eyebrow)
-        self._tb(s, PAD, 1.1, W - PAD * 2, .7, title, 28, self.ink, bold=True)
-        top, bottom = 2.05, H - .85
+        # Раскладка считала заголовок однострочным, и длинный налезал на
+        # шапку таблицы. Высоту заголовка оцениваем по ширине блока и
+        # кеглю, а таблицу начинаем под ним.
+        per_line = max(1, int((W - PAD * 2) / (.53 * 28 / 72)))
+        th = max(1, -(-len(title) // per_line)) * 28 * 1.3 / 72
+        self._tb(s, PAD, 1.1, W - PAD * 2, th + .1, title, 28, self.ink, bold=True)
+        top, bottom = max(2.05, 1.1 + th + .25), H - .85
         nrow = len(rows) + 1
         rh = min(.42, (bottom - top) / nrow)
         cols = len(header)
