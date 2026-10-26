@@ -43,7 +43,7 @@ jobs:
           if git diff --cached --quiet; then echo "no changes to commit"; exit 0; fi
           git commit -m "forms: ${{ github.event.inputs.url }}"
           for i in 1 2 3 4; do
-            git pull --rebase origin claude/profid-production-build-2hkvfm && \
+            git pull --rebase --autostash origin claude/profid-production-build-2hkvfm && \
             git push origin HEAD:claude/profid-production-build-2hkvfm && exit 0
             sleep $((2**i))
           done
