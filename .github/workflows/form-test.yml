@@ -1,0 +1,50 @@
+name: form-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Site URL whose forms to test (sends a REAL marked test submission)"
+        required: true
+        default: "https://ispgroupgc.com"
+
+permissions:
+  contents: write
+
+jobs:
+  forms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/profid-production-build-2hkvfm
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Tools
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-audit --no-fund playwright@1.49.1 >/dev/null
+          npx playwright install --with-deps chromium
+
+      - name: Test forms
+        run: |
+          node scripts/audit/forms.mjs "${{ github.event.inputs.url }}" || echo "forms exited $?"
+          ls -la audit/forms 2>/dev/null || true
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A audit
+          if git diff --cached --quiet; then echo "no changes to commit"; exit 0; fi
+          git commit -m "forms: ${{ github.event.inputs.url }}"
+          for i in 1 2 3 4; do
+            git pull --rebase origin claude/profid-production-build-2hkvfm && \
+            git push origin HEAD:claude/profid-production-build-2hkvfm && exit 0
+            sleep $((2**i))
+          done
+          exit 1
