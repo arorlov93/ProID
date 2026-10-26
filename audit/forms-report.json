@@ -1,0 +1,383 @@
+[
+ {
+  "url": "https://ispgroupgc.com",
+  "tag": "f1-home",
+  "forms": [
+   {
+    "idx": 0,
+    "action": null,
+    "resolved": "https://ispgroupgc.com/",
+    "method": "GET",
+    "id": "rq",
+    "name": null,
+    "cls": "form-card fade",
+    "visible": true,
+    "html": "<form class=\"form-card fade\" id=\"rq\" novalidate=\"\">\n        <div class=\"fgrid\">\n          <div><label for=\"q-name\">Name</label><input id=\"q-name\" type=\"text\" autocomplete=\"name\"></div>\n          <div><label for=\"q-mail\">Work e-mail</label><input id=\"q-mail\" type=\"email\" autocomplete=\"email\"></div>\n          <div><label for=\"q-co\">Company</label><input id=\"q-co\" type=\"text\" autocomplete=\"organization\"></div>\n          <div><label for=\"q-country\">Country</label><input id=\"q-country\" type=\"text\" autocomplete=\"country-name\"></div>\n          <div><label for=\"q-cat\">Category</label>\n            <select id=\"q-cat\">\n              <option>Building and finishing materials</option>\n              <option>Industrial equipment and machinery</option>\n              <option>Tools, hardware and fasteners</option>\n              <option>Metals and pipe</option>\n              <option>Paper, packaging and consumables</option>\n              <option>Food, commodities and beverages</option>\n              <option>Other</option>\n            </select>\n          </div>\n          <div><label for=\"q-terms\">Terms to quote</label>\n            <select id=\"q-terms\"><option>Not sure, advise</option><option>EXW</option><option>FCA</option><option>FOB</option><option>CFR</option><option>CIF</option><option>DAP</option><option>DDP</option></select>\n          </div>\n          <div><label for=\"q-qty\">Quantity</label><input id=\"q-qty\" type=\"text\" placeholder=\"Containers, tonnes, pieces\"></div>\n          <div><label for=\"q-dest\">Destination port or city</label><input id=\"q-dest\" type=\"text\"></div>\n          <div class=\"f-full\"><label for=\"q-spec\">Specification</label><textarea id=\"q-spec\" placeholder=\"Standard, grade, dimensions, certification, deadline\"></textarea></div>\n        </div>\n        <p style=\"margin:20px 0 0\"><button class=\"btn-lg\" type=\"submit\">Start a trade request</button></p>\n        <p class=\"form-note\">This opens your mail client with the request filled in, addressed to info@ispgroupgc.com. Nothing is sent from this page and nothing is stored here.</p>\n      </form>",
+    "captcha": false,
+    "fields": [
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "q-name",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": "name",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Name",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "email",
+      "name": null,
+      "id": "q-mail",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": "email",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Work e-mail",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "q-co",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": "organization",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Company",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "q-country",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": "country-name",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Country",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "SELECT",
+      "type": "select-one",
+      "name": null,
+      "id": "q-cat",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Category",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "SELECT",
+      "type": "select-one",
+      "name": null,
+      "id": "q-terms",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Terms to quote",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "q-qty",
+      "required": false,
+      "placeholder": "Containers, tonnes, pieces",
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Quantity",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "q-dest",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Destination port or city",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "name": null,
+      "id": "q-spec",
+      "required": false,
+      "placeholder": "Standard, grade, dimensions, certification, deadline",
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Specification",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "BUTTON",
+      "type": "submit",
+      "name": null,
+      "id": null,
+      "required": false,
+      "placeholder": null,
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": null,
+      "hidden": false,
+      "value": null
+     }
+    ],
+    "frameUrl": "https://ispgroupgc.com/"
+   }
+  ],
+  "tests": [
+   {
+    "name": "empty-submit",
+    "clientValidation": {
+     "valid": true,
+     "invalidFields": [],
+     "visibleErrors": []
+    },
+    "networkFired": false
+   },
+   {
+    "name": "invalid-email",
+    "formValid": false,
+    "networkFired": false
+   },
+   {
+    "name": "real-submit",
+    "filled": [
+     "q-name=TEST - site audit (ignore)",
+     "q-mail=test@example.com",
+     "q-co=Test",
+     "q-country=TEST - site audit (ignore)",
+     "null=Building and finishing materials",
+     "null=Not sure, advise",
+     "q-qty=TEST - site audit (ignore)",
+     "q-dest=Miami Beach",
+     "q-spec=TEST - site audit (ignore)"
+    ],
+    "submitButton": "START A TRADE REQUEST",
+    "elapsedMs": 9055,
+    "urlBefore": "https://ispgroupgc.com/",
+    "urlAfter": "https://ispgroupgc.com/",
+    "redirected": false,
+    "networkCalls": [],
+    "successTextFound": true,
+    "pageTextAfterSample": "Skip to content ISP Group Global Commerce What we do What we supply Corridors Guides About Contact REQUEST A QUOTE ISP GROUP LLC · AVENTURA, FLORIDA WE BUY IN OUR OWN NAME. We find the producer, confirm it can legally ship to your country, buy the goods ourselves and deliver them to your port. Principal, not a broker. DISCUSS YOUR REQUIREMENTS SCROLL 01 — ORIGIN FROM THE SOURCE. A container is the last twenty per cent of the job. The work that decides the price and the risk happens at the mill, the plant and the establishment, months before anything is loaded. 02 — SOURCING AND PROCUREMENT FIND THE RIGHT SOURCE. Supplier identification 01 Procurement coordination 02 Specification and verification 03 Commercial negotiation 04 03 — WHAT WE SUPPLY SIX CATEGORIES. Where we already have producer relationships and a documented lane. 01 Building and finishing materials STONE · TILE · CEMENT · CABLE 02 Industrial equipment and machinery LINES · COMPRESSORS · PUMPS 03 Tools, hardware and fasteners POWER TOOLS · ABRASIVES · FIXINGS 04 Metals and pipe SECTIONS · SHEET · LINE PIPE 05 Paper, packaging and consumables BOARD · FILM · FACILITY SUPPLY 06 Food, commodities and beverages FROZEN · STA",
+    "textDiffSample": ""
+   }
+  ],
+  "consoleErrors": [],
+  "network": [
+   {
+    "phase": "req",
+    "method": "POST",
+    "url": "https://ispgroupgc.com/cdn-cgi/rum?",
+    "postData": "{\"startTime\":1792976315985,\"pageloadId\":\"f08b26a6-d5da-40a5-8494-6299d7849d7b\",\"eventType\":1,\"nt\":\"navigate\",\"location\":\"https://ispgroupgc.com/\",\"versions\":{\"fl\":\"2024.11.0\",\"js\":\"2026.10.1\",\"timings\":2},\"bi\":{\"be\":\"Blink\",\"bev\":\"131\",\"bv\":\"131\",\"ov\":\"10.15\"},\"memory\":{\"totalJSHeapSize\":10000000,\"usedJSHeapSize\":10000000,\"jsHeapSizeLimit\":3760000000},\"firstPaint\":422,\"firstContentfulPaint\":422,\"timingsV2\":{\"nextHopProtocol\":\"h2\",\"domainLookupStart\":2,\"domainLookupEnd\":21,\"connectStart\":21,\"connectEnd\":45,\"secureConnectionStart\":24,\"requestStart\":45,\"responseStart\":234,\"responseEnd\":235,\"domIn"
+   },
+   {
+    "phase": "res",
+    "status": 204,
+    "url": "https://ispgroupgc.com/cdn-cgi/rum?",
+    "body": ""
+   }
+  ],
+  "targetForm": {
+   "idx": 0,
+   "frameUrl": "https://ispgroupgc.com/",
+   "action": "https://ispgroupgc.com/",
+   "method": "GET"
+  }
+ },
+ {
+  "url": "https://ispgroupgc.com/contact",
+  "tag": "f2-contact",
+  "forms": [
+   {
+    "idx": 0,
+    "action": null,
+    "resolved": "https://ispgroupgc.com/contact",
+    "method": "GET",
+    "id": "cf",
+    "name": null,
+    "cls": null,
+    "visible": true,
+    "html": "<form id=\"cf\" novalidate=\"\">\n    <label for=\"f-product\">Product or equipment</label>\n    <input id=\"f-product\" type=\"text\" autocomplete=\"off\" placeholder=\"What you need, in your own words\">\n    <label for=\"f-qty\">Quantity</label>\n    <input id=\"f-qty\" type=\"text\" autocomplete=\"off\" placeholder=\"Containers, tonnes, pieces\">\n    <label for=\"f-port\">Destination port or city</label>\n    <input id=\"f-port\" type=\"text\" autocomplete=\"off\" placeholder=\"Where it has to arrive\">\n    <label for=\"f-terms\">Terms you want quoted</label>\n    <select id=\"f-terms\">\n      <option>Not sure, advise</option><option>FOB</option><option>CFR</option>\n      <option>CIF</option><option>FCA</option><option>DAP</option>\n    </select>\n    <label for=\"f-note\">Anything else</label>\n    <textarea id=\"f-note\" placeholder=\"Specification, standard, certification, deadline\"></textarea>\n    <button class=\"btn\" type=\"submit\">Compose the email</button>\n    <p class=\"cresult\" id=\"cf-out\" hidden=\"\"></p>\n  </form>",
+    "captcha": false,
+    "fields": [
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "f-product",
+      "required": false,
+      "placeholder": "What you need, in your own words",
+      "autocomplete": "off",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Product or equipment",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "f-qty",
+      "required": false,
+      "placeholder": "Containers, tonnes, pieces",
+      "autocomplete": "off",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Quantity",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "name": null,
+      "id": "f-port",
+      "required": false,
+      "placeholder": "Where it has to arrive",
+      "autocomplete": "off",
+      "pattern": null,
+      "maxlength": null,
+      "label": "Destination port or city",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "SELECT",
+      "type": "select-one",
+      "name": null,
+      "id": "f-terms",
+      "required": false,
+      "placeholder": null,
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Terms you want quoted",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "name": null,
+      "id": "f-note",
+      "required": false,
+      "placeholder": "Specification, standard, certification, deadline",
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": "Anything else",
+      "hidden": false,
+      "value": null
+     },
+     {
+      "tag": "BUTTON",
+      "type": "submit",
+      "name": null,
+      "id": null,
+      "required": false,
+      "placeholder": null,
+      "autocomplete": null,
+      "pattern": null,
+      "maxlength": null,
+      "label": null,
+      "hidden": false,
+      "value": null
+     }
+    ],
+    "frameUrl": "https://ispgroupgc.com/contact"
+   }
+  ],
+  "tests": [
+   {
+    "name": "empty-submit",
+    "clientValidation": {
+     "valid": true,
+     "invalidFields": [],
+     "visibleErrors": []
+    },
+    "networkFired": false
+   },
+   {
+    "name": "invalid-email",
+    "skipped": "no email field"
+   },
+   {
+    "name": "real-submit",
+    "filled": [
+     "f-product=TEST - site audit (ignore)",
+     "f-qty=TEST - site audit (ignore)",
+     "f-port=Miami Beach",
+     "null=Not sure, advise",
+     "f-note=TEST - site audit (ignore)"
+    ],
+    "submitButton": "COMPOSE THE EMAIL",
+    "elapsedMs": 9055,
+    "urlBefore": "https://ispgroupgc.com/contact",
+    "urlAfter": "https://ispgroupgc.com/contact",
+    "redirected": false,
+    "networkCalls": [],
+    "successTextFound": false,
+    "pageTextAfterSample": "SKIP TO CONTENT ISP Group Global Commerce What we do What we supply Corridors Guides About Contact REQUEST A QUOTE ISP GROUP / CONTACT TELL US WHAT YOU NEED AND WHERE IT HAS TO ARRIVE Product, quantity and destination port is enough to start a quotation. No account, no registration, no fee. We reply within one working day. 1 working day to reply 10 working days to a landed price FOB · CFR · CIF · FCA · DAP REQUEST A QUOTE SEND A REQUIREMENT PRODUCT OR EQUIPMENT QUANTITY DESTINATION PORT OR CITY TERMS YOU WANT QUOTED Not sure, advise FOB CFR CIF FCA DAP ANYTHING ELSE COMPOSE THE EMAIL Opening your email client. If nothing happens, write to info@ispgroupgc.com with the same details. SCROLL What to put in the first message The faster a requirement becomes a specification, the faster it becomes a price. You do not need all of this to write to us, but each line you can answer removes a round trip. ON THIS PAGE 01 The four lines that start a quotation 02 What happens after you write 03 If you are a producer, not a buyer 04 Where we are 01 The four lines that start a quotation Everything else we can work out together. These four decide whether we can go straight to producers or have to co",
+    "textDiffSample": ""
+   }
+  ],
+  "consoleErrors": [],
+  "network": [
+   {
+    "phase": "req",
+    "method": "POST",
+    "url": "https://ispgroupgc.com/cdn-cgi/rum?",
+    "postData": "{\"startTime\":1792976335734,\"pageloadId\":\"c70195ed-f131-4cd3-b06a-aa5bcb639fbf\",\"eventType\":1,\"nt\":\"navigate\",\"location\":\"https://ispgroupgc.com/contact\",\"versions\":{\"fl\":\"2024.11.0\",\"js\":\"2026.10.1\",\"timings\":2},\"bi\":{\"be\":\"Blink\",\"bev\":\"131\",\"bv\":\"131\",\"ov\":\"10.15\"},\"memory\":{\"totalJSHeapSize\":10000000,\"usedJSHeapSize\":10000000,\"jsHeapSizeLimit\":3760000000},\"firstPaint\":0,\"firstContentfulPaint\":0,\"timingsV2\":{\"nextHopProtocol\":\"h2\",\"domainLookupStart\":1,\"domainLookupEnd\":2,\"connectStart\":2,\"connectEnd\":21,\"secureConnectionStart\":4,\"requestStart\":21,\"responseStart\":617,\"responseEnd\":619,\"domIn"
+   },
+   {
+    "phase": "res",
+    "status": 204,
+    "url": "https://ispgroupgc.com/cdn-cgi/rum?",
+    "body": ""
+   }
+  ],
+  "targetForm": {
+   "idx": 0,
+   "frameUrl": "https://ispgroupgc.com/contact",
+   "action": "https://ispgroupgc.com/contact",
+   "method": "GET"
+  }
+ }
+]

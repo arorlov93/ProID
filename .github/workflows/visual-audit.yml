@@ -41,7 +41,7 @@ jobs:
           URL: ${{ github.event.inputs.url }}
           MAXP: ${{ github.event.inputs.maxpages }}
         run: |
-          rm -rf audit
+          mkdir -p audit
           node scripts/audit/visual.mjs "$URL" || echo "audit exited $?"
           ls -la audit audit/shots || true
           du -sh audit || true

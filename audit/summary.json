@@ -1,0 +1,341 @@
+{
+ "base": "https://ispgroupgc.com",
+ "pagesCrawled": 20,
+ "pages": [
+  {
+   "url": "https://ispgroupgc.com",
+   "title": "ISP Group LLC: sourcing, supply and delivery to your port",
+   "titleLen": 57,
+   "metaDescLen": 186,
+   "h1": [
+    "WE BUY IN OUR OWN NAME."
+   ],
+   "words": 851,
+   "rawWords": 627,
+   "forms": 1,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/services",
+   "title": "What we do | sourcing, verification, landed pricing",
+   "titleLen": 51,
+   "metaDescLen": 155,
+   "h1": [
+    "Six pieces of work between an idea and a delivered container"
+   ],
+   "words": 1970,
+   "rawWords": 1285,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/supply",
+   "title": "What we supply | materials, equipment, food",
+   "titleLen": 43,
+   "metaDescLen": 161,
+   "h1": [
+    "Materials, products and equipment"
+   ],
+   "words": 984,
+   "rawWords": 583,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/corridors",
+   "title": "Trade corridors we run | China, Türkiye, West Africa, SADC",
+   "titleLen": 58,
+   "metaDescLen": 123,
+   "h1": [
+    "We run lanes, not a catalogue"
+   ],
+   "words": 1035,
+   "rawWords": 639,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/guides",
+   "title": "Guides to importing | Incoterms, landed cost, certificates",
+   "titleLen": 58,
+   "metaDescLen": 123,
+   "h1": [
+    "The questions that come before the first order"
+   ],
+   "words": 1204,
+   "rawWords": 649,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/about",
+   "title": "About ISP Group | international sourcing and trading",
+   "titleLen": 52,
+   "metaDescLen": 119,
+   "h1": [
+    "A trading company, not an agency"
+   ],
+   "words": 1740,
+   "rawWords": 1120,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/contact",
+   "title": "Contact ISP Group | sourcing enquiries",
+   "titleLen": 38,
+   "metaDescLen": 154,
+   "h1": [
+    "Tell us what you need and where it has to arrive"
+   ],
+   "words": 1682,
+   "rawWords": 983,
+   "forms": 1,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/building-materials",
+   "title": "Building and finishing materials | import and supply",
+   "titleLen": 52,
+   "metaDescLen": 116,
+   "h1": [
+    "Building and finishing materials"
+   ],
+   "words": 1848,
+   "rawWords": 1210,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/industrial-equipment",
+   "title": "Industrial equipment and machinery | sourcing and supply",
+   "titleLen": 56,
+   "metaDescLen": 112,
+   "h1": [
+    "Industrial equipment and machinery"
+   ],
+   "words": 1794,
+   "rawWords": 1186,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/tools-hardware",
+   "title": "Tools, hardware and fasteners | import and supply",
+   "titleLen": 49,
+   "metaDescLen": 120,
+   "h1": [
+    "Tools, hardware and fasteners"
+   ],
+   "words": 1761,
+   "rawWords": 1136,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/metals-pipe",
+   "title": "Metals and pipe | sections, plate, seamless and welded",
+   "titleLen": 54,
+   "metaDescLen": 138,
+   "h1": [
+    "Metals and pipe"
+   ],
+   "words": 1815,
+   "rawWords": 1183,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/paper-packaging",
+   "title": "Paper, packaging and consumables | reels and corrugated",
+   "titleLen": 55,
+   "metaDescLen": 137,
+   "h1": [
+    "Paper, packaging and consumables"
+   ],
+   "words": 1758,
+   "rawWords": 1137,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/food-agricultural",
+   "title": "Food and agricultural goods | frozen protein and staples",
+   "titleLen": 56,
+   "metaDescLen": 186,
+   "h1": [
+    "Food and agricultural goods"
+   ],
+   "words": 1992,
+   "rawWords": 1380,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/experience",
+   "title": "Twenty years of supply work | ISP Group",
+   "titleLen": 39,
+   "metaDescLen": 149,
+   "h1": [
+    "Twenty years of moving goods that were difficult to move"
+   ],
+   "words": 2573,
+   "rawWords": 1530,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/verify-supplier",
+   "title": "How to verify a supplier is a factory | ISP Group",
+   "titleLen": 49,
+   "metaDescLen": 126,
+   "h1": [
+    "How to verify a supplier is actually a factory"
+   ],
+   "words": 1780,
+   "rawWords": 1107,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/incoterms",
+   "title": "Incoterms 2020 explained | who pays for what",
+   "titleLen": 44,
+   "metaDescLen": 152,
+   "h1": [
+    "Incoterms, and the two columns people confuse"
+   ],
+   "words": 2112,
+   "rawWords": 1423,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/landed-price",
+   "title": "What a landed price must include | ISP Group",
+   "titleLen": 44,
+   "metaDescLen": 130,
+   "h1": [
+    "What a landed price has to include"
+   ],
+   "words": 1762,
+   "rawWords": 1116,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/hs-code",
+   "title": "Who is liable for the HS code | classification and duty",
+   "titleLen": 55,
+   "metaDescLen": 135,
+   "h1": [
+    "The HS code is the importer's problem"
+   ],
+   "words": 1688,
+   "rawWords": 1030,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/privacy",
+   "title": "Privacy | ISP Group",
+   "titleLen": 19,
+   "metaDescLen": 148,
+   "h1": [
+    "This site sets no cookies"
+   ],
+   "words": 1449,
+   "rawWords": 1087,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  },
+  {
+   "url": "https://ispgroupgc.com/terms",
+   "title": "Terms of use | ISP Group",
+   "titleLen": 24,
+   "metaDescLen": 157,
+   "h1": [
+    "Nothing here is an offer"
+   ],
+   "words": 1417,
+   "rawWords": 1048,
+   "forms": 0,
+   "imgsNoAlt": 0,
+   "consoleIssues": 0
+  }
+ ],
+ "lighthouse": {
+  "mobile": {
+   "error": "ENOENT: no such file or directory, open 'audit/lh-mobile.json'"
+  },
+  "desktop": {
+   "scores": {
+    "performance": 99,
+    "accessibility": 98,
+    "best-practices": 100,
+    "seo": 100
+   },
+   "metrics": {
+    "fcp": {
+     "score": 0.95,
+     "value": "0.8 s"
+    },
+    "lcp": {
+     "score": 0.98,
+     "value": "0.8 s"
+    },
+    "tbt": {
+     "score": 1,
+     "value": "0 ms"
+    },
+    "cls": {
+     "score": 1,
+     "value": "0.002"
+    },
+    "si": {
+     "score": 0.98,
+     "value": "0.9 s"
+    },
+    "ttfb": {
+     "score": 1,
+     "value": "Root document took 100 ms"
+    },
+    "interactive": {
+     "score": 1,
+     "value": "0.8 s"
+    }
+   },
+   "weight": {
+    "score": 1,
+    "value": "Total size was 324 KiB"
+   },
+   "opportunities": [],
+   "failedAudits": [
+    {
+     "id": "heading-order",
+     "title": "Heading elements are not in a sequentially-descending order",
+     "items": 1
+    }
+   ]
+  }
+ }
+}

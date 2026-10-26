@@ -1,0 +1,61 @@
+name: probe-audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Site URL to audit"
+        required: true
+        default: "https://ispgroupgc.com"
+      maxpages:
+        description: "Max pages to crawl"
+        required: false
+        default: "20"
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/profid-production-build-2hkvfm
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq dnsutils whois openssl >/dev/null
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-audit --no-fund playwright@1.49.1 >/dev/null
+          npx playwright install --with-deps chromium
+
+      - name: Run audit
+        env:
+          URL: ${{ github.event.inputs.url }}
+          MAXP: ${{ github.event.inputs.maxpages }}
+        run: |
+          mkdir -p audit
+          node scripts/audit/probe.mjs "$URL" || echo "audit exited $?"
+          ls -la audit audit/shots || true
+          du -sh audit || true
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A audit
+          if git diff --cached --quiet; then echo "no changes to commit"; exit 0; fi
+          git commit -m "probe: ${{ github.event.inputs.url }}"
+          for i in 1 2 3 4; do
+            git pull --rebase --autostash origin claude/profid-production-build-2hkvfm && \
+            git push origin HEAD:claude/profid-production-build-2hkvfm && exit 0
+            sleep $((2**i))
+          done
+          exit 1
