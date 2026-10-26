@@ -51,7 +51,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A audit
-          git diff --cached --quiet && echo "no changes" && exit 0
+          if git diff --cached --quiet; then echo "no changes to commit"; exit 0; fi
           git commit -m "audit: ${{ github.event.inputs.url }}"
           for i in 1 2 3 4; do
             git pull --rebase origin claude/profid-production-build-2hkvfm && \
