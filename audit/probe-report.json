@@ -1,0 +1,397 @@
+{
+ "contactForm": {
+  "form": {
+   "opacity": "1",
+   "transform": "none",
+   "bg": "rgba(0, 0, 0, 0)",
+   "visibility": "visible",
+   "box": "1090x828 @175,83",
+   "classes": "",
+   "zIndex": "auto",
+   "position": "static",
+   "backdrop": "none"
+  },
+  "labels": [
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(138, 146, 156)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(138, 146, 156)",
+    "borderBottom": "0px none rgb(138, 146, 156)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "8.96px",
+    "box": "1090x15 @175,83",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(138, 146, 156)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(138, 146, 156)",
+    "borderBottom": "0px none rgb(138, 146, 156)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "8.96px",
+    "box": "1090x15 @175,172",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(138, 146, 156)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(138, 146, 156)",
+    "borderBottom": "0px none rgb(138, 146, 156)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "8.96px",
+    "box": "1090x15 @175,262",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(138, 146, 156)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(138, 146, 156)",
+    "borderBottom": "0px none rgb(138, 146, 156)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "8.96px",
+    "box": "1090x15 @175,351",
+    "zIndex": "auto",
+    "position": "static"
+   }
+  ],
+  "fields": [
+   {
+    "tag": "INPUT",
+    "id": "f-name",
+    "color": "rgb(242, 243, 245)",
+    "bg": "rgb(11, 14, 18)",
+    "border": "1px solid rgba(242, 243, 245, 0.15)",
+    "borderBottom": "1px solid rgba(242, 243, 245, 0.15)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15.2px",
+    "box": "1090x51 @175,105",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "INPUT",
+    "id": "f-mail",
+    "color": "rgb(242, 243, 245)",
+    "bg": "rgb(11, 14, 18)",
+    "border": "1px solid rgba(242, 243, 245, 0.15)",
+    "borderBottom": "1px solid rgba(242, 243, 245, 0.15)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15.2px",
+    "box": "1090x51 @175,194",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "INPUT",
+    "id": "f-co",
+    "color": "rgb(242, 243, 245)",
+    "bg": "rgb(11, 14, 18)",
+    "border": "1px solid rgba(242, 243, 245, 0.15)",
+    "borderBottom": "1px solid rgba(242, 243, 245, 0.15)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15.2px",
+    "box": "1090x51 @175,283",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "INPUT",
+    "id": "f-product",
+    "color": "rgb(242, 243, 245)",
+    "bg": "rgb(11, 14, 18)",
+    "border": "1px solid rgba(242, 243, 245, 0.15)",
+    "borderBottom": "1px solid rgba(242, 243, 245, 0.15)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15.2px",
+    "box": "1090x51 @175,372",
+    "zIndex": "auto",
+    "position": "static"
+   }
+  ],
+  "button": [
+   {
+    "tag": "BUTTON",
+    "id": "",
+    "color": "rgb(255, 255, 255)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(255, 255, 255)",
+    "borderBottom": "0px none rgb(255, 255, 255)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "10.24px",
+    "box": "1090x39 @175,873",
+    "zIndex": "auto",
+    "position": "relative"
+   }
+  ],
+  "behindFirstField": [
+   "IMG.",
+   "SPAN.pz",
+   "DIV.shot",
+   "INPUT.",
+   "FORM.",
+   "ASIDE.cform"
+  ],
+  "parentChain": [
+   "ASIDE.cform op=1 bg=rgb(20, 25, 34) pos=static",
+   "DIV.heroside op=1 bg=rgba(0, 0, 0, 0) pos=relative",
+   "DIV.wrap chero-g op=1 bg=rgba(0, 0, 0, 0) pos=static",
+   "HEADER.hero chero op=1 bg=rgba(0, 0, 0, 0) pos=relative"
+  ]
+ },
+ "homeForm": {
+  "form": {
+   "opacity": "1",
+   "transform": "none",
+   "bg": "rgba(8, 10, 13, 0.72)",
+   "visibility": "visible",
+   "box": "760x641 @64,186",
+   "classes": "form-card fade",
+   "zIndex": "auto",
+   "position": "static",
+   "backdrop": "blur(14px)"
+  },
+  "labels": [
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(133, 140, 148)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(133, 140, 148)",
+    "borderBottom": "0px none rgb(133, 140, 148)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "10px",
+    "box": "330x16 @105,227",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(133, 140, 148)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(133, 140, 148)",
+    "borderBottom": "0px none rgb(133, 140, 148)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "10px",
+    "box": "330x16 @453,227",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(133, 140, 148)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(133, 140, 148)",
+    "borderBottom": "0px none rgb(133, 140, 148)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "10px",
+    "box": "330x16 @105,309",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "LABEL",
+    "id": "",
+    "color": "rgb(133, 140, 148)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "0px none rgb(133, 140, 148)",
+    "borderBottom": "0px none rgb(133, 140, 148)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "10px",
+    "box": "330x16 @453,309",
+    "zIndex": "auto",
+    "position": "static"
+   }
+  ],
+  "fields": [
+   {
+    "tag": "INPUT",
+    "id": "q-name",
+    "color": "rgb(244, 243, 239)",
+    "bg": "rgba(244, 243, 239, 0.06)",
+    "border": "1px solid rgba(244, 243, 239, 0.18)",
+    "borderBottom": "1px solid rgba(244, 243, 239, 0.18)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15px",
+    "box": "330x45 @105,250",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "INPUT",
+    "id": "q-mail",
+    "color": "rgb(244, 243, 239)",
+    "bg": "rgba(244, 243, 239, 0.06)",
+    "border": "1px solid rgba(244, 243, 239, 0.18)",
+    "borderBottom": "1px solid rgba(244, 243, 239, 0.18)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15px",
+    "box": "330x45 @453,250",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "INPUT",
+    "id": "q-co",
+    "color": "rgb(244, 243, 239)",
+    "bg": "rgba(244, 243, 239, 0.06)",
+    "border": "1px solid rgba(244, 243, 239, 0.18)",
+    "borderBottom": "1px solid rgba(244, 243, 239, 0.18)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15px",
+    "box": "330x45 @105,332",
+    "zIndex": "auto",
+    "position": "static"
+   },
+   {
+    "tag": "INPUT",
+    "id": "q-country",
+    "color": "rgb(244, 243, 239)",
+    "bg": "rgba(244, 243, 239, 0.06)",
+    "border": "1px solid rgba(244, 243, 239, 0.18)",
+    "borderBottom": "1px solid rgba(244, 243, 239, 0.18)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "15px",
+    "box": "330x45 @453,332",
+    "zIndex": "auto",
+    "position": "static"
+   }
+  ],
+  "button": [
+   {
+    "tag": "BUTTON",
+    "id": "",
+    "color": "rgb(8, 10, 13)",
+    "bg": "rgb(244, 243, 239)",
+    "border": "0px none rgb(8, 10, 13)",
+    "borderBottom": "0px none rgb(8, 10, 13)",
+    "opacity": "1",
+    "visibility": "visible",
+    "fontSize": "14px",
+    "box": "287x52 @105,699",
+    "zIndex": "auto",
+    "position": "static"
+   }
+  ],
+  "behindFirstField": [
+   "INPUT.",
+   "DIV.",
+   "DIV.fgrid",
+   "FORM.form-card fade",
+   "DIV.content in",
+   "IMG.media"
+  ],
+  "parentChain": [
+   "DIV.content in op=1 bg=rgba(0, 0, 0, 0) pos=relative",
+   "DIV.stage op=1 bg=rgba(0, 0, 0, 0) pos=sticky",
+   "SECTION.scene op=1 bg=rgba(0, 0, 0, 0) pos=relative",
+   "MAIN. op=1 bg=rgba(0, 0, 0, 0) pos=static"
+  ]
+ },
+ "nojs-home": {
+  "hiddenByOpacity": 19,
+  "totalRevealEls": 26,
+  "sample": [
+   {
+    "cls": "content",
+    "op": "1",
+    "h": 900
+   },
+   {
+    "cls": "eyebrow fade",
+    "op": "0",
+    "h": 18
+   },
+   {
+    "cls": "lead fade",
+    "op": "0",
+    "h": 94
+   },
+   {
+    "cls": "fade",
+    "op": "0",
+    "h": 56
+   },
+   {
+    "cls": "content",
+    "op": "0",
+    "h": 900
+   },
+   {
+    "cls": "eyebrow fade",
+    "op": "0",
+    "h": 18
+   },
+   {
+    "cls": "lead fade",
+    "op": "0",
+    "h": 125
+   },
+   {
+    "cls": "content",
+    "op": "1",
+    "h": 900
+   }
+  ],
+  "docHeight": 16376
+ },
+ "nojs-contact": {
+  "hiddenByOpacity": 4,
+  "totalRevealEls": 4,
+  "sample": [
+   {
+    "cls": "",
+    "op": "0",
+    "h": 1701
+   },
+   {
+    "cls": "",
+    "op": "0",
+    "h": 624
+   },
+   {
+    "cls": "",
+    "op": "0",
+    "h": 449
+   },
+   {
+    "cls": "cta",
+    "op": "0",
+    "h": 393
+   }
+  ],
+  "docHeight": 5414
+ },
+ "reducedMotion": {
+  "docHeight": 7209
+ }
+}
