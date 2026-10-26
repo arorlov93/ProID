@@ -75,6 +75,40 @@ await pg.screenshot({ path: `${OUT}/probe/reduced-motion-home.jpg`, type: 'jpeg'
 R.reducedMotion = await pg.evaluate(() => ({ docHeight: document.documentElement.scrollHeight }));
 await rm.close();
 
+
+// мобильная версия страницы контактов
+{
+  const mctx = await browser.newContext({ ...(await import('playwright')).devices['iPhone 13'] });
+  const mp = await mctx.newPage();
+  await mp.goto(BASE + '/contact', { waitUntil: 'load', timeout: 45000 }).catch(()=>{});
+  try { await mp.waitForLoadState('networkidle', { timeout: 10000 }); } catch {}
+  await mp.evaluate(() => document.querySelector('#cf')?.scrollIntoView({ block: 'center' }));
+  await mp.waitForTimeout(2000);
+  await mp.screenshot({ path: `${OUT}/probe/contact-mobile-form.jpg`, type: 'jpeg', quality: 85 });
+  R.contactMobile = await mp.evaluate(() => {
+    const f = document.querySelector('#cf'); if (!f) return { missing: true };
+    const i = f.querySelector('input'); const r = i.getBoundingClientRect();
+    return { formBox: (() => { const b = f.getBoundingClientRect(); return `${Math.round(b.width)}x${Math.round(b.height)} @${Math.round(b.left)},${Math.round(b.top)}`; })(),
+      behindFirstField: document.elementsFromPoint(r.left + r.width/2, r.top + r.height/2).slice(0,6).map(e => `${e.tagName}.${(e.className||'').toString().slice(0,30)}`),
+      navLinksInHeader: document.querySelectorAll('header nav a, .nav a').length };
+  });
+  await mctx.close();
+}
+// есть ли навигация в шапке на мобильной главной
+{
+  const mctx = await browser.newContext({ ...(await import('playwright')).devices['iPhone 13'] });
+  const mp = await mctx.newPage();
+  await mp.goto(BASE, { waitUntil: 'load', timeout: 45000 }).catch(()=>{});
+  await mp.waitForTimeout(1800);
+  R.homeMobileNav = await mp.evaluate(() => {
+    const hdr = document.querySelector('header') || document.body;
+    const vis = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).opacity !== '0'; };
+    return { headerLinks: [...hdr.querySelectorAll('a,button')].filter(vis).map(e => (e.textContent||'').replace(/\s+/g,' ').trim() || `[${e.tagName}]`).slice(0,15),
+             hasHamburger: !!document.querySelector('[class*=burger],[class*=menu-toggle],[aria-label*=enu],[class*=navtoggle]') };
+  });
+  await mctx.close();
+}
+
 await browser.close();
 fs.writeFileSync(`${OUT}/probe-report.json`, JSON.stringify(R, null, 1));
 console.log(JSON.stringify(R, null, 1));
